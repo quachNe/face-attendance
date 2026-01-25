@@ -25,15 +25,17 @@ const Login = () => {
 
       {/* LOGIN CARD */}
       <div style={styles.card}>
-        <h2 style={styles.title}>Đăng Nhập</h2>
-        <p style={styles.subtitle}>{/* Face Attendance System */}</p>
+        <div style={styles.logoBox}>
+          <h2 style={styles.title}>NANO TECH</h2>
+          <p style={styles.subtitle}>Attendance System</p>
+        </div>
 
         <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputBox}>
             <span style={styles.icon}>👤</span>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Tên đăng nhập"
               required
               style={styles.input}
             />
@@ -43,7 +45,7 @@ const Login = () => {
             <span style={styles.icon}>🔒</span>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Mật khẩu"
               required
               style={styles.input}
             />
@@ -58,7 +60,7 @@ const Login = () => {
             onClick={() => navigate("/scan")}
             style={styles.backBtn}
           >
-            ← Quay lại trang Scan
+            ← Quay lại trang điểm danh
           </button>
         </form>
       </div>
@@ -71,7 +73,7 @@ const styles = {
     height: "100vh",
     width: "100%",
     position: "relative",
-    fontFamily: "Segoe UI, sans-serif",
+    fontFamily: "Segoe UI, system-ui, sans-serif",
   },
 
   background: {
@@ -85,36 +87,40 @@ const styles = {
     position: "absolute",
     inset: 0,
     background:
-      "linear-gradient(120deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
+      "linear-gradient(120deg, rgba(2,6,23,0.85), rgba(2,6,23,0.65))",
   },
 
   card: {
     position: "relative",
     zIndex: 2,
-    width: 360,
-    padding: "36px 32px",
+    width: 380,
+    padding: "40px 34px",
     margin: "auto",
     top: "50%",
     transform: "translateY(-50%)",
-    background: "rgba(255,255,255,0.88)",
-    borderRadius: 20,
-    boxShadow: "0 30px 70px rgba(0,0,0,0.4)",
-    backdropFilter: "blur(10px)",
+    background: "rgba(255,255,255,0.92)",
+    borderRadius: 22,
+    boxShadow: "0 40px 90px rgba(0,0,0,0.45)",
+    backdropFilter: "blur(12px)",
     textAlign: "center",
+  },
+
+  logoBox: {
+    marginBottom: 28,
   },
 
   title: {
     fontSize: 26,
-    fontWeight: 700,
-    color: "#111827",
-    marginBottom: 4,
+    fontWeight: 800,
+    letterSpacing: 2,
+    color: "#020617",
+    marginBottom: 6,
   },
 
   subtitle: {
     fontSize: 13,
-    color: "#6b7280",
-    marginBottom: 28,
-    letterSpacing: 0.5,
+    color: "#475569",
+    letterSpacing: 0.6,
   },
 
   form: {
@@ -126,10 +132,11 @@ const styles = {
   inputBox: {
     display: "flex",
     alignItems: "center",
-    background: "#fff",
+    background: "#ffffff",
     borderRadius: 14,
-    padding: "10px 14px",
+    padding: "12px 14px",
     border: "1px solid #e5e7eb",
+    transition: "border 0.2s ease",
   },
 
   icon: {
@@ -143,30 +150,32 @@ const styles = {
     outline: "none",
     fontSize: 14,
     width: "100%",
+    color: "#020617",
   },
 
   loginBtn: {
-    marginTop: 8,
-    padding: "12px",
+    marginTop: 10,
+    padding: "13px",
     borderRadius: 30,
     border: "none",
     background:
-      "linear-gradient(135deg, #2563eb, #06b6d4)",
-    color: "#fff",
+      "linear-gradient(135deg, #0ca1a1 0%, #22d3ee 100%)",
+    color: "#ffffff",
     fontWeight: 600,
     fontSize: 15,
     cursor: "pointer",
-    boxShadow: "0 10px 25px rgba(37,99,235,0.4)",
+    boxShadow: "0 14px 30px rgba(12,161,161,0.45)",
+    transition: "transform 0.2s ease",
   },
 
   backBtn: {
-    marginTop: 4,
+    marginTop: 6,
     background: "transparent",
     border: "none",
-    color: "#374151",
+    color: "#475569",
     fontSize: 14,
     cursor: "pointer",
-    opacity: 0.8,
+    opacity: 0.85,
   },
 };
 

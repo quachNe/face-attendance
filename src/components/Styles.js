@@ -1,0 +1,36 @@
+import backgroundImg from "../assets/background.jpg";
+
+export const DEFAULT_FACE = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+export const Styles = {
+  container: { flex: 1, minHeight: "100vh", backgroundImage: `url(${backgroundImg})`, backgroundSize: "cover" },
+  overlay: { minHeight: "100vh", padding: 32, background: "rgba(1,1,5,0.85)", color: "#e5e7eb" },
+  header: { marginBottom: 24 },
+  title: { fontSize: 24, fontWeight: 700, marginBottom: 16 },
+  actions: { display: "flex", gap: 12 },
+  rightActions: { marginLeft: "auto", display: "flex", gap: 10 },
+  search: { width: 260, height: 42, padding: "0 12px", borderRadius: 8, background: "#020617", border: "1px solid #334155", color: "#fff" },
+  btnPrimary: { background: "#0ca1a1", padding: "10px 16px", borderRadius: 8, border: "none", color: "#fff", cursor: "pointer" },
+  btnExcel: { background: "#16a34a", padding: "10px 14px", borderRadius: 8, color: "#fff", border: "none", cursor: "pointer" },
+  btnPdf: { background: "#dc2626", padding: "10px 14px", borderRadius: 8, color: "#fff", border: "none", cursor: "pointer" },
+  tableWrapper: { background: "#020617", borderRadius: 12, border: "2px solid #1e293b" },
+  tableScroll: { maxHeight: "65vh", overflowY: "auto" },
+  table: { width: "100%", borderCollapse: "collapse" },
+  th: { padding: 12, color: "#38f2f2", position: "sticky", top: 0, background: "#020617", zIndex: 10 },
+  td: { padding: 12, textAlign: "center", borderBottom: "1px solid #1e293b" },
+  faceImg: { width: 42, height: 42, borderRadius: "50%", objectFit: "cover" },
+  actionIcons: { display: "flex", justifyContent: "center", gap: 12 },
+  iconBoxEdit: { width: 32, height: 32, borderRadius: "50%", border: "1px solid #0ca1a1", display: "flex", alignItems: "center", justifyContent: "center", color: "#38f2f2", cursor: "pointer" },
+  iconBoxDelete: { width: 32, height: 32, borderRadius: "50%", border: "1px solid #ef4444", display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444", cursor: "pointer" },
+  modalOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 100 },
+  modal: { width: 520, background: "#020617", padding: 24, borderRadius: 12 },
+  modalTitle: { textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 20 },
+  faceBox: { alignItems: "center", display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 },
+  facePreview: { width: 96, height: 96, borderRadius: "50%", objectFit: "cover" },
+  uploadBtn: { color: "#38f2f2", cursor: "pointer", fontSize: 14 },
+  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
+  formGroup: { display: "flex", flexDirection: "column", gap: 6 },
+  label: { fontSize: 13, color: "#94a3b8" },
+  formInput: { height: 42, padding: "0 12px", borderRadius: 8, background: "#020617", border: "1px solid #334155", color: "#e5e7eb" },
+  modalActions: { display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24 },
+};

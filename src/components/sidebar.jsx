@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiLogOut } from "react-icons/fi";
+import {
+  Users2,
+  ClipboardCheck,
+  BarChart3,
+  LogOut,
+} from "lucide-react";
 
 const Sidebar = ({ setActivePage }) => {
   const navigate = useNavigate();
@@ -17,31 +22,35 @@ const Sidebar = ({ setActivePage }) => {
     setActivePage(key);
   };
 
-  const renderMenu = (key, label, icon) => {
+  const renderMenu = (key, label, Icon) => {
     const isActive = activeMenu === key;
     const isHover = hoverMenu === key;
 
     return (
       <div
+        key={key}
         onClick={() => handleClick(key)}
         onMouseEnter={() => setHoverMenu(key)}
         onMouseLeave={() => setHoverMenu(null)}
         style={{
           ...styles.menuItem,
-          ...(isActive || isHover ? styles.menuItemActive : {}),
+          ...(isActive && styles.menuItemActive),
+          ...(isHover && !isActive && styles.menuItemHover),
         }}
       >
-        {/* Thanh sáng bên trái */}
-        {(isActive || isHover) && <div style={styles.activeBar} />}
+        {isActive && <div style={styles.activeBar} />}
 
-        {/* ICON */}
-        <span style={styles.icon}>{icon}</span>
+        <Icon
+          size={20}
+          style={{
+            color: isActive ? "#ffffff" : "#94a3b8",
+          }}
+        />
 
-        {/* TEXT */}
         <span
           style={{
             ...styles.menuText,
-            ...(isActive ? styles.activeText : {}),
+            ...(isActive && styles.activeText),
           }}
         >
           {label}
@@ -51,103 +60,137 @@ const Sidebar = ({ setActivePage }) => {
   };
 
   return (
-    <div style={styles.sidebar}>
-      <h2 style={styles.logo}>ATTENDANCE</h2>
+    <aside style={styles.sidebar}>
+      {/* LOGO */}
+      <div style={styles.logoContainer}>
+        <h2 style={styles.logo}>NANO TECH</h2>
+        <span style={styles.logoSub}>Attendance System</span>
+      </div>
 
-      {renderMenu("employee", "Nhân Viên", "👨‍💼")}
-      {renderMenu("history", "Điểm Danh", "📋")}
-      {renderMenu("stats", "Thống Kê", "📊")}
-      {renderMenu("settings", "Cài Đặt", "⚙️")}
+      {/* MENU */}
+      <div style={styles.menuList}>
+        {renderMenu("employee", "Nhân viên", Users2)}
+        {renderMenu("history", "Điểm danh", ClipboardCheck)}
+        {renderMenu("stats", "Thống kê", BarChart3)}
+      </div>
 
       <div style={{ flex: 1 }} />
 
-      <button style={styles.logoutBtn} onClick={handleLogout}>
-        <FiLogOut size={16} style={{ transform: "rotate(180deg)" }} />
+      {/* LOGOUT */}
+      <button
+        style={styles.logoutBtn}
+        onClick={handleLogout}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background =
+            "linear-gradient(135deg, #7f1d1d, #991b1b)";
+          e.currentTarget.style.boxShadow =
+            "0 0 14px rgba(239,68,68,0.35)";
+          e.currentTarget.style.color = "#fff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(239,68,68,0.08)";
+          e.currentTarget.style.boxShadow = "none";
+          e.currentTarget.style.color = "#fca5a5";
+        }}
+      >
+        <LogOut size={18} />
         <span>Đăng Xuất</span>
       </button>
-
-
-
-    </div>
+    </aside>
   );
 };
 
 const styles = {
   sidebar: {
-    width: 220,
-    background: "#0b1220",
-    color: "#c7d2fe",
-    padding: 24,
+    width: 260,
+    background: "linear-gradient(180deg, #020617 0%, #020617 100%)",
+    padding: "28px 16px",
     display: "flex",
     flexDirection: "column",
+    borderRight: "1px solid #1e293b",
+  },
+
+  logoContainer: {
+    marginBottom: 36,
+    paddingLeft: 6,
   },
 
   logo: {
-    marginBottom: 30,
-    color: "#38bdf8",
-    letterSpacing: 1,
+    margin: 0,
     fontSize: 20,
+    fontWeight: 800,
+    letterSpacing: 2,
+    color: "#ffffff",
   },
 
-  /* MENU */
+  logoSub: {
+    fontSize: 12,
+    color: "#64748b",
+    letterSpacing: 1,
+  },
+
+  menuList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  },
+
   menuItem: {
     position: "relative",
-    padding: "12px 10px",
-    cursor: "pointer",
-    borderRadius: 8,
+    padding: "12px 16px",
+    borderRadius: 14,
     display: "flex",
     alignItems: "center",
-    marginBottom: 6,
-    gap: 10,
+    gap: 14,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
   },
 
   menuItemActive: {
-    background: "#0ca1a1",
+    background: "linear-gradient(90deg, #0ca1a1, #089191)",
+    boxShadow: "0 6px 18px rgba(12,161,161,0.25)",
   },
 
-  icon: {
-    width: 20,
-    textAlign: "center",
-    fontSize: 16,
+  menuItemHover: {
+    background: "rgba(30,41,59,0.6)",
   },
 
   menuText: {
-    opacity: 0.85,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
+    fontSize: 15,
+    fontWeight: 500,
+    color: "#94a3b8",
   },
 
   activeText: {
-    color: "#f7f8f8",
-    opacity: 1,
+    color: "#ffffff",
     fontWeight: 600,
   },
 
   activeBar: {
     position: "absolute",
-    left: -8,
-    top: 8,
-    bottom: 8,
+    left: -10,
     width: 4,
-    borderRadius: 4,
+    height: 22,
     background: "#22d3ee",
+    borderRadius: "0 4px 4px 0",
+    boxShadow: "0 0 12px #22d3ee",
   },
 
   logoutBtn: {
-  background: "#ef4444",
-  border: "none",
-  borderRadius: 10,
-  padding: "10px",
-  color: "#fff",
-  cursor: "pointer",
-  fontWeight: 600,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 8,
-},
-
+    background: "rgba(239,68,68,0.08)",
+    border: "1px solid rgba(239,68,68,0.35)",
+    borderRadius: 16,
+    padding: "14px",
+    color: "#fca5a5",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    transition: "all 0.25s ease",
+    backdropFilter: "blur(6px)",
+  },
 };
 
 export default Sidebar;
