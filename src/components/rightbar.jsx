@@ -1,7 +1,8 @@
 import React from "react";
 import EmployeeManagement from "./EmployeeManagement";
 import AttendanceHistory from "./AttendanceHistory";
-import backgroundImg from "../assets/background.jpg";
+import ShiftManagement from "./ShiftManagement";
+import backgroundImg from "/background.jpg";
 
 const Rightbar = ({ activePage }) => {
   return (
@@ -9,9 +10,11 @@ const Rightbar = ({ activePage }) => {
       <div style={styles.overlay} className="custom-scroll">
         {activePage === "employee" ? (
           <EmployeeManagement />
-        ) : (
+        ) : activePage === "history" ? (
           <AttendanceHistory />
-        )}
+        ) : activePage === "shift" ? (
+          <ShiftManagement />
+        ) : (<div>Chưa có trang này</div>)}
       </div>
 
       <style>

@@ -8,7 +8,7 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-          <Route path="/scan" element={<Scan />} />
+          <Route path="/" element={<Scan />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
       </Routes>

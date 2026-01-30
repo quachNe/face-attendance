@@ -1,27 +1,24 @@
 import React, { useState } from "react";
-import { FiEdit, FiTrash2, FiFileText, FiUpload } from "react-icons/fi";
-import { AiOutlineFileExcel } from "react-icons/ai";
 import { Styles, DEFAULT_FACE } from "./Styles";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  FileText,
+  Upload,
+  Users2,
+  FileSpreadsheet,
+  Save,
+  X
+} from "lucide-react";
 
 const EmployeeManagement = () => {
   const [users, setUsers] = useState([
     { id: 1, name: "Nguyễn Văn A", dob: "1999-01-01", email: "a@gmail.com", phone: "0123456789", role: "admin", shift_id: 1, face_image: "https://i.pravatar.cc/60?img=3" },
     { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
-    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
   ]);
-
+  const [search, setSearch] = useState("");
+  const [filterRole, setFilterRole] = useState("all");
   const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -49,16 +46,46 @@ const EmployeeManagement = () => {
     setShowModal(false);
   };
 
+  const filteredUsers = users.filter((u) => {
+    const keyword = search.toLowerCase().trim();
+
+    const matchSearch =
+      !keyword ||
+      u.name?.toLowerCase().includes(keyword) ||
+      u.email?.toLowerCase().includes(keyword) ||
+      u.phone?.toLowerCase().includes(keyword);
+
+    const matchRole =
+      filterRole === "all" || u.role === filterRole;
+
+    return matchSearch && matchRole;
+  });
+
+
   return (
     <>
       <div style={Styles.header}>
-        <h1 style={Styles.title}>QUẢN LÝ NHÂN VIÊN</h1>
+        <h1 style={Styles.title}><Users2 /> QUẢN LÝ NHÂN VIÊN</h1>
         <div style={Styles.actions}>
-          <input placeholder="Tìm kiếm nhân viên..." style={Styles.search} />
+          <input
+            placeholder="Tìm theo tên, ngày sinh, email, SĐT"
+            style={Styles.search}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            style={Styles.filterSelect}
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+          >
+            <option value="all">Tất Cả</option>
+            <option value="admin">Quản Trị Viên</option>
+            <option value="user">Nhân Viên</option>
+          </select>
           <div style={Styles.rightActions}>
-            <button style={Styles.btnPrimary} onClick={openAddModal}>Thêm nhân viên</button>
-            <button style={Styles.btnExcel}><AiOutlineFileExcel /> Xuất Excel</button>
-            <button style={Styles.btnPdf}><FiFileText /> Xuất PDF</button>
+            <button style={Styles.btnPrimary} onClick={openAddModal}><Plus size={18}/>Thêm</button>
+            <button style={Styles.btnExcel}><FileSpreadsheet size={18}/> Xuất Excel</button>
+            <button style={Styles.btnPdf}><FileText size={18}/> Xuất PDF</button>
           </div>
         </div>
       </div>
@@ -74,7 +101,7 @@ const EmployeeManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((u, i) => (
+              {filteredUsers.map((u, i) => (
                 <tr key={u.id} onClick={() => setSelectedId(u.id)} style={{ background: selectedId === u.id ? "#0ca1a120" : "transparent" }}>
                   <td style={Styles.td}>{i + 1}</td>
                   <td style={Styles.td}>{u.name}</td>
@@ -86,8 +113,8 @@ const EmployeeManagement = () => {
                   <td style={Styles.td}><img src={u.face_image || DEFAULT_FACE} alt="" style={Styles.faceImg} /></td>
                   <td style={Styles.td}>
                     <div style={Styles.actionIcons}>
-                      <div style={Styles.iconBoxEdit} onClick={(e) => { e.stopPropagation(); openEditModal(u); }}><FiEdit /></div>
-                      <div style={Styles.iconBoxDelete} onClick={(e) => { e.stopPropagation(); setUsers(users.filter((item) => item.id !== u.id)); }}><FiTrash2 /></div>
+                      <div style={Styles.iconBoxEdit} onClick={(e) => { e.stopPropagation(); openEditModal(u); }}><Pencil size={15}/></div>
+                      <div style={Styles.iconBoxDelete} onClick={(e) => { e.stopPropagation(); setUsers(users.filter((item) => item.id !== u.id)); }}><Trash2 size={15}/></div>
                     </div>
                   </td>
                 </tr>
@@ -104,7 +131,7 @@ const EmployeeManagement = () => {
             <div style={Styles.faceBox}>
               <img src={form.face_preview || DEFAULT_FACE} alt="" style={Styles.facePreview} />
               <label style={Styles.uploadBtn}>
-                <FiUpload /> Upload ảnh
+                <Upload /> Upload ảnh
                 <input hidden type="file" onChange={(e) => setForm({ ...form, face_preview: URL.createObjectURL(e.target.files[0]) })} />
               </label>
             </div>
@@ -128,8 +155,8 @@ const EmployeeManagement = () => {
               </div>
             </div>
             <div style={Styles.modalActions}>
-              <button style={Styles.btnPdf} onClick={() => setShowModal(false)}>Hủy</button>
-              <button style={Styles.btnPrimary} onClick={handleSave}>Lưu</button>
+              <button style={Styles.btnPdf} onClick={() => setShowModal(false)}><X />Hủy</button>
+              <button style={Styles.btnPrimary} onClick={handleSave}><Save />Lưu</button>
             </div>
           </div>
         </div>

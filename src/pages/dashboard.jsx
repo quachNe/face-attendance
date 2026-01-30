@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import Rightbar from "../components/Rightbar";
-import backgroundImg from "../assets/background.jpg";
+import backgroundImg from "/background.jpg";
 
 const Dashboard = () => {
   const [activePage, setActivePage] = useState("employee");

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { useNavigate } from "react-router-dom";
-import backgroundImg from "../assets/background.jpg";
+import backgroundImg from "/background.jpg";
 
 const Scan = () => {
   const webcamRef = useRef(null);

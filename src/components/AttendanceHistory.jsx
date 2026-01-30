@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
 import { Styles, DEFAULT_FACE } from "./Styles";
-
+import { Users2, ClipboardCheck, BarChart3, Clock } from "lucide-react";
 const AttendanceHistory = () => {
   const [records] = useState([
     { id: 1, name: "Nguyễn Văn A", avatar: "https://i.pravatar.cc/60?img=3", checkIn: "08:01", note: "Đúng giờ" },
@@ -13,7 +13,7 @@ const AttendanceHistory = () => {
   return (
     <>
       <div style={Styles.header}>
-        <h1 style={Styles.title}>ĐIỂM DANH NHÂN VIÊN</h1>
+        <h1 style={Styles.title}><ClipboardCheck/> ĐIỂM DANH NHÂN VIÊN</h1>
         <div style={Styles.actions}>
           <input placeholder="Tìm kiếm nhân viên..." style={Styles.search} />
           <input type="date" style={Styles.formInput} />
