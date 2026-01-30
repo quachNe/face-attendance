@@ -1,13 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "../assets/background.jpg";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate("/dashboard"); // demo
+  // ✅ STATE
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ✅ HANDLE LOGIN
+  const handleLogin = async (e) => {
+    e.preventDefault(); // ⭐ rất quan trọng
+
+    if (!userName || !password) {
+      setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    const result = await login(userName, password);
+
+    if (result.success) {
+      setError("");
+      navigate("/dashboard");
+    } else {
+      setError(result.message || "Đăng nhập thất bại");
+    }
   };
 
   return (
@@ -36,20 +58,38 @@ const Login = () => {
             <input
               type="text"
               placeholder="Tên đăng nhập"
-              required
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
               style={styles.input}
             />
           </div>
 
           <div style={styles.inputBox}>
             <span style={styles.icon}>🔒</span>
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Mật khẩu"
-              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
             />
+
+            {/* EYE ICON */}
+            <span
+              style={styles.eye}
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
           </div>
+
+          {/* ERROR */}
+          {error && (
+            <p style={{ color: "red", fontSize: 13, marginTop: 6 }}>
+              {error}
+            </p>
+          )}
 
           <button type="submit" style={styles.loginBtn}>
             Đăng Nhập
@@ -136,7 +176,6 @@ const styles = {
     borderRadius: 14,
     padding: "12px 14px",
     border: "1px solid #e5e7eb",
-    transition: "border 0.2s ease",
   },
 
   icon: {
@@ -165,7 +204,6 @@ const styles = {
     fontSize: 15,
     cursor: "pointer",
     boxShadow: "0 14px 30px rgba(12,161,161,0.45)",
-    transition: "transform 0.2s ease",
   },
 
   backBtn: {
@@ -176,6 +214,13 @@ const styles = {
     fontSize: 14,
     cursor: "pointer",
     opacity: 0.85,
+  },
+  eye: {
+    marginLeft: 8,
+    cursor: "pointer",
+    fontSize: 16,
+    opacity: 0.6,
+    userSelect: "none",
   },
 };
 

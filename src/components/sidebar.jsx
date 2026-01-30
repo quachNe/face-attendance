@@ -1,21 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Users2,
-  ClipboardCheck,
-  BarChart3,
-  LogOut,
-} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { Users2, ClipboardCheck, BarChart3 } from "lucide-react";
 
 const Sidebar = ({ setActivePage }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [activeMenu, setActiveMenu] = useState("employee");
   const [hoverMenu, setHoverMenu] = useState(null);
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAuth");
-    navigate("/login");
-  };
 
   const handleClick = (key) => {
     setActiveMenu(key);
@@ -40,12 +33,7 @@ const Sidebar = ({ setActivePage }) => {
       >
         {isActive && <div style={styles.activeBar} />}
 
-        <Icon
-          size={20}
-          style={{
-            color: isActive ? "#ffffff" : "#94a3b8",
-          }}
-        />
+        <Icon size={20} color={isActive ? "#fff" : "#94a3b8"} />
 
         <span
           style={{
@@ -61,10 +49,15 @@ const Sidebar = ({ setActivePage }) => {
 
   return (
     <aside style={styles.sidebar}>
-      {/* LOGO */}
-      <div style={styles.logoContainer}>
-        <h2 style={styles.logo}>NANO TECH</h2>
-        <span style={styles.logoSub}>Attendance System</span>
+      {/* HEADER – CAO BẰNG NAVBAR */}
+      <div style={styles.header}>
+        <div style={styles.logoBox}>
+          <div style={styles.logoIcon}>N</div>
+          <div>
+            <div style={styles.logo}>NANO TECH</div>
+            <div style={styles.logoSub}>Attendance System</div>
+          </div>
+        </div>
       </div>
 
       {/* MENU */}
@@ -75,88 +68,94 @@ const Sidebar = ({ setActivePage }) => {
       </div>
 
       <div style={{ flex: 1 }} />
-
-      {/* LOGOUT */}
-      <button
-        style={styles.logoutBtn}
-        onClick={handleLogout}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background =
-            "linear-gradient(135deg, #7f1d1d, #991b1b)";
-          e.currentTarget.style.boxShadow =
-            "0 0 14px rgba(239,68,68,0.35)";
-          e.currentTarget.style.color = "#fff";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(239,68,68,0.08)";
-          e.currentTarget.style.boxShadow = "none";
-          e.currentTarget.style.color = "#fca5a5";
-        }}
-      >
-        <LogOut size={18} />
-        <span>Đăng Xuất</span>
-      </button>
     </aside>
   );
 };
 
 const styles = {
   sidebar: {
-    width: 260,
+    width: 280,
+    height: "100vh",
     background: "linear-gradient(180deg, #020617 0%, #020617 100%)",
-    padding: "28px 16px",
+    backdropFilter: "blur(14px)",
+    borderRight: "1px solid rgba(12,161,161,0.25)",
     display: "flex",
     flexDirection: "column",
-    borderRight: "1px solid #1e293b",
   },
 
-  logoContainer: {
-    marginBottom: 36,
-    paddingLeft: 6,
+  /* HEADER */
+  header: {
+    height: 60, // BẰNG NAVBAR
+    display: "flex",
+    alignItems: "center",
+    padding: "0 20px",
+    borderBottom: "1px solid rgba(12,161,161,0.25)",
+  },
+
+  logoBox: {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+  },
+
+  logoIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    background: "linear-gradient(135deg, #0ca1a1, #22d3ee)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 22,
+    fontWeight: 900,
+    color: "#020617",
+    boxShadow: "0 0 22px rgba(34,211,238,0.55)",
   },
 
   logo: {
-    margin: 0,
-    fontSize: 20,
-    fontWeight: 800,
+    fontSize: 18,
+    fontWeight: 900,
     letterSpacing: 2,
     color: "#ffffff",
+    lineHeight: 1.1,
   },
 
   logoSub: {
     fontSize: 12,
-    color: "#64748b",
-    letterSpacing: 1,
+    color: "#67e8f9",
+    letterSpacing: 1.1,
   },
 
+  /* MENU */
   menuList: {
+    padding: "20px 12px",
     display: "flex",
     flexDirection: "column",
-    gap: 6,
+    gap: 8,
   },
 
   menuItem: {
     position: "relative",
-    padding: "12px 16px",
-    borderRadius: 14,
+    padding: "14px 18px",
+    borderRadius: 16,
     display: "flex",
     alignItems: "center",
-    gap: 14,
+    gap: 16,
     cursor: "pointer",
-    transition: "all 0.2s ease",
+    transition: "all 0.25s ease",
   },
 
   menuItemActive: {
     background: "linear-gradient(90deg, #0ca1a1, #089191)",
-    boxShadow: "0 6px 18px rgba(12,161,161,0.25)",
+    boxShadow: "0 10px 26px rgba(12,161,161,0.4)",
   },
 
   menuItemHover: {
-    background: "rgba(30,41,59,0.6)",
+    background: "rgba(30,41,59,0.65)",
   },
 
   menuText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 500,
     color: "#94a3b8",
   },
@@ -168,28 +167,12 @@ const styles = {
 
   activeBar: {
     position: "absolute",
-    left: -10,
+    left: -8,
     width: 4,
-    height: 22,
+    height: 26,
     background: "#22d3ee",
     borderRadius: "0 4px 4px 0",
-    boxShadow: "0 0 12px #22d3ee",
-  },
-
-  logoutBtn: {
-    background: "rgba(239,68,68,0.08)",
-    border: "1px solid rgba(239,68,68,0.35)",
-    borderRadius: 16,
-    padding: "14px",
-    color: "#fca5a5",
-    fontWeight: 600,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    transition: "all 0.25s ease",
-    backdropFilter: "blur(6px)",
+    boxShadow: "0 0 14px #22d3ee",
   },
 };
 

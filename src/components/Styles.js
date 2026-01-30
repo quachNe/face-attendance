@@ -3,8 +3,8 @@ import backgroundImg from "../assets/background.jpg";
 export const DEFAULT_FACE = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
 export const Styles = {
-  container: { flex: 1, minHeight: "100vh", backgroundImage: `url(${backgroundImg})`, backgroundSize: "cover" },
-  overlay: { minHeight: "100vh", padding: 32, background: "rgba(1,1,5,0.85)", color: "#e5e7eb" },
+  container: { flex: 1,  minHeight: "calc(100vh - 60px)", backgroundImage: `url(${backgroundImg})`, backgroundSize: "cover" },
+  overlay: {  minHeight: "calc(100vh - 60px)", padding: 32, background: "rgba(1,1,5,0.85)", color: "#e5e7eb" },
   header: { marginBottom: 24 },
   title: { fontSize: 24, fontWeight: 700, marginBottom: 16 },
   actions: { display: "flex", gap: 12 },
@@ -14,7 +14,7 @@ export const Styles = {
   btnExcel: { background: "#16a34a", padding: "10px 14px", borderRadius: 8, color: "#fff", border: "none", cursor: "pointer" },
   btnPdf: { background: "#dc2626", padding: "10px 14px", borderRadius: 8, color: "#fff", border: "none", cursor: "pointer" },
   tableWrapper: { background: "#020617", borderRadius: 12, border: "2px solid #1e293b" },
-  tableScroll: { maxHeight: "65vh", overflowY: "auto" },
+  tableScroll: { maxHeight: "77vh", overflowY: "auto" },
   table: { width: "100%", borderCollapse: "collapse" },
   th: { padding: 12, color: "#38f2f2", position: "sticky", top: 0, background: "#020617", zIndex: 10 },
   td: { padding: 12, textAlign: "center", borderBottom: "1px solid #1e293b" },

@@ -7,6 +7,19 @@ const EmployeeManagement = () => {
   const [users, setUsers] = useState([
     { id: 1, name: "Nguyễn Văn A", dob: "1999-01-01", email: "a@gmail.com", phone: "0123456789", role: "admin", shift_id: 1, face_image: "https://i.pravatar.cc/60?img=3" },
     { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
+    { id: 2, name: "Trần Thị B", dob: "2000-05-12", email: "", phone: "", role: "user", shift_id: "", face_image: null },
   ]);
 
   const [selectedId, setSelectedId] = useState(null);
