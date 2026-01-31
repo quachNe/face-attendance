@@ -4,22 +4,10 @@
   margin: 0;
   padding: 0;
 }
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
 
 
 /* ===== RESET DATE INPUT ===== */
-.date-input {
+/* .date-input {
   width: 260px;
   height: 42px;
   padding: 0 12px;
@@ -27,25 +15,21 @@
   background-color: #020617;
   border: 1px solid #334155;
   color: #ffffff;
-
-  /* CỰC KỲ QUAN TRỌNG */
   appearance: none;
   -webkit-appearance: none;
-}
+} */
 
 /* ===== ICON LỊCH ===== */
-.date-input::-webkit-calendar-picker-indicator {
-  background-color: #bdaff4;   /* nền trắng */
+/* .date-input::-webkit-calendar-picker-indicator {
+  background-color: #bdaff4;
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
-
-  /* đổi icon từ trắng → đen */
   filter: invert(0);
-}
+} */
 
 /* hover cho xịn */
-.date-input::-webkit-calendar-picker-indicator:hover {
+/* .date-input::-webkit-calendar-picker-indicator:hover {
   background-color: #e5e7eb;
 }
 
@@ -70,4 +54,5 @@
 
 .read-the-docs {
   color: #888;
-}
+} */
+

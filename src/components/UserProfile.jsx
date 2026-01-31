@@ -1,112 +1,104 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, Save, X} from "lucide-react";
-import { useAuth } from "../context/AuthContext.jsx";
-const ChangePassword = ({ onClose }) => {
-  const { user } = useAuth();
-  const [form, setForm] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+import React, { useEffect, useState } from "react";
+import { Save, X, User, Mail, Phone, Briefcase, Calendar, } from "lucide-react";
 
-  const [show, setShow] = useState({
-    old: false,
-    new: false,
-    confirm: false,
-  });
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/login";
-  };
-  const handleChange = (key, value) =>
-    setForm({ ...form, [key]: value });
-
-  const handleSubmit = async () => {
-    if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
-      alert("Vui lòng nhập đầy đủ thông tin");
-      return;
-    }
-
-    if (form.newPassword.length < 6) {
-      alert("Mật khẩu mới phải có ít nhất 6 ký tự");
-      return;
-    }
-
-    if (form.oldPassword === form.newPassword) {
-      alert("Mật khẩu mới phải khác mật khẩu hiện tại");
-      return;
-    }
-
-    if (form.newPassword !== form.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp");
-      return;
-    }
-
+const UserProfile = ({ onClose, user }) => {
+  const fetchUser = async () => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/employees/${user.id}`,
         {
-          method: "PUT",
+          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({
-            oldPassword: form.oldPassword,
-            password: form.newPassword,
-          }),
         }
       );
 
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
 
-      if (!response.ok || !data.success) {
-        alert(data.message || "Đổi mật khẩu thất bại!");
-        return;
-      }
-
-      alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
-      handleLogout();
+      setForm({
+        name: data.name || "",
+        dob: data.dob || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        address: data.address || "",
+        role: data.role?.toUpperCase() || "",
+      });
     } catch (error) {
       console.error(error);
-      alert("Lỗi kết nối server");
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    dob: user?.dob || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    role: user.role?.toUpperCase() || "",
+  });
+
+  const handleChange = (key, value) =>
+    setForm({ ...form, [key]: value });
+
+  const handleSubmit = async() => {
+    if (!form.name || !form.email || !form.phone || !form.dob) {
+      alert("Không được để trống thông tin");
+      return;
+    }
+    try {
+      const response = await fetch(`http://localhost:5000/api/employees/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(form),
+      });
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      alert("Cập nhật thông tin thành công");
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div style={styles.overlay}>
       <div style={styles.modal}>
-        {/* Title center */}
+        {/* Title */}
         <div style={styles.title}>
-          ĐỔI MẬT KHẨU
+          THÔNG TIN NGƯỜI DÙNG
         </div>
 
         {/* Body */}
         <div style={styles.body}>
           {[
-            ["oldPassword", "Mật khẩu hiện tại", "old"],
-            ["newPassword", "Mật khẩu mới", "new"],
-            ["confirmPassword", "Xác nhận mật khẩu mới", "confirm"],
-          ].map(([key, label, type]) => (
+            ["name", "Họ và tên", <User size={18} />],
+            ["dob", "Ngày sinh", <Calendar size={18} />],
+            ["email", "Email", <Mail size={18} />],
+            ["phone", "Số điện thoại", <Phone size={18} />],
+            ["role", "Chức vụ", <Briefcase size={18} />],
+          ].map(([key, label, icon]) => (
             <div style={styles.field} key={key}>
               <label style={styles.label}>{label}</label>
               <div style={styles.inputBox}>
+                <span style={styles.icon}>{icon}</span>
+
                 <input
-                  type={show[type] ? "text" : "password"}
+                  type={key === "dob" ? "date" : "text"}
+                  disabled={key === "role"}   
                   value={form[key]}
                   onChange={(e) => handleChange(key, e.target.value)}
-                  style={styles.input}
+                  style={{
+                    ...styles.input,
+                    color: "#e5e7eb",
+                  }}
                 />
-                <span
-                  style={styles.eye}
-                  onClick={() =>
-                    setShow({ ...show, [type]: !show[type] })
-                  }
-                >
-                  {show[type] ? <EyeOff size={18} /> : <Eye size={18} />}
-                </span>
               </div>
             </div>
           ))}
@@ -127,10 +119,7 @@ const ChangePassword = ({ onClose }) => {
   );
 };
 
-export default ChangePassword;
-
-/* ================= STYLES ================= */
-
+export default UserProfile;
 const styles = {
   overlay: {
     position: "fixed",
@@ -144,7 +133,7 @@ const styles = {
   },
 
   modal: {
-    width: 420,
+    width: 460,
     padding: 26,
     borderRadius: 20,
     background: "rgba(2,6,23,0.9)",
@@ -161,13 +150,12 @@ const styles = {
     fontWeight: 800,
     marginBottom: 26,
     color: "#ffffff",
-    letterSpacing: 0.5,
-    },
+  },
 
   body: {
     display: "flex",
     flexDirection: "column",
-    gap: 18,
+    gap: 16,
   },
 
   field: {
@@ -191,6 +179,10 @@ const styles = {
     border: "1px solid #334155",
   },
 
+  icon: {
+    color: "#94a3b8",
+  },
+
   input: {
     flex: 1,
     background: "transparent",
@@ -200,15 +192,10 @@ const styles = {
     fontSize: 14,
   },
 
-  eye: {
-    cursor: "pointer",
-    color: "#94a3b8",
-  },
-
   actions: {
     display: "flex",
     gap: 12,
-    marginTop: 12,
+    marginTop: 18,
   },
 
   btnCancel: {

@@ -1,19 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
-import { Styles, DEFAULT_FACE } from "./Styles";
-import { Users2, ClipboardCheck, BarChart3, Clock } from "lucide-react";
+import { Styles} from "./Styles";
+import { ClipboardCheck} from "lucide-react";
 const AttendanceHistory = () => {
-  const [records] = useState([
-    { id: 1, name: "Nguyễn Văn A", avatar: "https://i.pravatar.cc/60?img=3", checkIn: "08:01", note: "Đúng giờ" },
-    { id: 2, name: "Trần Thị B", avatar: null, checkIn: "08:15", note: "Đi trễ" },
-    { id: 3, name: "Nguyễn Văn A", avatar: "https://i.pravatar.cc/60?img=3", checkIn: "—", note: "Quên check-in" },
-  ]);
+  const [records, setRecords] = useState([]);
+
+  const fetchAttendanceRecords = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/logs", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
+      setRecords(data);
+      console.log("Fetched attendance records:", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttendanceRecords();
+  }, []);
 
   return (
     <>
       <div style={Styles.header}>
-        <h1 style={Styles.title}><ClipboardCheck/> ĐIỂM DANH NHÂN VIÊN</h1>
+        <h1 style={Styles.title}><ClipboardCheck/> QUẢN LÝ ĐIỂM DANH</h1>
         <div style={Styles.actions}>
           <input placeholder="Tìm kiếm nhân viên..." style={Styles.search} />
           <input type="date" style={Styles.formInput} />
@@ -29,26 +47,31 @@ const AttendanceHistory = () => {
           <table style={Styles.table}>
             <thead>
               <tr>
-                {["STT", "Ảnh", "Nhân viên", "Giờ vào", "Trạng thái", "Ghi chú"].map((h) => (
+                {["STT","Nhân viên", "Giờ điểm danh", "Ghi chú"].map((h) => (
                   <th key={h} style={Styles.th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {records.map((r, i) => {
-                const hasAttendance = r.checkIn !== "—";
                 return (
                   <tr key={r.id}>
                     <td style={Styles.td}>{i + 1}</td>
-                    <td style={Styles.td}><img src={r.avatar || DEFAULT_FACE} alt="" style={Styles.faceImg} /></td>
                     <td style={Styles.td}>{r.name}</td>
-                    <td style={Styles.td}>{r.checkIn}</td>
-                    <td style={{ ...Styles.td, fontSize: 18, fontWeight: 700, color: hasAttendance ? "#22c55e" : "#ef4444" }}>
-                      {hasAttendance ? "✓" : "✕"}
+                    <td style={Styles.td}>{r.time}</td>
+                    <td
+                      style={{
+                        ...Styles.td,
+                        fontWeight: 600,
+                        color:
+                          r.status?.includes("muộn") || r.status?.includes("Quên")
+                            ? "#ef4444"
+                            : "#22c55e",
+                      }}
+                    >
+                      {r.status}
                     </td>
-                    <td style={{ ...Styles.td, fontWeight: 600, color: r.note.includes("trễ") || r.note.includes("Quên") ? "#ef4444" : "#22c55e" }}>
-                      {r.note}
-                    </td>
+
                   </tr>
                 );
               })}

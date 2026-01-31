@@ -201,6 +201,25 @@ export const Styles = {
     cursor: "pointer",
   },
 
+  loadingOverlay: {
+    position: "absolute", // ⚠️ không dùng fixed
+    inset: 0,
+    background: "rgba(255,255,255,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+
+  spinner: {
+    width: 42,
+    height: 42,
+    border: "4px solid #e5e7eb",
+    borderTop: "4px solid #0ca1a1",
+    borderRadius: "50%",
+    animation: "spin 20s linear infinite",
+    transform: "translateY(50px)", // 👈 đẩy xuống
+  },
   
 
   /* ====== MODAL ====== */
@@ -226,7 +245,7 @@ export const Styles = {
     textAlign: "center",
     fontSize: 22,
     fontWeight: 800,
-    color: "#38f2f2",
+    color: "fffffff",
     marginBottom: 20,
   },
 
@@ -243,14 +262,23 @@ export const Styles = {
     height: 100,
     borderRadius: "50%",
     objectFit: "cover",
-    border: "2px solid #38f2f2",
   },
 
   uploadBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+
+    padding: "10px 16px",
     fontSize: 14,
-    color: "#38f2f2",
+    fontWeight: 500,
+
+    color: "#ffffff",
+
     cursor: "pointer",
+    userSelect: "none",
   },
+
 
   formGrid: {
     display: "grid",
@@ -284,6 +312,18 @@ export const Styles = {
     gap: 10,
     marginTop: 24,
   },
+
+  formGridShift: {
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+},
+  formGroupShift :{
+    display: "flex",
+    flexDirection: "column",
+    gap: 16,
+  }
+  
 };
 
 export const stylesLogin = {

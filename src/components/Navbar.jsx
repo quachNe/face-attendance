@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { User, Settings, Lock, LogOut } from "lucide-react";
 import ChangePassword from "./ChangPassWord";
+import UserProfile from "./UserProfile";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
@@ -24,55 +26,58 @@ const Navbar = () => {
 
   return (
     <>
-    <div style={styles.container}>
-      <div style={styles.right} ref={dropdownRef}>
-        <span style={styles.greeting}>
-          Xin chào,{" "}
-          <b
+      <div style={styles.container}>
+        <div style={styles.right} ref={dropdownRef}>
+          <span style={styles.greeting}>
+            Xin chào,{" "}
+            <b
+              style={{
+                background: "linear-gradient(135deg, #22d3ee, #06b6d4)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: 800,
+              }}
+            >
+              {user?.name || "Admin"}
+            </b>
+          </span>
+
+          {/* Avatar */}
+          <div
             style={{
-              background: "linear-gradient(135deg, #22d3ee, #06b6d4)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontWeight: 800,
+              ...styles.avatar,
+              background: open
+                ? "rgba(12,161,161,0.35)"
+                : "rgba(12,161,161,0.15)",
             }}
+            onClick={() => setOpen(!open)}
           >
-            {user?.name || "Admin"}
-          </b>
-        </span>
-
-        {/* Avatar */}
-        <div
-          style={{
-            ...styles.avatar,
-            background: open
-              ? "rgba(12,161,161,0.35)"
-              : "rgba(12,161,161,0.15)",
-          }}
-          onClick={() => setOpen(!open)}
-        >
-          <User size={20} />
-        </div>
-
-        {/* Dropdown */}
-        {open && (
-          <div style={styles.dropdown}>
-            <DropdownItem icon={<Settings size={16} />} text="Đổi thông tin" />
-            <DropdownItem onClick={() => setShowChangePassword(true)} icon={<Lock size={16} />} text="Đổi mật khẩu" />
-            <div style={styles.divider} />
-            <DropdownItem
-              icon={<LogOut size={16} />}
-              text="Đăng xuất"
-              danger
-              onClick={handleLogout}
-            />
+            <User size={20} />
           </div>
-        )}
+
+          {/* Dropdown */}
+          {open && (
+            <div style={styles.dropdown}>
+              <DropdownItem icon={<Settings size={16} />} text="Đổi thông tin" onClick={() => setShowUserProfile(true)} />
+              <DropdownItem onClick={() => setShowChangePassword(true)} icon={<Lock size={16} />} text="Đổi mật khẩu" />
+              <div style={styles.divider} />
+              <DropdownItem
+                icon={<LogOut size={16} />}
+                text="Đăng xuất"
+                danger
+                onClick={handleLogout}
+              />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-    {showChangePassword && (
-  <ChangePassword onClose={() => setShowChangePassword(false)} />
-)}
-</>
+      {showChangePassword && (
+        <ChangePassword onClose={() => setShowChangePassword(false)} />
+      )}
+      {showUserProfile && (
+        <UserProfile onClose={() => setShowUserProfile(false)} user={user} />
+      )}  
+    </>
   );
 };
 

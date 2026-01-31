@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "/background.jpg";
 import { useAuth } from "../context/AuthContext";
-import { stylesLogin, Styles} from "../components/Styles";
-
+import { stylesLogin } from "../components/Styles";
+import { Eye, EyeOff, User, Lock } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -16,7 +16,7 @@ const Login = () => {
 
   // ✅ HANDLE LOGIN
   const handleLogin = async (e) => {
-    e.preventDefault(); // ⭐ rất quan trọng
+    e.preventDefault();
 
     if (!userName || !password) {
       setError("Vui lòng nhập đầy đủ thông tin");
@@ -55,7 +55,7 @@ const Login = () => {
 
         <form onSubmit={handleLogin} style={stylesLogin.form}>
           <div style={stylesLogin.inputBox}>
-            <span style={stylesLogin.icon}>👤</span>
+            <span style={stylesLogin.icon}><User size={18} /></span>
             <input
               type="text"
               placeholder="Tên đăng nhập"
@@ -66,7 +66,7 @@ const Login = () => {
           </div>
 
           <div style={stylesLogin.inputBox}>
-            <span style={stylesLogin.icon}>🔒</span>
+            <span style={stylesLogin.icon}><Lock size={18} /></span>
 
             <input
               type={showPassword ? "text" : "password"}
@@ -81,7 +81,7 @@ const Login = () => {
               style={stylesLogin.eye}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </span>
           </div>
 
