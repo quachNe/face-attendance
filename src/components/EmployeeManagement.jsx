@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Styles, DEFAULT_FACE } from "./Styles";
+import { Styles, DEFAULT_FACE, stylesButton, stylesError, stylesForm, styleTable, styleModel } from "./Styles";
 import {
   Plus,
   Pencil,
@@ -12,6 +12,7 @@ import {
   X
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../services/EmployeeService";
+import { getShifts } from "../services/ShiftService";
 import { exportEmployeePDF } from "../utils/exportPDF";
 
 // CSS global cho input date (chỉ inject 1 lần)
@@ -53,6 +54,11 @@ const EmployeeManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hoverIcon, setHoverIcon] = useState({
+    id: null,
+    type: null,
+  });
+
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -86,6 +92,7 @@ const EmployeeManagement = () => {
 
   //  MỞ MODEL SỬA NHÂN VIÊN
   const openEditModal = (u) => {
+    if (!u || !u.id) return;
     setEditId(u.id);
     setForm({
       ...u,
@@ -172,7 +179,7 @@ const EmployeeManagement = () => {
           u.id === editId ? data.user : u
         ));
         setShowModal(false);
-        FetchEmployee();
+        fetchEmployee();
       } catch (err) {
         console.error(err);
       }
@@ -203,7 +210,7 @@ const EmployeeManagement = () => {
         return;
       }
       
-      await FetchEmployee();
+      await fetchEmployee();
       setShowModal(false);
     } catch (err) {
       console.error(err);
@@ -223,7 +230,7 @@ const EmployeeManagement = () => {
   });
 
   // LẤY DANH SÁCH NHÂN VIÊN TỪ API
-  const FetchEmployee = async () => {
+  const fetchEmployee = async () => {
     try {
       const {data} = await getEmployees();
       const mappedUsers = data.map((u) => ({
@@ -242,23 +249,16 @@ const EmployeeManagement = () => {
         u => u.role !== "admin"
       );
       setUsers(userNotAdmin);
+      console.log("Fetched users:", userNotAdmin);
     } catch (error) {
       console.error(error);
     }
   };
 
+  // LẤY DANH SÁCH CA LÀM VIỆC TỪ API
   const fetchShifts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/shifts`,{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      const data = await response.json();
+      const {data} = await getShifts();
       setShifts(data);
     } catch (error) {
       console.error(error);
@@ -267,14 +267,9 @@ const EmployeeManagement = () => {
     }
   };
 
-  // const exportEmployeePDF = () => {
-    
-  // };
-
-
-  // Gọi API khi component mount
+  // GỌI APU KHI MOUNT
   useEffect(() => {
-    FetchEmployee();
+    fetchEmployee();
     fetchShifts();
   }, []);
 
@@ -287,12 +282,12 @@ const EmployeeManagement = () => {
         <div style={Styles.actions}>
           <input
             placeholder="Tìm theo tên, ngày sinh, email, SĐT"
-            style={Styles.search}
+            style={stylesForm.searchInput}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            style={Styles.filterSelect}
+            style={stylesForm.filterSelect}
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
           >
@@ -301,14 +296,14 @@ const EmployeeManagement = () => {
             <option value="EMPLOYEE">Nhân Viên</option>
           </select>
           <div style={Styles.rightActions}>
-            <button style={Styles.btnPrimary} onClick={openAddModal}>
+            <button style={stylesButton.btnAdd} onClick={openAddModal}>
               <Plus size={18} /> Thêm
             </button>
-            <button style={Styles.btnExcel}>
+            <button style={stylesButton.btnExcel}>
               <FileSpreadsheet size={18} /> Xuất Excel
             </button>
             <button
-            style={Styles.btnPdf}
+            style={stylesButton.btnPdf}
             onClick={() => exportEmployeePDF(users)}
           >
             <FileText size={18} /> Xuất PDF
@@ -318,91 +313,133 @@ const EmployeeManagement = () => {
         </div>
       </div>
       <div style={{ position: "relative" }}>
-      {loading && (
-                <div style={Styles.loadingOverlay}>
-                  <div style={Styles.spinner}></div>
-                </div>
-              )}
-      <div style={Styles.tableWrapper}>
-        <div style={Styles.tableScroll} className="custom-scroll">
-          <table style={Styles.table}>
-            <thead>
-              <tr>
-                {["STT", "Họ tên", "Ngày sinh", "Email", "SĐT", "Vai trò", "Ca","Khuôn mặt", "Thao tác"].map((h) => (
-                  <th key={h} style={Styles.th}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {!loading && filteredUsers
-                .filter(u => u && u.id) // ✅ CHỐNG undefined
-                .map((u, i) => (
-                  <tr
-                    key={u.id}
-                    onClick={() => setSelectedId(u.id)}
-                    style={{
-                      background: selectedId === u.id ? "#0ca1a120" : "transparent",
-                    }}
-                  >
-                    <td style={Styles.td}>{i + 1}</td>
-                    <td style={Styles.td}>{u.name}</td>
-                    <td style={Styles.td}>{u.dob || "—"}</td>
-                    <td style={Styles.td}>{u.email || "—"}</td>
-                    <td style={Styles.td}>{u.phone || "—"}</td>
-                    <td style={Styles.td}>
-                      {u.role === "admin" ? "Quản trị viên" : "Nhân viên"}
-                    </td>
-                    <td style={Styles.td}>{u.shift_name || "—"}</td>
-                    <td style={{ ...Styles.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
-                      {u.face_image ? "✓" : "✕"}
-                    </td>
-                    <td style={Styles.td}>
-                      <div style={Styles.actionIcons}>
-                        <div
-                          style={Styles.iconBoxEdit}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditModal(u);
-                          }}
-                        >
-                          <Pencil size={15} />
+        {loading && (
+          <div style={styleTable.loadingOverlay}>
+            <div style={styleTable.spinner}></div>
+          </div>
+        )}
+        <div style={styleTable.tableWrapper}>
+          <div style={styleTable.tableScroll} className="custom-scroll">
+            <table style={styleTable.table}>
+              <thead>
+                <tr>
+                  {["STT", "Họ tên", "Ngày sinh", "Email", "SĐT", "Vai trò", "Ca","Khuôn mặt", "Thao tác"].map((h) => (
+                    <th key={h} style={styleTable.th}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {!loading && filteredUsers
+                  .filter(u => u && u.id)
+                  .map((u, i) => (
+                    <tr
+                      key={u.id}
+                      onClick={() => setSelectedId(u.id)}
+                      style={{
+                        background: selectedId === u.id ? "#0ca1a120" : "transparent",
+                      }}
+                    >
+                      <td style={styleTable.td}>{i + 1}</td>
+                      <td style={styleTable.td}>{u.name}</td>
+                      <td style={styleTable.td}>{u.dob || "—"}</td>
+                      <td style={styleTable.td}>{u.email || "—"}</td>
+                      <td style={styleTable.td}>{u.phone || "—"}</td>
+                      <td style={styleTable.td}>
+                        {u.role === "admin" ? "Quản trị viên" : "Nhân viên"}
+                      </td>
+                      <td style={styleTable.td}>{u.shift_name || "—"}</td>
+                      <td style={{ ...styleTable.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
+                        {u.face_image ? "✓" : "✕"}
+                      </td>
+                      <td style={styleTable.td}>
+                        <div style={stylesButton.actionIcons}>
+                          {/* EDIT */}
+                          <div
+                            style={{
+                              ...stylesButton.iconBoxEdit,
+                              ...stylesButton.iconBoxBase,
+                              ...(hoverIcon.id === u.id &&
+                                hoverIcon.type === "edit" &&
+                                stylesButton.iconBoxEditHover),
+                            }}
+                            onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
+                            onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(u);
+                            }}
+                          >
+                            <Pencil size={15} />
+                          </div>
+
+                          {/* DELETE */}
+                          <div
+                            style={{
+                              ...stylesButton.iconBoxDelete,
+                              ...stylesButton.iconBoxBase,
+                              ...(hoverIcon.id === u.id &&
+                                hoverIcon.type === "delete" &&
+                                stylesButton.iconBoxDeleteHover),
+                            }}
+                            onMouseEnter={() => setHoverIcon({ id: u.id, type: "delete" })}
+                            onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setUsers(prev => prev.filter(item => item?.id !== u.id));
+                            }}
+                          >
+                            <Trash2 size={15} />
+                          </div>
                         </div>
-                        <div
-                          style={Styles.iconBoxDelete}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setUsers(prev =>
-                              prev.filter(item => item?.id !== u.id)
-                            );
-                          }}
-                        >
-                          <Trash2 size={15} />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-  </div>
       {showModal && (
-        <div style={Styles.modalOverlay}>
-          <div style={Styles.modal}>
-            <h2 style={Styles.modalTitle}>{editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}</h2>
+        <div style={styleModel.modalOverlay}>
+          <div style={styleModel.modal}>
+            <h2 style={styleModel.modalTitle}>{editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}</h2>
 
-            <div style={Styles.faceBox}>
-              <img src={form.face_preview || DEFAULT_FACE} alt="" style={Styles.facePreview} />
-              <label style={Styles.uploadBtn}>
-                < Upload/> Khuôn Mặt
+            <div style={styleModel.faceBox}>
+              <div style={{ position: "relative" }}>
+                <img
+                  src={DEFAULT_FACE}
+                  alt=""
+                  style={styleModel.facePreview}
+                />
+
+                {/* BADGE: chỉ hiện khi đã có ảnh nhận diện */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 6,
+                      right: 6,
+                      background: form.face_image ? "#2e7d32" : "#e53935",
+                      color: "#fff",
+                      fontSize: 11,
+                      padding: "2px 6px",
+                      borderRadius: 6,
+                      fontWeight: 600,
+                      width: "max-content",
+                    }}
+                  >
+                    {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
+                  </div>
+              </div>
+
+              <label style={stylesButton.uploadBtn}>
+                <Upload /> Chọn khuôn mặt
                 <input
                   hidden
                   type="file"
                   accept="image/*"
-                  capture="user" // 👈 mở camera nếu có
+                  capture="user"
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (!file) return;
@@ -411,21 +448,21 @@ const EmployeeManagement = () => {
                       ...form,
                       face_preview: URL.createObjectURL(file),
                       face_file: file,
+                      face_image: false, // ⚠️ ảnh mới chưa được nhận diện
                     });
                   }}
                 />
               </label>
             </div>
-
-            <div style={Styles.formGrid}>
+            <div style={styleModel.formGrid}>
               {[
                 ["Họ tên", "name"],
                 ["Ngày sinh", "dob", "date"],
                 ["Email", "email", "email"],
                 ["SĐT", "phone", "tel"],
               ].map(([label, key, type]) => (
-                <div key={key} style={Styles.formGroup}>
-                  <label style={Styles.label}>{label}<span style={{ color: "red" }}> *</span></label>
+                <div key={key} style={styleModel.formGroup}>
+                  <label style={styleModel.label}>{label}<span style={{ color: "red" }}> *</span></label>
                   <input
                     type={type || "text"}
                     inputMode={key === "phone" ? "numeric" : undefined}
@@ -433,7 +470,7 @@ const EmployeeManagement = () => {
                     maxLength={key === "phone" ? 11 : undefined}
                     className={type === "date" ? "custom-date-input" : ""}
                     style={{
-                      ...Styles.formInput,
+                      ...styleModel.formInput,
                       ...(type === "date" ? { color: "#ffffff" } : {}),
                     }}
                     value={form[key] || ""}
@@ -451,11 +488,10 @@ const EmployeeManagement = () => {
                 </div>
               ))}
 
-
-              <div style={Styles.formGroup}>
-                <label style={Styles.label}>Vai trò <span style={{ color: "red" }}>*</span></label>
+              <div style={styleModel.formGroup}>
+                <label style={styleModel.label}>Vai trò <span style={{ color: "red" }}>*</span></label>
                 <select
-                  style={Styles.formInput}
+                  style={styleModel.formInput}
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
                 > 
@@ -464,10 +500,10 @@ const EmployeeManagement = () => {
                 </select>
               </div>
 
-              <div style={Styles.formGroup}>
-                <label style={Styles.label}>Ca làm việc <span style={{ color: "red" }}>*</span></label>
+              <div style={styleModel.formGroup}>
+                <label style={styleModel.label}>Ca làm việc <span style={{ color: "red" }}>*</span></label>
                 <select
-                  style={Styles.formInput}
+                  style={styleModel.formInput}
                   value={form.shift || ""}
                   onChange={(e) =>
                     setForm({ ...form, shift: Number(e.target.value) })
@@ -483,18 +519,21 @@ const EmployeeManagement = () => {
             </div>
             {/* ERROR */}
             {error && (
-              <p style={{ color: "red", fontSize: 14, fontWeight: "bold", marginTop: 30, textAlign: "center" }}>
+              <p style={stylesError.message}>
                 {error}
               </p>
             )}
-            <div style={Styles.modalActions}>
-              <button style={Styles.btnPdf} onClick={() => setShowModal(false)}>
+
+            {/* ACTION */}
+            <div style={stylesButton.actions}>
+              <button style={stylesButton.btnCancel} onClick={() =>  {setShowModal(false); setError("")}}>
                 <X /> Hủy
               </button>
-              <button style={Styles.btnPrimary} onClick={handleSave}>
+              <button style={stylesButton.btnSave} onClick={handleSave}>
                 <Save /> Lưu
               </button>
             </div>
+
           </div>
         </div>
       )}

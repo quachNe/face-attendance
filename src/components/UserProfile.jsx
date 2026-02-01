@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Save, X, User, Mail, Phone, Briefcase, Calendar, } from "lucide-react";
 
 const UserProfile = ({ onClose, user }) => {
+  const [hover, setHover] = useState(null);
   const fetchUser = async () => {
     try {
       const response = await fetch(
@@ -88,31 +89,63 @@ const UserProfile = ({ onClose, user }) => {
               <label style={styles.label}>{label}</label>
               <div style={styles.inputBox}>
                 <span style={styles.icon}>{icon}</span>
-
                 <input
-                  type={key === "dob" ? "date" : "text"}
-                  disabled={key === "role"}   
+                  type={
+                    key === "dob"
+                      ? "date"
+                      : key === "phone"
+                      ? "tel"
+                      : "text"
+                  }
+                  disabled={key === "role"}
                   value={form[key]}
-                  onChange={(e) => handleChange(key, e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+
+                    // Nếu là SĐT → chỉ cho nhập số
+                    if (key === "phone") {
+                      value = value.replace(/\D/g, "");
+                    }
+
+                    handleChange(key, value);
+                  }}
                   style={{
                     ...styles.input,
                     color: "#e5e7eb",
                   }}
                 />
+
               </div>
             </div>
           ))}
 
           {/* Actions */}
           <div style={styles.actions}>
-            <button style={styles.btnCancel} onClick={onClose}>
+            <button
+              style={{
+                ...styles.btnCancel,
+                ...(hover === "cancel" && styles.btnCancelHover),
+              }}
+              onMouseEnter={() => setHover("cancel")}
+              onMouseLeave={() => setHover(null)}
+              onClick={onClose}
+            >
               <X size={18} /> Hủy
             </button>
 
-            <button style={styles.btnSave} onClick={handleSubmit}>
+            <button
+              style={{
+                ...styles.btnSave,
+                ...(hover === "save" && styles.btnSaveHover),
+              }}
+              onMouseEnter={() => setHover("save")}
+              onMouseLeave={() => setHover(null)}
+              onClick={handleSubmit}
+            >
               <Save size={18} /> Lưu
             </button>
           </div>
+
         </div>
       </div>
     </div>
@@ -229,5 +262,13 @@ const styles = {
     justifyContent: "center",
     gap: 8,
     boxShadow: "0 12px 30px rgba(34,211,238,0.5)",
+  },
+
+  btnCancelHover: {
+    transform: "translateY(-1px)",
+  },
+
+  btnSaveHover: {
+    transform: "translateY(-1px)",
   },
 };

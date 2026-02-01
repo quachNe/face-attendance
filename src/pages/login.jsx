@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "/background.jpg";
 import { useAuth } from "../context/AuthContext";
-import { stylesLogin } from "../components/Styles";
+import { stylesButton, stylesLogin } from "../components/Styles";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // ✅ STATE
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // ✅ HANDLE LOGIN
+  // HANDLE LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -87,19 +86,19 @@ const Login = () => {
 
           {/* ERROR */}
           {error && (
-            <p style={{ color: "red", fontSize: 13, marginTop: 6 }}>
+            <p style={{ color: "red", fontSize: 14, marginTop: 6, fontWeight: "bold" }}>
               {error}
             </p>
           )}
 
-          <button type="submit" style={stylesLogin.loginBtn}>
+          <button type="submit" style={stylesButton.loginBtn}>
             Đăng Nhập
           </button>
 
           <button
             type="button"
             onClick={() => navigate("/")}
-            style={stylesLogin.backBtn}
+            style={stylesButton.backBtn}
           >
             ← Quay lại trang điểm danh
           </button>
@@ -108,7 +107,5 @@ const Login = () => {
     </div>
   );
 };
-
-
 
 export default Login;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { User, Settings, Lock, LogOut } from "lucide-react";
-import ChangePassword from "./ChangPassWord";
+import ChangePassword from "./ChangePassWord";
 import UserProfile from "./UserProfile";
 const Navbar = () => {
   const [open, setOpen] = useState(false);

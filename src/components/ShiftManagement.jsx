@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Styles } from "./Styles";
+import { styleModel, Styles, stylesButton, stylesError, stylesForm, styleTable } from "./Styles";
 import {
   Plus,
   Pencil,
@@ -8,6 +8,13 @@ import {
   X,
   Clock
 } from "lucide-react";
+
+import {
+  getShifts,
+  createShift,
+  updateShift,
+  deleteShift,
+} from "../services/ShiftService";
 
 // CSS cập nhật cho icon clock trắng (dùng brightness(0) invert(1) để trắng đậm, rõ)
 const timePickerStyles = `
@@ -32,6 +39,11 @@ const ShiftManagement = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [error, setError] = useState("");
+  const [hoverIcon, setHoverIcon] = useState({
+    id: null,
+    type: null,
+  });
   const [form, setForm] = useState({
     name: "",
     start_time: "",
@@ -55,50 +67,35 @@ const ShiftManagement = () => {
     setShowModal(true);
   };
 
-
+  // LƯU CA LÀM VIỆC (THÊM MỚI HOẶC CẬP NHẬT)
   const handleSave = async () => {
-    // Validate cơ bản
     if (!form.name || !form.start_time || !form.end_time) {
-      alert("Vui lòng nhập đầy đủ thông tin ca làm việc");
+      setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
-    const isEdit = !!editId;
-    const url = isEdit
-      ? `http://localhost:5000/api/shifts/${editId}`
-      : `http://localhost:5000/api/shifts`;
+    try {
+      let res;
 
-    const method = isEdit ? "PUT" : "POST";
+      if (editId) {
+        res = await updateShift(editId, form);
+        setShifts(
+          shifts.map((s) => (s.id === editId ? res.data : s))
+        );
+      } else {
+        res = await createShift(form);
+        setShifts([...shifts, res.data]);
+      }
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(form),
-    });
-
-    if (!response.ok) {
-      alert("Lưu ca làm việc thất bại");
-      return;
+      setShowModal(false);
+      setEditId(null);
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Lưu ca làm việc thất bại");
     }
-
-    const data = await response.json();
-    const normalizeTime = (t) => {
-      if (!t) return "";
-      return t.length > 5 ? t.slice(0, 5) : t; // "08:00:00" → "08:00"
-    };
-    if (isEdit) {
-      setShifts(shifts.map(s => (s.id === editId ? data : s)));
-    } else {
-      setShifts([...shifts, data]);
-    }
-
-    setShowModal(false);
-    setEditId(null);
-    // fetchShifts();
   };
+
 
 
 
@@ -112,26 +109,18 @@ const ShiftManagement = () => {
     return matchSearch;
   });
 
+  // LẤY DANH SÁCH CA LÀM VIỆC TỪ API
   const fetchShifts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/shifts`,{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      const data = await response.json();
-      setShifts(data);
-      console.log("Fetched shifts:", data);
-    } catch (error) {
-      console.error(error);
+      const res = await getShifts();
+      setShifts(res.data);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchShifts();
@@ -147,31 +136,29 @@ const ShiftManagement = () => {
         <div style={Styles.actions}>
           <input
             placeholder="Tìm theo tên ca làm việc"
-            style={Styles.search}
+            style={stylesForm.searchInput}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <div style={Styles.rightActions}>
-            <button style={Styles.btnPrimary} onClick={openAddModal}><Plus size={18}/>Thêm</button>
+            <button style={stylesButton.btnAdd} onClick={openAddModal}><Plus size={18}/>Thêm</button>
           </div>
         </div>
       </div>
 
       <div style={{ position: "relative" }}>
-  
         {loading && (
-          <div style={Styles.loadingOverlay}>
-            <div style={Styles.spinner}></div>
+          <div style={styleTable.loadingOverlay}>
+            <div style={styleTable.spinner}></div>
           </div>
         )}
-
-        <div style={Styles.tableWrapper}>
-          <div style={Styles.tableScroll} className="custom-scroll">
-            <table style={Styles.table}>
+        <div style={styleTable.tableWrapper}>
+          <div style={styleTable.tableScroll} className="custom-scroll">
+            <table style={styleTable.table}>
               <thead>
                 <tr>
                   {["STT", "Tên Ca", "Giờ Bắt Đầu", "Giờ Kết Thúc", "Thao tác"].map((h) => (
-                    <th key={h} style={Styles.th}>{h}</th>
+                    <th key={h} style={styleTable.th}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -182,28 +169,51 @@ const ShiftManagement = () => {
                     onClick={() => setSelectedId(s.id)}
                     style={{ background: selectedId === s.id ? "#0ca1a120" : "transparent" }}
                   >
-                    <td style={Styles.td}>{i + 1}</td>
-                    <td style={Styles.td}>{s.name}</td>
-                    <td style={Styles.td}>{s.start_time|| "—"}</td>
-                    <td style={Styles.td}>{s.end_time || "—"}</td>
-                    <td style={Styles.td}>
-                      <div style={Styles.actionIcons}>
+                    <td style={styleTable.td}>{i + 1}</td>
+                    <td style={styleTable.td}>{s.name}</td>
+                    <td style={styleTable.td}>{s.start_time|| "—"}</td>
+                    <td style={styleTable.td}>{s.end_time || "—"}</td>
+                    <td style={styleTable.td}>
+                      <div style={stylesButton.actionIcons}>
+                        {/* EDIT */}
                         <div
-                          style={Styles.iconBoxEdit}
-                          onClick={(e) => { e.stopPropagation(); openEditModal(s); }}
+                          style={{
+                            ...stylesButton.iconBase,
+                            ...stylesButton.iconBoxEdit,
+                            ...(hoverIcon.id === s.id &&
+                              hoverIcon.type === "edit" &&
+                              stylesButton.iconBoxEditHover),
+                          }}
+                          onMouseEnter={() => setHoverIcon({ id: s.id, type: "edit" })}
+                          onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(s);
+                          }}
                         >
                           <Pencil size={15} />
                         </div>
+
+                        {/* DELETE */}
                         <div
-                          style={Styles.iconBoxDelete}
+                          style={{
+                            ...stylesButton.iconBase,
+                            ...stylesButton.iconBoxDelete,
+                            ...(hoverIcon.id === s.id &&
+                              hoverIcon.type === "delete" &&
+                              stylesButton.iconBoxDeleteHover),
+                          }}
+                          onMouseEnter={() => setHoverIcon({ id: s.id, type: "delete" })}
+                          onMouseLeave={() => setHoverIcon({ id: null, type: null })}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setShifts(shifts.filter((item) => item.id !== s.id));
+                            setShifts(prev => prev.filter(item => item.id !== s.id));
                           }}
                         >
                           <Trash2 size={15} />
                         </div>
                       </div>
+
                     </td>
                   </tr>
                 ))}
@@ -212,35 +222,33 @@ const ShiftManagement = () => {
           </div>
         </div>
       </div>
-
-
       {showModal && (
-        <div style={Styles.modalOverlay}>
-          <div style={Styles.modal}>
-            <h2 style={Styles.modalTitle}>
+        <div style={styleModel.modalOverlay}>
+          <div style={styleModel.modal}>
+            <h2 style={styleModel.modalTitle}>
               {editId ? "SỬA CA LÀM VIỆC" : "THÊM CA LÀM VIỆC"}
             </h2>
 
-            <div style={Styles.formGridShift}>
+            <div style={styleModel.formGridShift}>
               {/* Tên ca */}
-              <div style={Styles.formGroupShift}>
-                <label style={Styles.label}>Tên Ca</label>
+              <div style={styleModel.formGroupShift}>
+                <label style={styleModel.label}>Tên Ca <span style={{ color: "red" }}>*</span></label>
                 <input
                   type="text"
-                  style={Styles.formInput}
+                  style={styleModel.formInput}
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
 
               {/* Giờ bắt đầu */}
-              <div style={Styles.formGroupShift}>
-                <label style={Styles.label}>Giờ Bắt Đầu</label>
+              <div style={styleModel.formGroupShift}>
+                <label style={styleModel.label}>Giờ Bắt Đầu <span style={{ color: "red" }}>*</span></label>
                 <input
                   type="time"
                   className="custom-time-input"
                   style={{
-                    ...Styles.formInput,
+                    ...styleModel.formInput,
                   }}
                   value={form.start_time}
                   onChange={(e) =>
@@ -250,13 +258,13 @@ const ShiftManagement = () => {
               </div>
 
               {/* Giờ kết thúc */}
-              <div style={Styles.formGroupShift}>
-                <label style={Styles.label}>Giờ Kết Thúc</label>
+              <div style={styleModel.formGroupShift}>
+                <label style={styleModel.label}>Giờ Kết Thúc <span style={{ color: "red" }}>*</span></label>
                 <input
                   type="time"
                   className="custom-time-input"
                   style={{
-                    ...Styles.formInput,
+                    ...styleModel.formInput,
                   }}
                   value={form.end_time}
                   onChange={(e) =>
@@ -265,12 +273,16 @@ const ShiftManagement = () => {
                 />
               </div>
             </div>
-
-            <div style={Styles.modalActions}>
-              <button style={Styles.btnPdf} onClick={() => setShowModal(false)}>
+            {error && (
+              <p style={stylesError.message}>
+                {error}
+              </p>
+            )}
+            <div style={stylesButton.actions}>
+              <button style={stylesButton.btnCancel} onClick={() =>  {setShowModal(false); setError("")}}>
                 <X /> Hủy
               </button>
-              <button style={Styles.btnPrimary} onClick={handleSave}>
+              <button style={stylesButton.btnSave} onClick={handleSave}>
                 <Save /> Lưu
               </button>
             </div>

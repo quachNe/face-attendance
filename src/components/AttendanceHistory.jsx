@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
-import { Styles} from "./Styles";
+import { Styles, stylesButton, stylesForm, styleTable} from "./Styles";
 import { ClipboardCheck} from "lucide-react";
 
 const datePickerStyles = `
@@ -56,22 +56,27 @@ const AttendanceHistory = () => {
       <div style={Styles.header}>
         <h1 style={Styles.title}><ClipboardCheck/> QUẢN LÝ ĐIỂM DANH</h1>
         <div style={Styles.actions}>
-          <input placeholder="Tìm kiếm nhân viên..." style={Styles.search} />
-          <input type="date" style={Styles.formInput} className={"custom-date-input"} value={date}/>
+          <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
+          <input type="date" 
+            style={stylesForm.formInput} 
+            className={"custom-date-input"} 
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
           <div style={Styles.rightActions}>
-            <button style={Styles.btnExcel}><AiOutlineFileExcel /> Xuất Excel</button>
-            <button style={Styles.btnPdf}><FiFileText /> Xuất PDF</button>
+            <button style={stylesButton.btnExcel}><AiOutlineFileExcel /> Xuất Excel</button>
+            <button style={stylesButton.btnPdf}><FiFileText /> Xuất PDF</button>
           </div>
         </div>
       </div>
 
-      <div style={Styles.tableWrapper}>
-        <div style={Styles.tableScroll} className="custom-scroll">
-          <table style={Styles.table}>
+      <div style={styleTable.tableWrapper}>
+        <div style={styleTable.tableScroll} className="custom-scroll">
+          <table style={styleTable.table}>
             <thead>
               <tr>
                 {["STT","Nhân viên", "Giờ điểm danh", "Ghi chú"].map((h) => (
-                  <th key={h} style={Styles.th}>{h}</th>
+                  <th key={h} style={styleTable.th}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -79,12 +84,12 @@ const AttendanceHistory = () => {
               {records.map((r, i) => {
                 return (
                   <tr key={r.id}>
-                    <td style={Styles.td}>{i + 1}</td>
-                    <td style={Styles.td}>{r.name}</td>
-                    <td style={Styles.td}>{r.time}</td>
+                    <td style={styleTable.td}>{i + 1}</td>
+                    <td style={styleTable.td}>{r.name}</td>
+                    <td style={styleTable.td}>{r.time}</td>
                     <td
                       style={{
-                        ...Styles.td,
+                        ...styleTable.td,
                         fontWeight: 600,
                         color:
                           r.status?.includes("muộn") || r.status?.includes("Quên")
