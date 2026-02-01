@@ -11,6 +11,8 @@ import {
   Save,
   X
 } from "lucide-react";
+import { getEmployees, updateEmployee, createEmployee } from "../services/EmployeeService";
+import { exportEmployeePDF } from "../utils/exportPDF";
 
 // CSS global cho input date (chỉ inject 1 lần)
 const datePickerStyles = `
@@ -32,7 +34,7 @@ const datePickerStyles = `
   }
 `;
 
-// Inject CSS một lần duy nhất khi component mount
+// // Inject CSS một lần duy nhất khi component mount
 if (!document.getElementById("date-picker-custom-style")) {
   const styleSheet = document.createElement("style");
   styleSheet.id = "date-picker-custom-style";
@@ -46,6 +48,7 @@ const EmployeeManagement = () => {
   const [shifts, setShifts] = useState([]);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
+  const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -63,7 +66,7 @@ const EmployeeManagement = () => {
     face_file: null,
   });
 
-  // Mở modal thêm nhân viên
+  //  MỞ MODEL THÊM NHÂN VIÊN
   const openAddModal = () => {
     setEditId(null);
     setForm({
@@ -81,21 +84,21 @@ const EmployeeManagement = () => {
     setShowModal(true);
   };
 
-  //  Mở modal sửa nhân viên
+  //  MỞ MODEL SỬA NHÂN VIÊN
   const openEditModal = (u) => {
     setEditId(u.id);
     setForm({
       ...u,
       username: u.username,
       role : u.role == "admin" ? "ADMIN" : "EMPLOYEE",
-      shift: u.shift,
+      shift: u.shift_id,
       face_preview: u.face_image,
       face_file: null,
     });
     setShowModal(true);
   };
 
-
+  // TẠO USERNAME TỰ ĐỘNG THEO DẠNG NVYYYYXXXX (YYYY: Năm hiện tại, XXXX: Số thứ tự)
   const generateUsername = (users) => {
     const year = new Date().getFullYear();
 
@@ -113,8 +116,7 @@ const EmployeeManagement = () => {
     return `NV${year}${String(next).padStart(4, "0")}`;
   };
 
-
-  // Lưu nhân viên (thêm hoặc sửa)
+  // CHUYỂN FILE ẢNH THÀNH BASE64
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -124,6 +126,7 @@ const EmployeeManagement = () => {
     }
   );
 
+  // TẠO MẬT KHẨU TỪ NGÀY SINH THEO ĐỊNH DẠNG DDMMYYYY
   const generatePassword = (dob) => {
     if (!dob) return "";
     const d = new Date(dob);
@@ -133,9 +136,10 @@ const EmployeeManagement = () => {
     return `${day}${month}${year}`;
   };
 
+  // LƯU THÔNG TIN NHÂN VIÊN (THÊM MỚI HOẶC SỬA)
   const handleSave = async () => {
-    if (!form.name || !form.dob) {
-      alert("Thiếu tên hoặc ngày sinh");
+    if (!form.name || !form.dob || !form.email || !form.phone) {
+      setError("Vui lòng điền đầy đủ thông tin bắt buộc");
       return;
     }
 
@@ -144,9 +148,7 @@ const EmployeeManagement = () => {
       imageBase64 = await fileToBase64(form.face_file);
     }
 
-    // =====================
-    // 👉 TRƯỜNG HỢP SỬA
-    // =====================
+    // SỬA THÔNG TIN NHÂN VIÊN
     if (editId) {
       const payload = {
         name: form.name,
@@ -155,30 +157,17 @@ const EmployeeManagement = () => {
         phone: form.phone,
         role: form.role,
         shift: form.shift,
-        image: imageBase64, // null nếu không đổi ảnh
+        image: imageBase64,
       };
 
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/employees/${editId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
+        const {data} = await updateEmployee(editId, payload);
+        if (!data.success) {
           alert(data.message || "Lỗi cập nhật nhân viên");
           return;
         }
 
-        // 👉 update lại state FE
+        // update lại state FE
         setUsers(users.map(u =>
           u.id === editId ? data.user : u
         ));
@@ -186,15 +175,12 @@ const EmployeeManagement = () => {
         FetchEmployee();
       } catch (err) {
         console.error(err);
-        alert("Không kết nối được server");
       }
 
       return;
     }
 
-    // =====================
-    // 👉 TRƯỜNG HỢP THÊM MỚI
-    // =====================
+    // THÊM MỚI NHÂN VIÊN
     const username = generateUsername(users);
     const password = generatePassword(form.dob);
 
@@ -206,36 +192,25 @@ const EmployeeManagement = () => {
       email: form.email,
       phone: form.phone,
       role: form.role || "EMPLOYEE",
-      shift: form.shift || 1,
+      shift: form.shift,
       image: imageBase64,
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/employees", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
+      const {data} = await createEmployee(payload);
+      if (!data.success) {
         alert(data.message || "Lỗi tạo nhân viên");
         return;
       }
-
-      setUsers([...users, data.user]);
+      
+      await FetchEmployee();
       setShowModal(false);
     } catch (err) {
       console.error(err);
-      alert("Không kết nối được server");
     }
   };
 
-  // Lọc nhân viên theo tìm kiếm và vai trò
+  // LỌC NHÂN VIÊN THEO TỪ KHÓA VÀ VAI TRÒ
   const filteredUsers = users.filter((u) => {
     const keyword = search.toLowerCase().trim();
     const matchSearch =
@@ -247,19 +222,10 @@ const EmployeeManagement = () => {
     return matchSearch && matchRole;
   });
 
-  // Lấy danh sách nhân viên từ API
+  // LẤY DANH SÁCH NHÂN VIÊN TỪ API
   const FetchEmployee = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/employees`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      const data = await response.json();
+      const {data} = await getEmployees();
       const mappedUsers = data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -268,11 +234,13 @@ const EmployeeManagement = () => {
         email: u.email || "",
         phone: u.phone || "",
         role: u.role,
-        shift: u.shift || "",
+        shift_id: u.shift?.id || null,
+        shift_name: u.shift?.name || "",
         face_image: u.face_image || null,
       }));
-      const userNotAdmin = mappedUsers.filter(u => u.role !== "admin");
-      console.log("Fetched users:", userNotAdmin);
+      const userNotAdmin = mappedUsers.filter(
+        u => u.role !== "admin"
+      );
       setUsers(userNotAdmin);
     } catch (error) {
       console.error(error);
@@ -298,6 +266,11 @@ const EmployeeManagement = () => {
       setLoading(false);
     }
   };
+
+  // const exportEmployeePDF = () => {
+    
+  // };
+
 
   // Gọi API khi component mount
   useEffect(() => {
@@ -334,9 +307,13 @@ const EmployeeManagement = () => {
             <button style={Styles.btnExcel}>
               <FileSpreadsheet size={18} /> Xuất Excel
             </button>
-            <button style={Styles.btnPdf}>
-              <FileText size={18} /> Xuất PDF
-            </button>
+            <button
+            style={Styles.btnPdf}
+            onClick={() => exportEmployeePDF(users)}
+          >
+            <FileText size={18} /> Xuất PDF
+          </button>
+
           </div>
         </div>
       </div>
@@ -377,8 +354,7 @@ const EmployeeManagement = () => {
                     <td style={Styles.td}>
                       {u.role === "admin" ? "Quản trị viên" : "Nhân viên"}
                     </td>
-                    <td style={Styles.td}>{u.shift || "—"}</td>
-                    {/* <td style={Styles.td}>{u.face_image ? "Có" : "Không"}</td> */}
+                    <td style={Styles.td}>{u.shift_name || "—"}</td>
                     <td style={{ ...Styles.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
                       {u.face_image ? "✓" : "✕"}
                     </td>
@@ -445,26 +421,39 @@ const EmployeeManagement = () => {
               {[
                 ["Họ tên", "name"],
                 ["Ngày sinh", "dob", "date"],
-                ["Email", "email"],
-                ["SĐT", "phone"],
+                ["Email", "email", "email"],
+                ["SĐT", "phone", "tel"],
               ].map(([label, key, type]) => (
                 <div key={key} style={Styles.formGroup}>
-                  <label style={Styles.label}>{label}</label>
+                  <label style={Styles.label}>{label}<span style={{ color: "red" }}> *</span></label>
                   <input
                     type={type || "text"}
+                    inputMode={key === "phone" ? "numeric" : undefined}
+                    pattern={key === "phone" ? "[0-9]*" : undefined}
+                    maxLength={key === "phone" ? 11 : undefined}
                     className={type === "date" ? "custom-date-input" : ""}
                     style={{
                       ...Styles.formInput,
-                      ...(type === "date" ? { color: "#ffffff" } : {}), // giữ màu chữ trắng nếu cần
+                      ...(type === "date" ? { color: "#ffffff" } : {}),
                     }}
                     value={form[key] || ""}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    onChange={(e) => {
+                      let value = e.target.value;
+
+                      // chỉ cho nhập số nếu là phone
+                      if (key === "phone") {
+                        value = value.replace(/\D/g, "");
+                      }
+
+                      setForm({ ...form, [key]: value });
+                    }}
                   />
                 </div>
               ))}
 
+
               <div style={Styles.formGroup}>
-                <label style={Styles.label}>Vai trò</label>
+                <label style={Styles.label}>Vai trò <span style={{ color: "red" }}>*</span></label>
                 <select
                   style={Styles.formInput}
                   value={form.role}
@@ -476,24 +465,28 @@ const EmployeeManagement = () => {
               </div>
 
               <div style={Styles.formGroup}>
-                <label style={Styles.label}>Ca làm việc</label>
-
+                <label style={Styles.label}>Ca làm việc <span style={{ color: "red" }}>*</span></label>
                 <select
                   style={Styles.formInput}
-                  value={form.shift}
+                  value={form.shift || ""}
                   onChange={(e) =>
-                    setForm({ ...form, shift: e.target.value })
+                    setForm({ ...form, shift: Number(e.target.value) })
                   }
                 >
-                  {Array.isArray(shifts) && shifts.map(shift => (
-                    <option key={shift.id} value={shift.id}>
-                      {shift.name}
+                  {shifts.map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
-
+            {/* ERROR */}
+            {error && (
+              <p style={{ color: "red", fontSize: 14, fontWeight: "bold", marginTop: 30, textAlign: "center" }}>
+                {error}
+              </p>
+            )}
             <div style={Styles.modalActions}>
               <button style={Styles.btnPdf} onClick={() => setShowModal(false)}>
                 <X /> Hủy

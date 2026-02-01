@@ -3,8 +3,31 @@ import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
 import { Styles} from "./Styles";
 import { ClipboardCheck} from "lucide-react";
+
+const datePickerStyles = `
+  .custom-date-input {
+    color-scheme: dark; /* giúp icon trắng/sáng ở Firefox và một số trường hợp Chrome */
+  }
+
+  .custom-date-input::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1); /* biến icon thành trắng hoàn toàn */
+    opacity: 1 !important;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+
+  .custom-date-input::-webkit-inner-spin-button,
+  .custom-date-input::-webkit-clear-button {
+    display: none; /* ẩn các nút spin nếu có */
+  }
+`;
+
 const AttendanceHistory = () => {
   const [records, setRecords] = useState([]);
+  const [date, setDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   const fetchAttendanceRecords = async () => {
     try {
@@ -34,7 +57,7 @@ const AttendanceHistory = () => {
         <h1 style={Styles.title}><ClipboardCheck/> QUẢN LÝ ĐIỂM DANH</h1>
         <div style={Styles.actions}>
           <input placeholder="Tìm kiếm nhân viên..." style={Styles.search} />
-          <input type="date" style={Styles.formInput} />
+          <input type="date" style={Styles.formInput} className={"custom-date-input"} value={date}/>
           <div style={Styles.rightActions}>
             <button style={Styles.btnExcel}><AiOutlineFileExcel /> Xuất Excel</button>
             <button style={Styles.btnPdf}><FiFileText /> Xuất PDF</button>

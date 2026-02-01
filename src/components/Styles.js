@@ -1,3 +1,4 @@
+import { Bold } from "lucide-react";
 import backgroundImg from "/background.jpg";
 
 export const DEFAULT_FACE = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
@@ -293,8 +294,9 @@ export const Styles = {
   },
 
   label: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#94a3b8",
+    fontWeight: 600,
   },
 
   formInput: {
