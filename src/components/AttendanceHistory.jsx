@@ -3,25 +3,7 @@ import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
 import { Styles, stylesButton, stylesForm, styleTable} from "./Styles";
 import { ClipboardCheck} from "lucide-react";
-
-const datePickerStyles = `
-  .custom-date-input {
-    color-scheme: dark; /* giúp icon trắng/sáng ở Firefox và một số trường hợp Chrome */
-  }
-
-  .custom-date-input::-webkit-calendar-picker-indicator {
-    filter: brightness(0) invert(1); /* biến icon thành trắng hoàn toàn */
-    opacity: 1 !important;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-  }
-
-  .custom-date-input::-webkit-inner-spin-button,
-  .custom-date-input::-webkit-clear-button {
-    display: none; /* ẩn các nút spin nếu có */
-  }
-`;
+import { getLogs } from "../services/AttendanceService";
 
 const AttendanceHistory = () => {
   const [records, setRecords] = useState([]);
@@ -29,19 +11,11 @@ const AttendanceHistory = () => {
     new Date().toISOString().split("T")[0]
   );
 
+  // LẤY DANH SÁCH ĐIỂM DANH THEO NGÀY
   const fetchAttendanceRecords = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/logs", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      const data = await response.json();
+      const { data } = await getLogs({ date });
       setRecords(data);
-      console.log("Fetched attendance records:", data);
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +23,7 @@ const AttendanceHistory = () => {
 
   useEffect(() => {
     fetchAttendanceRecords();
-  }, []);
+  }, [date]);
 
   return (
     <>
@@ -58,7 +32,7 @@ const AttendanceHistory = () => {
         <div style={Styles.actions}>
           <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
           <input type="date" 
-            style={stylesForm.formInput} 
+            style={stylesForm.filterSelect} 
             className={"custom-date-input"} 
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -81,9 +55,25 @@ const AttendanceHistory = () => {
               </tr>
             </thead>
             <tbody>
-              {records.map((r, i) => {
-                return (
-                  <tr key={r.id}>
+              {records.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    style={{
+                      ...styleTable.td,
+                      textAlign: "center",
+                      color: "#94a3b8",
+                      fontStyle: "italic",
+                      padding: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Không có dữ liệu
+                  </td>
+                </tr>
+              ) : (
+                records.map((r, i) => (
+                  <tr key={r.id || i}>
                     <td style={styleTable.td}>{i + 1}</td>
                     <td style={styleTable.td}>{r.name}</td>
                     <td style={styleTable.td}>{r.time}</td>
@@ -99,10 +89,9 @@ const AttendanceHistory = () => {
                     >
                       {r.status}
                     </td>
-
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>

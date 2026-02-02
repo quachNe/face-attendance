@@ -51,9 +51,9 @@ export const Styles = {
     gap: 10,
   },
 
-  
 };
 
+// USING IN MODALS
 export const styleModel = {
   modalOverlay: {
     position: "fixed",
@@ -165,106 +165,6 @@ export const styleModel = {
   },
 };
 
-export const stylesLogin = {
-  wrapper: {
-    height: "100vh",
-    width: "100%",
-    position: "relative",
-    fontFamily: "Inter, Segoe UI, system-ui, sans-serif",
-    overflow: "hidden",
-  },
-
-  background: {
-    position: "absolute",
-    inset: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    filter: "blur(2px) scale(1.05)",
-  },
-
-  overlay: {
-    position: "absolute",
-    inset: 0,
-    background:
-      "linear-gradient(120deg, rgba(2,6,23,0.9), rgba(2,6,23,0.6))",
-  },
-
-  card: {
-    position: "relative",
-    zIndex: 2,
-    width: 380,
-    padding: "36px 32px",
-    margin: "auto",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "rgba(255,255,255,0.85)",
-    borderRadius: 26,
-    boxShadow: "0 30px 80px rgba(0,0,0,0.4)",
-    backdropFilter: "blur(18px)",
-    textAlign: "center",
-  },
-
-  logoBox: {
-    marginBottom: 24,
-  },
-
-  title: {
-    fontSize: 40,
-    fontWeight: 800,
-    letterSpacing: 4,
-    background: "linear-gradient(135deg, #0ca1a1, #22d3ee)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-  },
-
-  subtitle: {
-    fontSize: 17,
-    fontWeight: 600,
-    color: "#64748b",
-    letterSpacing: 1,
-    marginTop: 1,
-  },
-
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-  },
-
-  inputBox: {
-    display: "flex",
-    alignItems: "center",
-    background: "rgba(255,255,255,0.95)",
-    borderRadius: 16,
-    padding: "13px 16px",
-    border: "1px solid #e5e7eb",
-    transition: "all 0.2s ease",
-  },
-
-  icon: {
-    marginRight: 12,
-    fontSize: 16,
-    opacity: 0.6,
-  },
-
-  input: {
-    border: "none",
-    outline: "none",
-    fontSize: 14,
-    width: "100%",
-    color: "#020617",
-    background: "transparent",
-  },
-
-  eye: {
-    marginLeft: 10,
-    cursor: "pointer",
-    fontSize: 16,
-    opacity: 0.6,
-    userSelect: "none",
-  },
-};
-
 export const stylesSidebar = {
   sidebar: {
     width: 280,
@@ -369,6 +269,7 @@ export const stylesSidebar = {
   },
 };
 
+// USING IN BUTTONS
 export const stylesButton = {
   actions: {
     display: "flex",
@@ -551,6 +452,7 @@ export const stylesButton = {
   },
 };
 
+// USING IN ERROR MESSAGES
 export const stylesError = {
   message: {
     color: "red", 

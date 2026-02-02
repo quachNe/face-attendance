@@ -82,9 +82,11 @@ const ShiftManagement = () => {
         setShifts(
           shifts.map((s) => (s.id === editId ? res.data : s))
         );
+        await fetchShifts();
       } else {
         res = await createShift(form);
         setShifts([...shifts, res.data]);
+        await fetchShifts();
       }
 
       setShowModal(false);

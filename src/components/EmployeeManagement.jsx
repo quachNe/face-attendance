@@ -99,8 +99,9 @@ const EmployeeManagement = () => {
       username: u.username,
       role : u.role == "admin" ? "ADMIN" : "EMPLOYEE",
       shift: u.shift_id,
-      face_preview: u.face_image,
+      face_preview: null,
       face_file: null,
+      face_image: !!u.face_image,
     });
     setShowModal(true);
   };
@@ -241,8 +242,8 @@ const EmployeeManagement = () => {
         email: u.email || "",
         phone: u.phone || "",
         role: u.role,
-        shift_id: u.shift?.id || null,
-        shift_name: u.shift?.name || "",
+        shift_id: u.shift_id || null,
+        shift_name: u.shift || "",
         face_image: u.face_image || null,
       }));
       const userNotAdmin = mappedUsers.filter(
@@ -407,53 +408,61 @@ const EmployeeManagement = () => {
             <h2 style={styleModel.modalTitle}>{editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}</h2>
 
             <div style={styleModel.faceBox}>
-              <div style={{ position: "relative" }}>
-                <img
-                  src={DEFAULT_FACE}
-                  alt=""
-                  style={styleModel.facePreview}
-                />
+  <div style={{ position: "relative" }}>
+    <img
+      src={form.face_preview ? form.face_preview : DEFAULT_FACE}
+      alt=""
+      style={styleModel.facePreview}
+    />
 
-                {/* BADGE: chỉ hiện khi đã có ảnh nhận diện */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 6,
-                      right: 6,
-                      background: form.face_image ? "#2e7d32" : "#e53935",
-                      color: "#fff",
-                      fontSize: 11,
-                      padding: "2px 6px",
-                      borderRadius: 6,
-                      fontWeight: 600,
-                      width: "max-content",
-                    }}
-                  >
-                    {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
-                  </div>
-              </div>
+    {/* BADGE trạng thái */}
+    <div
+      style={{
+        position: "absolute",
+        bottom: 6,
+        right: 6,
+        background: form.face_image ? "#2e7d32" : "#e53935",
+        color: "#fff",
+        fontSize: 11,
+        padding: "2px 6px",
+        borderRadius: 6,
+        fontWeight: 600,
+        width: "max-content",
+      }}
+    >
+      {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
+    </div>
+  </div>
 
-              <label style={stylesButton.uploadBtn}>
-                <Upload /> Chọn khuôn mặt
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  capture="user"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
+  <label style={stylesButton.uploadBtn}>
+    <Upload /> Chọn khuôn mặt
+    <input
+      hidden
+      type="file"
+      accept="image/*"
+      capture="user"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-                    setForm({
-                      ...form,
-                      face_preview: URL.createObjectURL(file),
-                      face_file: file,
-                      face_image: false, // ⚠️ ảnh mới chưa được nhận diện
-                    });
-                  }}
-                />
-              </label>
-            </div>
+        // Clear preview cũ để tránh memory leak
+        if (form.face_preview) {
+          URL.revokeObjectURL(form.face_preview);
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+
+        setForm(prev => ({
+          ...prev,
+          face_preview: previewUrl, // CHỈ có khi upload mới
+          face_file: file,
+          face_image: false, // ảnh mới => chưa nhận diện
+        }));
+      }}
+    />
+  </label>
+</div>
+
             <div style={styleModel.formGrid}>
               {[
                 ["Họ tên", "name"],

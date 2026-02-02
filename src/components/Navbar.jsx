@@ -75,7 +75,7 @@ const Navbar = () => {
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
       {showUserProfile && (
-        <UserProfile onClose={() => setShowUserProfile(false)} user={user} />
+        <UserProfile onClose={() => setShowUserProfile(false)} />
       )}  
     </>
   );

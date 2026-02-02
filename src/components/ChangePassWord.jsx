@@ -9,6 +9,7 @@ import {
 } from "./Styles.js";
 
 const ChangePassword = ({ onClose }) => {
+  //STATE
   const { user } = useAuth();
 
   const [error, setError] = useState("");
@@ -24,14 +25,16 @@ const ChangePassword = ({ onClose }) => {
     confirm: false,
   });
 
-  const handleChange = (key, value) =>
-    setForm({ ...form, [key]: value });
+  // XỬ LÝ THAY ĐỔI GIÁ TRỊ FORM
+  const handleChange = (key, value) => setForm({ ...form, [key]: value });
 
+  // XỬ LÝ ĐĂNG XUẤT
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
   };
 
+  // XỬ LÝ ĐỔI MẬT KHẨU
   const handleSubmit = async () => {
     if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
       setError("Vui lòng nhập đầy đủ thông tin");
@@ -59,16 +62,24 @@ const ChangePassword = ({ onClose }) => {
         password: form.newPassword,
       };
 
-      const { data } = await updateEmployee(user.id, payload);
+      const res = await updateEmployee(user.id, payload);
 
-      if (!data.success) {
-        setError(data.message || "Đổi mật khẩu thất bại!");
+      // HTTP 2xx là thành công
+      if (res.status === 200 || res.status === 204) {
+        alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+        handleLogout();
         return;
       }
 
-      alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
-      handleLogout();
+      // fallback
+      setError(res.data?.message || "Đổi mật khẩu thất bại!");
     } catch (err) {
+      // ĐÚNG LỖI 400 TỪ BACKEND
+      if (err.response?.status === 400) {
+        setError(err.response.data?.message || "Mật khẩu cũ không đúng");
+        return;
+      }
+
       console.error(err);
       setError("Lỗi kết nối server");
     }
@@ -80,7 +91,7 @@ const ChangePassword = ({ onClose }) => {
         <h2 style={styleModel.modalTitle}>ĐỔI MẬT KHẨU</h2>
 
         <div style={styleModel.formGridShift}>
-          {/* Mật khẩu hiện tại */}
+          {/* MẬT KHẨU HIỆN TAI */}
           <div style={styleModel.formGroupShift}>
             <label style={styleModel.label}>
               Mật khẩu hiện tại <span style={{ color: "red" }}>*</span>
@@ -104,7 +115,7 @@ const ChangePassword = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Mật khẩu mới */}
+          {/* MẬT KHẨU MỚI */}
           <div style={styleModel.formGroupShift}>
             <label style={styleModel.label}>
               Mật khẩu mới <span style={{ color: "red" }}>*</span>
@@ -128,7 +139,7 @@ const ChangePassword = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Xác nhận mật khẩu */}
+          {/* XÁC NHẬN MẬT KHẨU MỚI */}
           <div style={styleModel.formGroupShift}>
             <label style={styleModel.label}>
               Xác nhận mật khẩu mới <span style={{ color: "red" }}>*</span>
