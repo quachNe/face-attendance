@@ -10,14 +10,18 @@ const AttendanceHistory = () => {
   const [date, setDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-
+  const [loading, setLoading] = useState(true);
+  
   // LẤY DANH SÁCH ĐIỂM DANH THEO NGÀY
   const fetchAttendanceRecords = async () => {
     try {
       const { data } = await getLogs({ date });
       setRecords(data);
+      console.log("Attendance records:", data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,57 +47,61 @@ const AttendanceHistory = () => {
           </div>
         </div>
       </div>
-
-      <div style={styleTable.tableWrapper}>
-        <div style={styleTable.tableScroll} className="custom-scroll">
-          <table style={styleTable.table}>
-            <thead>
-              <tr>
-                {["STT","Nhân viên", "Giờ điểm danh", "Ghi chú"].map((h) => (
-                  <th key={h} style={styleTable.th}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {records.length === 0 ? (
+      <div style={{ position: "relative" }}>
+        {loading && (
+          <div style={styleTable.loadingOverlay}>
+            <div style={styleTable.spinner}></div>
+          </div>
+        )}
+        <div style={styleTable.tableWrapper}>
+          <div style={styleTable.tableScroll} className="custom-scroll">
+            <table style={styleTable.table}>
+              <thead>
                 <tr>
-                  <td
-                    colSpan={4}
-                    style={{
-                      ...styleTable.td,
-                      textAlign: "center",
-                      color: "#94a3b8",
-                      fontStyle: "italic",
-                      padding: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Không có dữ liệu
-                  </td>
+                  {["#","Họ Và Tên", "Giờ Vào","Giờ Ra", "Ghi Chú"].map((h) => (
+                    <th key={h} style={styleTable.th}>{h}</th>
+                  ))}
                 </tr>
-              ) : (
-                records.map((r, i) => (
-                  <tr key={r.id || i}>
-                    <td style={styleTable.td}>{i + 1}</td>
-                    <td style={styleTable.td}>{r.name}</td>
-                    <td style={styleTable.td}>{r.time}</td>
+              </thead>
+              <tbody>
+                {records.length === 0 ? (
+                  <tr>
                     <td
+                      colSpan={4}
                       style={{
                         ...styleTable.td,
-                        fontWeight: 600,
-                        color:
-                          r.status?.includes("muộn") || r.status?.includes("Quên")
-                            ? "#ef4444"
-                            : "#22c55e",
+                        textAlign: "center",
+                        color: "#94a3b8",
+                        fontStyle: "italic",
+                        padding: "16px",
+                        fontWeight: "bold",
                       }}
                     >
-                      {r.status}
+                      Không có dữ liệu
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  records.map((r, i) => (
+                    <tr key={r.id || i}>
+                      <td style={styleTable.td}>{i + 1}</td>
+                      <td style={styleTable.td}>{r.name}</td>
+                      <td style={styleTable.td}>{r.time}</td>
+                      <td style={styleTable.td}>{r.checkout}</td>
+                      <td
+                        style={{
+                          ...styleTable.td,
+                          fontWeight: 600,
+                          color: r.status === "overtime" ? "#ef4444" : "#22c55e",
+                        }}
+                      >
+                        {r.status === "overtime" ? "Trễ Giờ" : "Đúng Giờ"}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </>

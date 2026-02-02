@@ -82,7 +82,7 @@ const UserProfile = ({ onClose}) => {
 
   return (
     <div style={styleModel.modalOverlay}>
-      <div style={styleModel.modal}>
+      <div style={{...styleModel.modal, width: 500, padding: "30px 24px"}}>
         <h2 style={styleModel.modalTitle}>
           THÔNG TIN NGƯỜI DÙNG
         </h2>

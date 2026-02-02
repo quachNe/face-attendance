@@ -3,6 +3,7 @@ import EmployeeManagement from "./EmployeeManagement";
 import AttendanceHistory from "./AttendanceHistory";
 import ShiftManagement from "./ShiftManagement";
 import backgroundImg from "/background.jpg";
+import SystemStatistics from "./SystemStatistics";
 
 const Rightbar = ({ activePage }) => {
   return (
@@ -14,7 +15,7 @@ const Rightbar = ({ activePage }) => {
           <AttendanceHistory />
         ) : activePage === "shift" ? (
           <ShiftManagement />
-        ) : (<div>Chưa có trang này</div>)}
+        ) : (<SystemStatistics />)}
       </div>
 
       <style>
@@ -37,7 +38,7 @@ const Rightbar = ({ activePage }) => {
 const styles = {
   container: {
     flex: 1,
-    height: "calc(100vh - 60px)", // ❗ trừ navbar
+    height: "calc(100vh - 60px)",
     backgroundImage: `url(${backgroundImg})`,
     backgroundSize: "cover",
   },

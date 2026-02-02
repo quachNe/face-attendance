@@ -87,7 +87,7 @@ const ChangePassword = ({ onClose }) => {
 
   return (
     <div style={styleModel.modalOverlay}>
-      <div style={styleModel.modal}>
+      <div style={{...styleModel.modal, width: 400, padding: "30px 24px"}}>
         <h2 style={styleModel.modalTitle}>ĐỔI MẬT KHẨU</h2>
 
         <div style={styleModel.formGridShift}>

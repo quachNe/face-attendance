@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Users2, ClipboardCheck, BarChart3, Clock } from "lucide-react";
 import { stylesSidebar } from "./Styles";
-
+import logoImg from "/Logo1.png";
 const Sidebar = ({ setActivePage }) => {
 
   const [activeMenu, setActiveMenu] = useState("employee");
@@ -49,7 +49,18 @@ const Sidebar = ({ setActivePage }) => {
       {/* HEADER – CAO BẰNG NAVBAR */}
       <div style={stylesSidebar.header}>
         <div style={stylesSidebar.logoBox}>
-          <div style={stylesSidebar.logoIcon}>N</div>
+          <div style={stylesSidebar.logoIcon}>
+            <img
+              src={logoImg}
+              alt="Nano Tech"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </div>
+
           <div>
             <div style={stylesSidebar.logo}>NANO TECH</div>
             <div style={stylesSidebar.logoSub}>Attendance System</div>

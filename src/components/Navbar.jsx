@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { User, Settings, Lock, LogOut } from "lucide-react";
+import React, { useState, useEffect, useRef, use } from "react";
+import { User, Settings, Lock, LogOut, Bold } from "lucide-react";
 import ChangePassword from "./ChangePassWord";
 import UserProfile from "./UserProfile";
+import { useAuth } from "../context/AuthContext";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const user = JSON.parse(localStorage.getItem("user"));
+  // const user = JSON.parse(localStorage.getItem("user"));
+  const {user} = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+
+  // XỬ LÝ ĐĂNG XUẤT
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
@@ -148,7 +152,7 @@ const styles = {
   dropdown: {
     position: "absolute",
     top: 52,
-    right: 0,
+    right: -10,
     width: 190,
     background: "rgba(2,6,23,0.97)",
     border: "1px solid rgba(12,161,161,0.35)",
@@ -164,8 +168,9 @@ const styles = {
     gap: 10,
     alignItems: "center",
     cursor: "pointer",
-    fontSize: 14,
+    fontSize: 15,
     transition: "all 0.2s ease",
+    fontWeight: 500,
   },
 
   divider: {

@@ -195,16 +195,14 @@ export const stylesSidebar = {
     width: 50,
     height: 50,
     borderRadius: 18,
-    background: "linear-gradient(135deg, #0ca1a1, #22d3ee)",
+    // background: "linear-gradient(135deg, #0ca1a1, #22d3ee)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 30,
-    fontWeight: 900,
-    color: "#020617",
     boxShadow: "0 0 22px rgba(34,211,238,0.55)",
+    overflow: "hidden",
   },
-
+  
   logo: {
     fontSize: 22,
     fontWeight: 800,
@@ -535,7 +533,7 @@ export const styleTable = {
     borderTop: "4px solid #0ca1a1",
     borderRadius: "50%",
     animation: "spin 20s linear infinite",
-    transform: "translateY(50px)", // 👈 đẩy xuống
+    transform: "translateY(70px)", // 👈 đẩy xuống
   },
 
   loadingOverlay: {

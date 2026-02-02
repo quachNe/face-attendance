@@ -159,7 +159,7 @@ const ShiftManagement = () => {
             <table style={styleTable.table}>
               <thead>
                 <tr>
-                  {["STT", "Tên Ca", "Giờ Bắt Đầu", "Giờ Kết Thúc", "Thao tác"].map((h) => (
+                  {["#", "Tên Ca", "Giờ Bắt Đầu", "Giờ Kết Thúc", "Thao Tác"].map((h) => (
                     <th key={h} style={styleTable.th}>{h}</th>
                   ))}
                 </tr>
@@ -226,7 +226,7 @@ const ShiftManagement = () => {
       </div>
       {showModal && (
         <div style={styleModel.modalOverlay}>
-          <div style={styleModel.modal}>
+          <div style={{...styleModel.modal, width: 450, padding: "30px 24px"}}>
             <h2 style={styleModel.modalTitle}>
               {editId ? "SỬA CA LÀM VIỆC" : "THÊM CA LÀM VIỆC"}
             </h2>

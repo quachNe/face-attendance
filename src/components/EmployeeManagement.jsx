@@ -324,7 +324,7 @@ const EmployeeManagement = () => {
             <table style={styleTable.table}>
               <thead>
                 <tr>
-                  {["STT", "Họ tên", "Ngày sinh", "Email", "SĐT", "Vai trò", "Ca","Khuôn mặt", "Thao tác"].map((h) => (
+                  {["#", "Họ Và Tên", "Ngày Sinh", "Email", "SĐT", "Chức Vụ", "Ca","Khuôn Mặt", "Thao Tác"].map((h) => (
                     <th key={h} style={styleTable.th}>
                       {h}
                     </th>
