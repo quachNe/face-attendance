@@ -115,7 +115,7 @@ const styles = {
   container: {
     height: 60,
     padding: "0 18px",
-    background: "rgba(2,6,23,0.85)",
+    background: "#020617",
     backdropFilter: "blur(12px)",
     borderBottom: "1px solid rgba(12,161,161,0.35)",
     display: "flex",

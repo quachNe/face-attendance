@@ -16,7 +16,6 @@ import {
   deleteShift,
 } from "../services/ShiftService";
 
-// CSS cập nhật cho icon clock trắng (dùng brightness(0) invert(1) để trắng đậm, rõ)
 const timePickerStyles = `
   .custom-time-input {
     color-scheme: dark !important; /* Buộc dark mode cho picker popup */
@@ -44,19 +43,21 @@ const ShiftManagement = () => {
     id: null,
     type: null,
   });
+
   const [form, setForm] = useState({
     name: "",
     start_time: "",
     end_time: "",
   });
 
-
+  // MỞ MODAL THÊM MỚI
   const openAddModal = () => {
     setEditId(null);
     setForm({ name: "", start_time: "", end_time: "" });
     setShowModal(true);
   };
 
+  // MỞ MODAL CHỈNH SỬA CA LÀM VIỆC
   const openEditModal = (s) => {
     setEditId(s.id);
     setForm({
@@ -98,9 +99,7 @@ const ShiftManagement = () => {
     }
   };
 
-
-
-
+  // LỌC CA LÀM VIỆC THEO TỪ KHÓA TÌM KIẾM
   const filteredShifts = shifts.filter((u) => {
     const keyword = search.toLowerCase().trim();
 
@@ -123,18 +122,18 @@ const ShiftManagement = () => {
     }
   };
 
-
+  // GỌI API KHI MOUNT COMPONENT
   useEffect(() => {
     fetchShifts();
   }, []);
 
   return (
     <>
-      {/* Inject CSS cập nhật */}
       <style>{timePickerStyles}</style>
-
+      {/*------------------------ HEADER ------------------------*/}
       <div style={Styles.header}>
         <h1 style={Styles.title}><Clock/>QUẢN LÝ CA LÀM VIỆC</h1>
+        {/*------------------------ SEARCH ------------------------*/}
         <div style={Styles.actions}>
           <input
             placeholder="Tìm theo tên ca làm việc"
@@ -147,7 +146,7 @@ const ShiftManagement = () => {
           </div>
         </div>
       </div>
-
+      {/*------------------------ TABLE ------------------------*/}
       <div style={{ position: "relative" }}>
         {loading && (
           <div style={styleTable.loadingOverlay}>
@@ -177,7 +176,6 @@ const ShiftManagement = () => {
                     <td style={styleTable.td}>{s.end_time || "—"}</td>
                     <td style={styleTable.td}>
                       <div style={stylesButton.actionIcons}>
-                        {/* EDIT */}
                         <div
                           style={{
                             ...stylesButton.iconBase,
@@ -196,7 +194,6 @@ const ShiftManagement = () => {
                           <Pencil size={15} />
                         </div>
 
-                        {/* DELETE */}
                         <div
                           style={{
                             ...stylesButton.iconBase,
@@ -224,6 +221,7 @@ const ShiftManagement = () => {
           </div>
         </div>
       </div>
+      {/*------------------------ MODAL ------------------------*/}
       {showModal && (
         <div style={styleModel.modalOverlay}>
           <div style={{...styleModel.modal, width: 450, padding: "30px 24px"}}>

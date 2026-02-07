@@ -14,6 +14,7 @@ import {
 import { getEmployees, updateEmployee, createEmployee } from "../services/EmployeeService";
 import { getShifts } from "../services/ShiftService";
 import { exportEmployeePDF } from "../utils/exportPDF";
+import * as XLSX from "xlsx";
 
 // CSS global cho input date (chỉ inject 1 lần)
 const datePickerStyles = `
@@ -274,19 +275,103 @@ const EmployeeManagement = () => {
     fetchShifts();
   }, []);
 
+  // XUẤT DANH SÁCH NHÂN VIÊN RA EXCEL
+  const handleExportExcel = () => {
+    if (!filteredUsers.length) {
+      alert("Không có dữ liệu để xuất");
+      return;
+    }
+
+    const tableData = filteredUsers.map((u, index) => ({
+      STT: index + 1,
+      "Họ và tên": u.name,
+      "Ngày sinh": u.dob || "",
+      Email: u.email || "",
+      "Số điện thoại": u.phone || "",
+      "Chức vụ": u.role === "admin" ? "Quản trị viên" : "Nhân viên",
+      "Ca làm việc": u.shift_name || "",
+      "Khuôn mặt": u.face_image ? "Đã nhận diện" : "Chưa nhận diện",
+    }));
+
+    // 👉 Sheet bắt đầu từ A1 (KHÔNG tiêu đề)
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+    /* ===== HEADER (DÒNG 1) ===== */
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const headerCell = XLSX.utils.encode_cell({ r: 0, c: C });
+      const cell = worksheet[headerCell];
+      if (!cell) continue;
+
+      cell.s = {
+        font: { bold: true },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+
+    /* ===== BODY (KẺ BẢNG) ===== */
+    for (let R = 1; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const addr = XLSX.utils.encode_cell({ r: R, c: C });
+        const cell = worksheet[addr];
+        if (!cell) continue;
+
+        cell.s = {
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+          alignment: {
+            vertical: "center",
+            horizontal: [0, 2, 7].includes(C) ? "center" : "left",
+          },
+        };
+      }
+    }
+
+    /* ===== WIDTH ===== */
+    worksheet["!cols"] = [
+      { wch: 6 },   // STT
+      { wch: 24 },  // Họ tên
+      { wch: 14 },  // Ngày sinh
+      { wch: 28 },  // Email
+      { wch: 16 },  // SĐT
+      { wch: 16 },  // Chức vụ
+      { wch: 18 },  // Ca
+      { wch: 18 },  // Khuôn mặt
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "NhanVien");
+    XLSX.writeFile(workbook, "Danh_sach_nhan_vien.xlsx");
+  };
+
   return (
     <>
+      {/*------------------------ HEADER ------------------------*/}
       <div style={Styles.header}>
+        {/*------------------------ TITLE ------------------------*/}
         <h1 style={Styles.title}>
           <Users2 /> QUẢN LÝ NHÂN VIÊN
         </h1>
+        
         <div style={Styles.actions}>
+          {/*------------------------ SEARCH ------------------------*/}
           <input
             placeholder="Tìm theo tên, ngày sinh, email, SĐT"
             style={stylesForm.searchInput}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          {/*------------------------ FILLTER ------------------------*/}
           <select
             style={stylesForm.filterSelect}
             value={filterRole}
@@ -297,12 +382,15 @@ const EmployeeManagement = () => {
             <option value="EMPLOYEE">Nhân Viên</option>
           </select>
           <div style={Styles.rightActions}>
+            {/*------------------------ ADD ------------------------*/}
             <button style={stylesButton.btnAdd} onClick={openAddModal}>
               <Plus size={18} /> Thêm
             </button>
-            <button style={stylesButton.btnExcel}>
+            {/*------------------------ EXPORT EXCEL ------------------------*/}
+            <button style={stylesButton.btnExcel} onClick={handleExportExcel}>
               <FileSpreadsheet size={18} /> Xuất Excel
             </button>
+            {/*------------------------ EXPORT PDF ------------------------*/}
             <button
             style={stylesButton.btnPdf}
             onClick={() => exportEmployeePDF(users)}
@@ -313,6 +401,7 @@ const EmployeeManagement = () => {
           </div>
         </div>
       </div>
+      {/*------------------------ CONTENT ------------------------*/}
       <div style={{ position: "relative" }}>
         {loading && (
           <div style={styleTable.loadingOverlay}>
@@ -402,67 +491,66 @@ const EmployeeManagement = () => {
           </div>
         </div>
       </div>
+      {/*------------------------ MODAL------------------------*/}
       {showModal && (
         <div style={styleModel.modalOverlay}>
           <div style={styleModel.modal}>
             <h2 style={styleModel.modalTitle}>{editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}</h2>
-
             <div style={styleModel.faceBox}>
-  <div style={{ position: "relative" }}>
-    <img
-      src={form.face_preview ? form.face_preview : DEFAULT_FACE}
-      alt=""
-      style={styleModel.facePreview}
-    />
+              <div style={{ position: "relative" }}>
+                <img
+                  src={form.face_preview ? form.face_preview : DEFAULT_FACE}
+                  alt=""
+                  style={styleModel.facePreview}
+                />
 
-    {/* BADGE trạng thái */}
-    <div
-      style={{
-        position: "absolute",
-        bottom: 6,
-        right: 6,
-        background: form.face_image ? "#2e7d32" : "#e53935",
-        color: "#fff",
-        fontSize: 11,
-        padding: "2px 6px",
-        borderRadius: 6,
-        fontWeight: 600,
-        width: "max-content",
-      }}
-    >
-      {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
-    </div>
-  </div>
+                {/* BADGE trạng thái */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 6,
+                    right: 6,
+                    background: form.face_image ? "#2e7d32" : "#e53935",
+                    color: "#fff",
+                    fontSize: 11,
+                    padding: "2px 6px",
+                    borderRadius: 6,
+                    fontWeight: 600,
+                    width: "max-content",
+                  }}
+                >
+                  {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
+                </div>
+              </div>
 
-  <label style={stylesButton.uploadBtn}>
-    <Upload /> Chọn khuôn mặt
-    <input
-      hidden
-      type="file"
-      accept="image/*"
-      capture="user"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+              <label style={stylesButton.uploadBtn}>
+                <Upload /> Chọn khuôn mặt
+                <input
+                  hidden
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
 
-        // Clear preview cũ để tránh memory leak
-        if (form.face_preview) {
-          URL.revokeObjectURL(form.face_preview);
-        }
+                    // Clear preview cũ để tránh memory leak
+                    if (form.face_preview) {
+                      URL.revokeObjectURL(form.face_preview);
+                    }
 
-        const previewUrl = URL.createObjectURL(file);
+                    const previewUrl = URL.createObjectURL(file);
 
-        setForm(prev => ({
-          ...prev,
-          face_preview: previewUrl, // CHỈ có khi upload mới
-          face_file: file,
-          face_image: false, // ảnh mới => chưa nhận diện
-        }));
-      }}
-    />
-  </label>
-</div>
-
+                    setForm(prev => ({
+                      ...prev,
+                      face_preview: previewUrl, // CHỈ có khi upload mới
+                      face_file: file,
+                      face_image: false, // ảnh mới => chưa nhận diện
+                    }));
+                  }}
+                />
+              </label>
+            </div>
             <div style={styleModel.formGrid}>
               {[
                 ["Họ tên", "name"],

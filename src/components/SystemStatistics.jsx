@@ -12,10 +12,7 @@ const cardStyle = {
 
 const SystemStatistics = () => {
   return (
-    <>
-    {/* // <div style={Styles.container}> */}
-    {/* //   <div style={Styles.overlay}> */}
-        
+    <>  
         {/* HEADER */}
         <div style={Styles.header}>
           <h1 style={Styles.title}>
@@ -152,8 +149,6 @@ const SystemStatistics = () => {
             </div>
           ))}
         </div>
-      {/* </div> */}
-    {/* </div> */}
     </>
   );
 };
