@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
-import { Styles, stylesButton, stylesForm, styleTable} from "./Styles";
+import { Styles, stylesButton, stylesForm, styleTable} from "../style/Styles";
 import { ClipboardCheck} from "lucide-react";
-import { getLogs } from "../services/AttendanceService";
+import { getLogs } from "../../../services/AttendanceService";
 
 const AttendanceHistory = () => {
   const [records, setRecords] = useState([]);

@@ -29,17 +29,16 @@ export const AuthProvider = ({ children }) => {
             console.log(data);
 
             if (res.ok && data.success) {
-            // ✅ backend trả trực tiếp
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
-            localStorage.setItem("token", data.token);
+                setUser(data.user);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", data.token);
 
-            return { success: true };
+                return { success: true };
             } else {
-            return {
-                success: false,
-                message: data.message || "Tên đăng nhập hoặc mật khẩu không đúng",
-            };
+                return {
+                    success: false,
+                    message: data.message || "Tên đăng nhập hoặc mật khẩu không đúng",
+                };
             }
         } catch (error) {
             console.error("Login error:", error);

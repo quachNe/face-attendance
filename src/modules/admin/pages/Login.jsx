@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "/background.jpg";
-import { useAuth } from "../context/AuthContext";
-import { styleModel, stylesButton } from "../components/Styles";
+import { useAuth } from "../../../context/AuthContext";
+import { styleModel, stylesButton } from "../style/Styles";
 import { Eye, EyeOff, User, Lock, LogIn, ArrowLeft } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();

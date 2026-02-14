@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { styleModel, Styles, stylesButton, stylesError, stylesForm, styleTable } from "./Styles";
+import { styleModel, Styles, stylesButton, stylesError, stylesForm, styleTable } from "../style/Styles";
 import {
   Plus,
   Pencil,
@@ -14,7 +14,7 @@ import {
   createShift,
   updateShift,
   deleteShift,
-} from "../services/ShiftService";
+} from "../../../services/ShiftService";
 
 const timePickerStyles = `
   .custom-time-input {

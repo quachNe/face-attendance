@@ -1,7 +1,6 @@
 import React from "react";
-import { Styles, styleTable } from "./Styles";
+import { Styles, DEFAULT_FACE } from "../style/Styles";
 import { BarChart3 } from "lucide-react";
-import { DEFAULT_FACE } from "./Styles";
 
 const cardStyle = {
   background: "#020617",

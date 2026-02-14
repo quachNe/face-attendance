@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Save, X, User, Mail, Phone, Briefcase, Calendar, } from "lucide-react";
-import { styleModel, stylesButton, stylesError } from "./Styles";
-import { getEmployeeById, updateEmployee } from "../services/EmployeeService";
-import { useAuth } from "../context/AuthContext";
+import { styleModel, stylesButton, stylesError } from "../style/Styles";
+import { getEmployeeById, updateEmployee } from "../../../services/EmployeeService";
+import { useAuth } from "../../../context/AuthContext";
 
 const UserProfile = ({ onClose}) => {
   const { user } = useAuth();

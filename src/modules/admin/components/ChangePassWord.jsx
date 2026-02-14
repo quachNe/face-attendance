@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Save, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext.jsx";
-import { updateEmployee } from "../services/EmployeeService.js";
+import { useAuth } from "../../../context/AuthContext.jsx";
+import { updateEmployee } from "../../../services/EmployeeService.js";
 import {
   stylesButton,
   stylesError,
   styleModel,
-} from "./Styles.js";
+} from "../style/Styles";
 
 const ChangePassword = ({ onClose }) => {
   //STATE

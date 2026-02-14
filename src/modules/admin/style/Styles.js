@@ -339,14 +339,14 @@ export const stylesButton = {
   uploadBtn: {
     display: "inline-flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: 8,
     padding: "10px 16px",
     fontSize: 14,
     fontWeight: 500,
-    color: "#ffffff",
     cursor: "pointer",
-    userSelect: "none",
-  },
+    background: "none",
+  }
 };
 
 // USING IN ERROR MESSAGES

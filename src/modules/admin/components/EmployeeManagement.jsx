@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Styles, DEFAULT_FACE, stylesButton, stylesError, stylesForm, styleTable, styleModel } from "./Styles";
+import React, { useState, useEffect, useRef } from "react";
+import { Styles, DEFAULT_FACE, stylesButton, stylesError, stylesForm, styleTable, styleModel } from "../style/Styles";
 import {
   Plus,
   Pencil,
   Trash2,
   FileText,
-  Upload,
+  Camera ,
   Users2,
   FileSpreadsheet,
   Save,
   X
 } from "lucide-react";
-import { getEmployees, updateEmployee, createEmployee } from "../services/EmployeeService";
-import { getShifts } from "../services/ShiftService";
-import { exportEmployeePDF } from "../utils/exportPDF";
+import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
+import { getShifts } from "../../../services/ShiftService";
+import { exportEmployeePDF } from "../../../utils/exportPDF";
 import * as XLSX from "xlsx";
 
 // CSS global cho input date (chỉ inject 1 lần)
@@ -59,6 +59,70 @@ const EmployeeManagement = () => {
     id: null,
     type: null,
   });
+  // ===== WEBCAM =====
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const [showCamModal, setShowCamModal] = useState(false);
+  const [camStream, setCamStream] = useState(null);
+
+  const openCameraModal = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+    });
+
+    setCamStream(stream);
+    setShowCamModal(true);
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    }, 100);
+  } catch (err) {
+    alert("Không thể mở webcam");
+  }
+};
+  const closeCameraModal = () => {
+  if (camStream) {
+    camStream.getTracks().forEach(track => track.stop());
+  }
+  setCamStream(null);
+  setShowCamModal(false);
+};
+const captureFromCamera = () => {
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
+  if (!video || !canvas) return;
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+
+    const file = new File([blob], "face.jpg", { type: "image/jpeg" });
+    const previewUrl = URL.createObjectURL(blob);
+
+    // clear preview cũ
+    if (form.face_preview) {
+      URL.revokeObjectURL(form.face_preview);
+    }
+
+    setForm(prev => ({
+      ...prev,
+      face_preview: previewUrl,
+      face_file: file,
+      face_image: false,
+    }));
+
+    closeCameraModal();
+  }, "image/jpeg");
+};
 
   const [form, setForm] = useState({
     name: "",
@@ -522,34 +586,20 @@ const EmployeeManagement = () => {
                   {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
                 </div>
               </div>
-
-              <label style={stylesButton.uploadBtn}>
-                <Upload /> Chọn khuôn mặt
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  capture="user"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    // Clear preview cũ để tránh memory leak
-                    if (form.face_preview) {
-                      URL.revokeObjectURL(form.face_preview);
-                    }
-
-                    const previewUrl = URL.createObjectURL(file);
-
-                    setForm(prev => ({
-                      ...prev,
-                      face_preview: previewUrl, // CHỈ có khi upload mới
-                      face_file: file,
-                      face_image: false, // ảnh mới => chưa nhận diện
-                    }));
-                  }}
-                />
-              </label>
+                  <button
+                    type="button"
+                    onClick={openCameraModal}
+                    style={{
+                      ...stylesButton.uploadBtn,
+                      background: "none",
+                      border: "1px dashed #9ca3af",
+                      borderRadius: 8,
+                      justifyContent: "center",
+                      width: "50%",
+                    }}
+                  >
+                    <Camera size={18} />Chụp ảnh khuôn mặt
+                  </button>
             </div>
             <div style={styleModel.formGrid}>
               {[
@@ -631,6 +681,48 @@ const EmployeeManagement = () => {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/*------------------------ MODAL WEBCAM------------------------*/}
+      {showCamModal && (
+        <div style={styleModel.modalOverlay}>
+          <div style={{ ...styleModel.modal, width: 360 }}>
+            <h3 style={{ textAlign: "center", marginBottom: 12 }}>
+              <Camera size={18} /> Chụp ảnh khuôn mặt
+            </h3>
+
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              style={{
+                width: "100%",
+                borderRadius: 12,
+                border: "2px solid #0ca1a1",
+              }}
+            />
+
+            <div
+              style={{
+                marginTop: 12,
+                display: "flex",
+                justifyContent: "center",
+                
+                gap: 12,
+              }}
+            >
+              <button onClick={closeCameraModal} style={stylesButton.btnCancel}>
+                <X size={18} /> Hủy
+              </button>
+              <button onClick={captureFromCamera} style={stylesButton.btnSave}>
+                <Camera size={18} /> Chụp
+              </button>
+              
+            </div>
+
+            <canvas ref={canvasRef} hidden />
           </div>
         </div>
       )}
