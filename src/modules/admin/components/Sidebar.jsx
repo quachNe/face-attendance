@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Users2, ClipboardCheck, BarChart3, Clock } from "lucide-react";
+import { Users2, ClipboardCheck, BarChart3, Clock, Plane   } from "lucide-react";
 import logoImg from "/Logo1.png";
 const Sidebar = ({ setActivePage }) => {
 
@@ -71,6 +71,7 @@ const Sidebar = ({ setActivePage }) => {
       <div style={stylesSidebar.menuList}>
         {renderMenu("employee", "Nhân viên", Users2)}
         {renderMenu("shift", "Ca làm việc", Clock)}
+        {renderMenu("leave", "Nghỉ phép", Plane  )}
         {renderMenu("history", "Điểm danh", ClipboardCheck)}
         {renderMenu("stats", "Thống kê", BarChart3)}
       </div>

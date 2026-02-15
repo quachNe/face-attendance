@@ -4,29 +4,35 @@ import LeaveMenu from "../components/LeaveMenu";
 import LeaveFooter from "../components/LeaveFooter";
 import LeaveLoginModal from "../components/LeaveLoginModal";
 import { useAuth } from "../../../context/AuthContext";
-import Profile from "../components/Profile";
-import { User2Icon, CalendarDays, FileText } from "lucide-react"
+import { User2Icon, CalendarDays, FileText } from "lucide-react";
+import LeaveRequest from "../components/LeaveRequest";
+import LeaveStatus from "../components/LeaveStatus";
+import ProfileModal from "../components/ProfileModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const LeaveManagement = () => {
   const [showLogin, setShowLogin] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [active, setActive] = useState(null);
-  const {user} = useAuth();
+  const { user } = useAuth();
+
   useEffect(() => {
     if (!user) {
       setActive(null);
     }
   }, [user]);
+
   const renderContent = () => {
     if (!active) {
       return (
         <div style={styles.emptyWrapper}>
           <div style={styles.emptyCard}>
             <div style={styles.emptyIcon}>📂</div>
-            <h2 style={styles.emptyTitle}>
-              Chưa chọn chức năng
-            </h2>
+            <h2 style={styles.emptyTitle}>Chưa chọn chức năng</h2>
             <p style={styles.emptyDesc}>
-              Vui lòng chọn một chức năng bên trái để bắt đầu sử dụng hệ thống quản lý đơn xin nghỉ phép.
+              Vui lòng chọn một chức năng bên trái để bắt đầu sử dụng hệ thống
+              quản lý đơn xin nghỉ phép.
             </p>
           </div>
         </div>
@@ -36,35 +42,25 @@ const LeaveManagement = () => {
     switch (active) {
       case "request":
         return (
-          <div>
+          <>
             <h2 style={styles.contentTitle}>
               <CalendarDays size={22} />
               <span>Gửi đơn xin nghỉ phép</span>
             </h2>
-          </div>
+            <LeaveRequest />
+          </>
         );
 
       case "status":
         return (
-          <div>
+          <>
             <h2 style={styles.contentTitle}>
               <FileText size={22} />
               <span>Trạng thái đơn nghỉ phép</span>
             </h2>
-          </div>
+            <LeaveStatus />
+          </>
         );
-
-      case "profile":
-        return (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <h2 style={styles.contentTitle}>
-              <User2Icon size={22} />
-              <span>Thông tin cá nhân</span>
-            </h2>
-            <Profile />
-          </div>
-        );
-
       default:
         return null;
     }
@@ -72,7 +68,12 @@ const LeaveManagement = () => {
 
   return (
     <div style={styles.page}>
-      <LeaveHeader onLoginClick={() => setShowLogin(true)} />
+      {/* ✅ CHỈ 1 HEADER */}
+      <LeaveHeader
+        onLoginClick={() => setShowLogin(true)}
+        onShowProfile={() => setShowProfile(true)}
+        onShowChangePassword={() => setShowChangePassword(true)}
+      />
 
       <div style={styles.wrapper}>
         <div style={styles.left}>
@@ -83,21 +84,26 @@ const LeaveManagement = () => {
           />
         </div>
 
-        <div style={styles.right}>
-          {renderContent()}
-        </div>
+        <div style={styles.right}>{renderContent()}</div>
       </div>
 
       <LeaveFooter />
 
-      {showLogin && (
-        <LeaveLoginModal onClose={() => setShowLogin(false)} />
+      {showLogin && <LeaveLoginModal onClose={() => setShowLogin(false)} />}
+      {showProfile && (
+        <ProfileModal onClose={() => setShowProfile(false)} />
+      )}
+      {showChangePassword && (
+        <ChangePasswordModal
+          onClose={() => setShowChangePassword(false)}
+        />
       )}
     </div>
   );
-}
+};
 
 export default LeaveManagement;
+
 const styles = {
   page: {
     height: "100vh",
@@ -126,7 +132,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
   },
-
 
   /* ================= EMPTY STATE ================= */
 
@@ -169,6 +174,7 @@ const styles = {
 
   contentTitle: {
     margin: 0,
+    gap: "10px",
     display: "flex",
     alignItems: "center",
     fontSize: "23px",

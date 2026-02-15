@@ -10,12 +10,16 @@ const Rightbar = ({ activePage }) => {
     <div style={styles.container}>
       <div style={styles.overlay} className="custom-scroll">
         {activePage === "employee" ? (
-          <EmployeeManagement />
-        ) : activePage === "history" ? (
-          <AttendanceHistory />
-        ) : activePage === "shift" ? (
-          <ShiftManagement />
-        ) : (<SystemStatistics />)}
+            <EmployeeManagement />
+          ) : activePage === "history" ? (
+            <AttendanceHistory />
+          ) : activePage === "shift" ? (
+            <ShiftManagement />
+          ) : activePage === "leave" ? (
+            <div>Chưa làm</div>
+          ) :(
+          <SystemStatistics />)
+        }
       </div>
 
       <style>

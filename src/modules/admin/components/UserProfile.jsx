@@ -1,26 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { Save, X, User, Mail, Phone, Briefcase, Calendar, } from "lucide-react";
+import {
+  Save,
+  X,
+  User,
+  Mail,
+  Phone,
+  Briefcase,
+  Calendar,
+} from "lucide-react";
 import { styleModel, stylesButton, stylesError } from "../style/Styles";
-import { getEmployeeById, updateEmployee } from "../../../services/EmployeeService";
+import {
+  getEmployeeById,
+  updateEmployee,
+} from "../../../services/EmployeeService";
 import { useAuth } from "../../../context/AuthContext";
 
-const UserProfile = ({ onClose}) => {
+const UserProfile = ({ onClose }) => {
   const { user } = useAuth();
+
+  const [animate, setAnimate] = useState(false);
+  const [shake, setShake] = useState(false);
   const [hover, setHover] = useState(null);
   const [error, setError] = useState("");
+
   const [form, setForm] = useState({
-    name: user?.name || "",
-    dob: user?.dob || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    address: user?.address || "",
-    role: user.role?.toUpperCase() || "",
+    name: "",
+    dob: "",
+    email: "",
+    phone: "",
+    address: "",
+    role: "",
   });
 
-  // LOAD USER TỪ API
+  /* ================= LOAD USER ================= */
   const fetchUser = async () => {
     try {
-      const {data} = await getEmployeeById(`${user.id}`);
+      const { data } = await getEmployeeById(user.id);
       setForm({
         name: data.name || "",
         dob: data.dob || "",
@@ -29,24 +44,44 @@ const UserProfile = ({ onClose}) => {
         address: data.address || "",
         role: data.role?.toUpperCase() || "",
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  // GỌI API KHI MOUNT COMPONENT
+  /* ================= MOUNT ================= */
   useEffect(() => {
     fetchUser();
+
+    setTimeout(() => setAnimate(true), 10);
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
-  
-  // XỬ LÝ THAY ĐỔI GIÁ TRỊ FORM
-  const handleChange = (key, value) => setForm({ ...form, [key]: value });
+  /* ================= CLOSE ================= */
+  const handleClose = () => {
+    setAnimate(false);
+    setTimeout(() => {
+      onClose();
+    }, 250);
+  };
 
-  // XỬ LÝ LƯU THÔNG TIN NGƯỜI DÙNG
+  /* ================= CHANGE ================= */
+  const handleChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     if (!form.name || !form.email || !form.phone || !form.dob) {
       setError("Không được để trống thông tin");
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
       return;
     }
 
@@ -55,13 +90,13 @@ const UserProfile = ({ onClose}) => {
 
       if (!data.success) {
         setError(data.message || "Cập nhật thất bại");
+        setShake(true);
+        setTimeout(() => setShake(false), 400);
         return;
       }
 
-      // lấy user hiện tại trong local
       const currentUser = JSON.parse(localStorage.getItem("user"));
 
-      // merge lại user (KHÔNG phụ thuộc backend có trả user hay không)
       const updatedUser = {
         ...currentUser,
         name: form.name,
@@ -71,18 +106,35 @@ const UserProfile = ({ onClose}) => {
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      alert("Cập nhật thông tin thành công");
-      onClose();
+      alert("Đổi thông tin thành công!!")
+      // handleClose();
     } catch (err) {
       console.error(err);
       setError("Cập nhật thất bại");
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
     }
   };
 
   return (
-    <div style={styleModel.modalOverlay}>
-      <div style={{...styleModel.modal, width: 500, padding: "30px 24px"}}>
+    <div
+      style={styleModel.modalOverlay}
+      onClick={handleClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...styleModel.modal,
+          width: 500,
+          padding: "30px 24px",
+          transform: animate
+            ? "translateY(0)"
+            : "translateY(-40px)",
+          opacity: animate ? 1 : 0,
+          transition: "all 0.25s ease",
+          animation: shake ? "shake 0.35s" : "none",
+        }}
+      >
         <h2 style={styleModel.modalTitle}>
           THÔNG TIN NGƯỜI DÙNG
         </h2>
@@ -96,9 +148,18 @@ const UserProfile = ({ onClose}) => {
             ["role", "Chức vụ", <Briefcase size={18} />],
           ].map(([key, label, icon]) => (
             <div key={key} style={styleModel.formGroup}>
-              <label style={styleModel.label}>{label}<span style={{ color: "red" }}> *</span></label>
+              <label style={styleModel.label}>
+                {label}
+                {key !== "role" && (
+                  <span style={{ color: "red" }}> *</span>
+                )}
+              </label>
+
               <div style={stylesUserProfile.inputBox}>
-                <span style={stylesUserProfile.icon}>{icon}</span>
+                <span style={stylesUserProfile.icon}>
+                  {icon}
+                </span>
+
                 <input
                   type={
                     key === "dob"
@@ -111,40 +172,31 @@ const UserProfile = ({ onClose}) => {
                   value={form[key]}
                   onChange={(e) => {
                     let value = e.target.value;
-
-                    // Nếu là SĐT → chỉ cho nhập số
                     if (key === "phone") {
                       value = value.replace(/\D/g, "");
                     }
-
                     handleChange(key, value);
                   }}
-                  style={{
-                    ...stylesUserProfile.input,
-                    color: "#e5e7eb",
-                  }}
+                  style={stylesUserProfile.input}
                 />
               </div>
             </div>
           ))}
 
-          {/* ERROR */}
           {error && (
-            <p style={stylesError.message}>
-              {error}
-            </p>
+            <p style={stylesError.message}>{error}</p>
           )}
 
-          {/* ACTIONS */}
           <div style={stylesButton.actions}>
             <button
               style={{
                 ...stylesButton.btnCancel,
-                ...(hover === "cancel" && stylesButton.btnCancelHover),
+                ...(hover === "cancel" &&
+                  stylesButton.btnCancelHover),
               }}
               onMouseEnter={() => setHover("cancel")}
               onMouseLeave={() => setHover(null)}
-              onClick={onClose}
+              onClick={handleClose}
             >
               <X size={18} /> Hủy
             </button>
@@ -152,7 +204,8 @@ const UserProfile = ({ onClose}) => {
             <button
               style={{
                 ...stylesButton.btnSave,
-                ...(hover === "save" && stylesButton.btnSaveHover),
+                ...(hover === "save" &&
+                  stylesButton.btnSaveHover),
               }}
               onMouseEnter={() => setHover("save")}
               onMouseLeave={() => setHover(null)}
@@ -163,13 +216,27 @@ const UserProfile = ({ onClose}) => {
           </div>
         </div>
       </div>
+
+      {/* SHAKE KEYFRAME */}
+      <style>
+        {`
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          50% { transform: translateX(6px); }
+          75% { transform: translateX(-4px); }
+          100% { transform: translateX(0); }
+        }
+      `}
+      </style>
     </div>
   );
 };
 
 export default UserProfile;
 
-// STYLES
+/* ================= STYLES ================= */
+
 const stylesUserProfile = {
   inputBox: {
     display: "flex",

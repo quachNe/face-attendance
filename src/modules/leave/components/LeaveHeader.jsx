@@ -1,24 +1,52 @@
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { User, LogIn, LogOut } from "lucide-react";
+import { User, LogIn } from "lucide-react";
+import LeaveDropdown from "./LeaveDropdown";
 
-function LeaveHeader({ onLoginClick }) {
-  const { user, logout } = useAuth();
+function LeaveHeader({
+  onLoginClick,
+  onShowProfile,
+  onShowChangePassword
+}) {
+  const { user } = useAuth();
+  const [showDropDown, setShowDropDown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleShowDropDown = () => {
+    setShowDropDown((prev) => !prev);
+  };
+
+  // Click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setShowDropDown(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div style={styles.header}>
-      
+      {/* LOGO */}
       <div style={styles.logoContainer}>
         <img src="/Logo1.png" alt="logo" style={styles.logo} />
         <span style={styles.systemName}>NANO TECH</span>
       </div>
 
-      <div>
-        <h2 style={styles.pageTitle}>
-          QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
-        </h2>
-      </div>
+      {/* TITLE */}
+      <h2 style={styles.pageTitle}>
+        QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
+      </h2>
 
-      <div style={styles.userContainer}>
+      {/* USER */}
+      <div style={styles.userContainer} ref={dropdownRef}>
         {!user ? (
           <button onClick={onLoginClick} style={styles.loginBtn}>
             <LogIn size={18} style={{ marginRight: "6px" }} />
@@ -26,31 +54,33 @@ function LeaveHeader({ onLoginClick }) {
           </button>
         ) : (
           <>
-            <div style={styles.userInfo}>
-              <User size={18} />
+            <div style={styles.userInfo} onClick={handleShowDropDown}>
               <span style={styles.username}>
                 Xin chào, {user.name}
               </span>
+              <User size={25} style={{ cursor: "pointer" }} />
             </div>
 
-            <span style={styles.divider}>|</span>
-
-            <button onClick={logout} style={styles.logoutBtn}>
-              <LogOut size={18} style={{ marginRight: "6px" }} />
-              Đăng xuất
-            </button>
+            {showDropDown && (
+              <LeaveDropdown
+                onClose={() => setShowDropDown(false)}
+                onShowProfile={onShowProfile}
+                onShowChangePassword={onShowChangePassword}
+              />
+            )}
           </>
         )}
       </div>
-
     </div>
   );
 }
 
 export default LeaveHeader;
 
+
 const styles = {
   header: {
+    position: "relative", // 🔥 quan trọng
     background: "linear-gradient(90deg, #0f4c81, #1e3a8a)",
     color: "white",
     padding: "12px 40px",
@@ -85,36 +115,25 @@ const styles = {
   userContainer: {
     display: "flex",
     alignItems: "center",
-    gap: "10px"
+    gap: "10px",
+    position: "relative"  // 🔥 anchor cho dropdown
   },
 
   username: {
     fontSize: "14px"
   },
 
-  divider: {
-    opacity: 0.7
-  },
   userInfo: {
     display: "flex",
     alignItems: "center",
-    gap: "6px"
+    gap: "6px",
+    cursor: "pointer"
   },
 
   loginBtn: {
-    background: "none",display:"flex",
-    justifyContent:"center",
-    border: "none",
-    color: "white",
-    cursor: "pointer",
-    fontSize: "14px",
-    padding: 0,
-    },
-
-  logoutBtn: {
-    display:"flex",
-    justifyContent:"center",
     background: "none",
+    display: "flex",
+    alignItems: "center",
     border: "none",
     color: "white",
     cursor: "pointer",

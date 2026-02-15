@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Eye, EyeOff, Save, X } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext.jsx";
 import { updateEmployee } from "../../../services/EmployeeService.js";
@@ -9,8 +9,10 @@ import {
 } from "../style/Styles";
 
 const ChangePassword = ({ onClose }) => {
-  //STATE
   const { user } = useAuth();
+
+  const [animate, setAnimate] = useState(false);
+  const [shake, setShake] = useState(false);
 
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -25,34 +27,80 @@ const ChangePassword = ({ onClose }) => {
     confirm: false,
   });
 
-  // XỬ LÝ THAY ĐỔI GIÁ TRỊ FORM
-  const handleChange = (key, value) => setForm({ ...form, [key]: value });
+  /* ================= PASSWORD STRENGTH ================= */
 
-  // XỬ LÝ ĐĂNG XUẤT
+  const getStrength = (password) => {
+    let score = 0;
+
+    if (password.length >= 6) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+
+    return score;
+  };
+
+  const strength = getStrength(form.newPassword);
+
+  const strengthLabel = ["Rất yếu", "Yếu", "Trung bình", "Mạnh", "Rất mạnh"];
+  const strengthColor = [
+    "#ef4444",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#16a34a",
+  ];
+
+  /* ================= MOUNT ================= */
+
+  useEffect(() => {
+    setTimeout(() => setAnimate(true), 10);
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, []);
+
+  const handleClose = () => {
+    setAnimate(false);
+    setTimeout(() => onClose(), 250);
+  };
+
+  const handleChange = (key, value) =>
+    setForm({ ...form, [key]: value });
+
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
   };
 
-  // XỬ LÝ ĐỔI MẬT KHẨU
+  /* ================= SUBMIT ================= */
+
   const handleSubmit = async () => {
     if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
       setError("Vui lòng nhập đầy đủ thông tin");
+      triggerShake();
       return;
     }
 
     if (form.newPassword.length < 6) {
-      setError("Mật khẩu mới phải có ít nhất 6 ký tự");
+      setError("Mật khẩu phải ít nhất 6 ký tự");
+      triggerShake();
       return;
     }
 
     if (form.oldPassword === form.newPassword) {
-      setError("Mật khẩu mới phải khác mật khẩu hiện tại");
+      setError("Mật khẩu mới phải khác mật khẩu cũ");
+      triggerShake();
       return;
     }
 
     if (form.newPassword !== form.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp");
+      triggerShake();
       return;
     }
 
@@ -70,113 +118,156 @@ const ChangePassword = ({ onClose }) => {
         return;
       }
 
-      // fallback
-      setError(res.data?.message || "Đổi mật khẩu thất bại!");
+      setError(res.data?.message || "Đổi mật khẩu thất bại");
+      triggerShake();
     } catch (err) {
-      // ĐÚNG LỖI 400 TỪ BACKEND
       if (err.response?.status === 400) {
         setError(err.response.data?.message || "Mật khẩu cũ không đúng");
+        triggerShake();
         return;
       }
 
-      console.error(err);
       setError("Lỗi kết nối server");
+      triggerShake();
     }
   };
 
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+  };
+
   return (
-    <div style={styleModel.modalOverlay}>
-      <div style={{...styleModel.modal, width: 400, padding: "30px 24px"}}>
+    <div style={styleModel.modalOverlay} onClick={handleClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...styleModel.modal,
+          width: 400,
+          padding: "30px 24px",
+          transform: animate
+            ? "translateY(0)"
+            : "translateY(-40px)",
+          opacity: animate ? 1 : 0,
+          transition: "all 0.25s ease",
+          animation: shake ? "shake 0.35s" : "none",
+        }}
+      >
         <h2 style={styleModel.modalTitle}>ĐỔI MẬT KHẨU</h2>
 
         <div style={styleModel.formGridShift}>
-          {/* MẬT KHẨU HIỆN TAI */}
-          <div style={styleModel.formGroupShift}>
-            <label style={styleModel.label}>
-              Mật khẩu hiện tại <span style={{ color: "red" }}>*</span>
-            </label>
+          {["old", "new", "confirm"].map((type, index) => {
+            const key =
+              type === "old"
+                ? "oldPassword"
+                : type === "new"
+                ? "newPassword"
+                : "confirmPassword";
 
-            <div style={styleModel.inputWrapper}>
-              <input
-                type={show.old ? "text" : "password"}
-                style={styleModel.formInput}
-                value={form.oldPassword}
-                onChange={(e) =>
-                  handleChange("oldPassword", e.target.value)
-                }
-              />
-              <span
-                style={styleModel.eyeIcon}
-                onClick={() => setShow({ ...show, old: !show.old })}
-              >
-                {show.old ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-          </div>
+            const label =
+              type === "old"
+                ? "Mật khẩu hiện tại"
+                : type === "new"
+                ? "Mật khẩu mới"
+                : "Xác nhận mật khẩu mới";
 
-          {/* MẬT KHẨU MỚI */}
-          <div style={styleModel.formGroupShift}>
-            <label style={styleModel.label}>
-              Mật khẩu mới <span style={{ color: "red" }}>*</span>
-            </label>
+            return (
+              <div key={type} style={styleModel.formGroupShift}>
+                <label style={styleModel.label}>
+                  {label} <span style={{ color: "red" }}>*</span>
+                </label>
 
-            <div style={styleModel.inputWrapper}>
-              <input
-                type={show.new ? "text" : "password"}
-                style={styleModel.formInput}
-                value={form.newPassword}
-                onChange={(e) =>
-                  handleChange("newPassword", e.target.value)
-                }
-              />
-              <span
-                style={styleModel.eyeIcon}
-                onClick={() => setShow({ ...show, new: !show.new })}
-              >
-                {show.new ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-          </div>
+                <div style={styleModel.inputWrapper}>
+                  <input
+                    type={show[type] ? "text" : "password"}
+                    style={styleModel.formInput}
+                    value={form[key]}
+                    onChange={(e) =>
+                      handleChange(key, e.target.value)
+                    }
+                  />
+                  <span
+                    style={styleModel.eyeIcon}
+                    onClick={() =>
+                      setShow({ ...show, [type]: !show[type] })
+                    }
+                  >
+                    {show[type] ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </span>
+                </div>
 
-          {/* XÁC NHẬN MẬT KHẨU MỚI */}
-          <div style={styleModel.formGroupShift}>
-            <label style={styleModel.label}>
-              Xác nhận mật khẩu mới <span style={{ color: "red" }}>*</span>
-            </label>
+                {/* PASSWORD STRENGTH */}
+                {type === "new" && form.newPassword && (
+                  <div style={{ marginTop: 8 }}>
+                    <div
+                      style={{
+                        height: 6,
+                        borderRadius: 10,
+                        background: "#1f2937",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${(strength / 4) * 100}%`,
+                          height: "100%",
+                          background:
+                            strengthColor[strength],
+                          transition: "0.3s",
+                        }}
+                      />
+                    </div>
 
-            <div style={styleModel.inputWrapper}>
-              <input
-                type={show.confirm ? "text" : "password"}
-                style={styleModel.formInput}
-                value={form.confirmPassword}
-                onChange={(e) =>
-                  handleChange("confirmPassword", e.target.value)
-                }
-              />
-              <span
-                style={styleModel.eyeIcon}
-                onClick={() =>
-                  setShow({ ...show, confirm: !show.confirm })
-                }
-              >
-                {show.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-          </div>
+                    <small
+                      style={{
+                        color: strengthColor[strength],
+                        fontWeight: 500,
+                      }}
+                    >
+                      {strengthLabel[strength]}
+                    </small>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {error && <p style={stylesError.message}>{error}</p>}
 
         <div style={stylesButton.actions}>
-          <button style={stylesButton.btnCancel} onClick={onClose}>
+          <button
+            style={stylesButton.btnCancel}
+            onClick={handleClose}
+          >
             <X size={18} /> Hủy
           </button>
 
-          <button style={stylesButton.btnSave} onClick={handleSubmit}>
+          <button
+            style={stylesButton.btnSave}
+            onClick={handleSubmit}
+          >
             <Save size={18} /> Lưu
           </button>
         </div>
       </div>
+
+      {/* SHAKE KEYFRAME */}
+      <style>
+        {`
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          50% { transform: translateX(6px); }
+          75% { transform: translateX(-4px); }
+          100% { transform: translateX(0); }
+        }
+      `}
+      </style>
     </div>
   );
 };
