@@ -24,96 +24,105 @@ const Login = () => {
 
     const result = await login(userName, password);
 
-    if (result.success) {
-      setError("");
-      navigate("/dashboard");
-    } else {
+    if (!result.success) {
       setError(result.message || "Đăng nhập thất bại");
+      return;
     }
+
+    const loggedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (loggedUser.role !== "admin") {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      setError("Bạn không có quyền truy cập vào trang của quản trị viên");
+      return;
+    }
+
+    navigate("/dashboard");
   };
 
+
   return (
-  <div style={stylesLogin.wrapper}>
-    <div
-      style={{
-        ...stylesLogin.background,
-        backgroundImage: `url(${backgroundImg})`,
-      }}
-    />
-      <div style={styleModel.modalOverlay}>
-        <div style={{
-          ...styleModel.modal,
-          width: 450,
-          padding: "40px 36px",
-        }}>
-          <div style={stylesLogin.logoBox}>
-            <h2 style={stylesLogin.title}>NANO TECH</h2>
-            <p style={stylesLogin.subtitle}>Attendance System</p>
-          </div>
-
-          <form onSubmit={handleLogin} style={stylesLogin.form}>
-            <div style={stylesLogin.inputBox}>
-              <span style={stylesLogin.icon}><User size={18} /></span>
-              <input
-                type="text"
-                placeholder="Tên đăng nhập"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                style={stylesLogin.input}
-              />
+    <div style={stylesLogin.wrapper}>
+      <div
+        style={{
+          ...stylesLogin.background,
+          backgroundImage: `url(${backgroundImg})`,
+        }}
+      />
+        <div style={styleModel.modalOverlay}>
+          <div style={{
+            ...styleModel.modal,
+            width: 450,
+            padding: "40px 36px",
+          }}>
+            <div style={stylesLogin.logoBox}>
+              <h2 style={stylesLogin.title}>NANO TECH</h2>
+              <p style={stylesLogin.subtitle}>Attendance System</p>
             </div>
 
-            <div style={stylesLogin.inputBox}>
-              <span style={stylesLogin.icon}><Lock size={18} /></span>
+            <form onSubmit={handleLogin} style={stylesLogin.form}>
+              <div style={stylesLogin.inputBox}>
+                <span style={stylesLogin.icon}><User size={18} /></span>
+                <input
+                  type="text"
+                  placeholder="Tên đăng nhập"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  style={stylesLogin.input}
+                />
+              </div>
 
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={stylesLogin.input}
-              />
+              <div style={stylesLogin.inputBox}>
+                <span style={stylesLogin.icon}><Lock size={18} /></span>
 
-              <span
-                style={stylesLogin.eye}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mật khẩu"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={stylesLogin.input}
+                />
 
-            {error && (
-              <p style={{ color: "red", fontSize: 14, marginTop: 6, fontWeight: "bold" }}>
-                {error}
-              </p>
-            )}
+                <span
+                  style={stylesLogin.eye}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </span>
+              </div>
 
-            <button type="submit" style={{
-              ...stylesButton.loginBtn,
-              // width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <LogIn size={18} style={{ marginRight: 8 }} />
-              Đăng nhập
-            </button>
+              {error && (
+                <p style={{ color: "red", fontSize: 14, marginTop: 6, fontWeight: "bold" }}>
+                  {error}
+                </p>
+              )}
 
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              style={{
-                ...stylesButton.backBtn,
+              <button type="submit" style={{
+                ...stylesButton.loginBtn,
+                // width: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 8,
-              }}
-            >
-              <ArrowLeft size={18} />
-              Quay lại trang điểm danh
-            </button>
+              }}>
+                <LogIn size={18} style={{ marginRight: 8 }} />
+                Đăng nhập
+              </button>
 
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                style={{
+                  ...stylesButton.backBtn,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <ArrowLeft size={18} />
+                Quay lại trang điểm danh
+              </button>
           </form>
         </div>
       </div>

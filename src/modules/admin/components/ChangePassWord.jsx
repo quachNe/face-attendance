@@ -64,7 +64,6 @@ const ChangePassword = ({ onClose }) => {
 
       const res = await updateEmployee(user.id, payload);
 
-      // HTTP 2xx là thành công
       if (res.status === 200 || res.status === 204) {
         alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
         handleLogout();

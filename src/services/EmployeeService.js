@@ -1,5 +1,9 @@
 import API from "../config/Api";
 
+// LOGIN
+export const loginApi = (payload) =>
+  API.post("/auth/login", payload);
+
 // GET
 export const getEmployees = () =>
   API.get("/employees");
@@ -19,3 +23,9 @@ export const updateEmployee = (id, payload) =>
 // DELETE
 export const deleteEmployee = (id) =>
   API.delete(`/employees/${id}`);
+
+// ================= PROFILE (USER SELF UPDATE) =================
+
+// UPDATE PROFILE + PASSWORD
+export const updateProfile = (payload) =>
+  API.put("/profile", payload);

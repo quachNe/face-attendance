@@ -56,7 +56,6 @@ const styles = {
     background: "#ffffff",
     padding: "20px",
     borderRadius: "12px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
   },
 
   menuItem: {

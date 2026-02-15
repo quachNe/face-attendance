@@ -8,7 +8,6 @@ const PublicOnlyRoute = ({ children }) => {
     if (user.role === "admin") {
       return <Navigate to="/dashboard" replace />;
     }
-    return <Navigate to="/leave" replace />;
   }
 
   return children;

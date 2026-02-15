@@ -13,7 +13,7 @@ function LeaveHeader({ onLoginClick }) {
 
       <div>
         <h2 style={styles.pageTitle}>
-          QUẢN LÝ ĐƠN XIN PHÉP NGHỈ VIỆC
+          QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
         </h2>
       </div>
 

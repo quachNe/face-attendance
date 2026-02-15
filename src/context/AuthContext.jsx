@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { loginApi } from "../services/EmployeeService";
 
 // Tạo ra một context mới
 const AuthContext = createContext();
@@ -7,28 +8,23 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+    // STATE LƯU USER VÀO LOCALSTORGE
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem("user");
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
+    // XỬ LÝ LOGIN
     const login = async (username, password) => {
         try {
-            const res = await fetch("http://localhost:5000/api/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
+            const res = await loginApi({
                 username: username.trim(),
                 password: password.replace(/\n/g, "").trim(),
-            }),
             });
 
-            const data = await res.json();
-            console.log(data);
+            const data = res.data;
 
-            if (res.ok && data.success) {
+            if (data.success) {
                 setUser(data.user);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
@@ -41,12 +37,15 @@ export const AuthProvider = ({ children }) => {
                 };
             }
         } catch (error) {
-            console.error("Login error:", error);
-            return { success: false, message: "Network error" };
+            return {
+                success: false,
+                message:
+                    error.response?.data?.message || "Network error",
+            };
         }
     };
 
-
+    // XỬ LÝ LOGOUT
     const logout = () => {
         localStorage.removeItem("user");
         localStorage.removeItem("token");

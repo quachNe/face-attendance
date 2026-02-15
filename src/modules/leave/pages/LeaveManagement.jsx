@@ -4,6 +4,8 @@ import LeaveMenu from "../components/LeaveMenu";
 import LeaveFooter from "../components/LeaveFooter";
 import LeaveLoginModal from "../components/LeaveLoginModal";
 import { useAuth } from "../../../context/AuthContext";
+import Profile from "../components/Profile";
+import {User2Icon} from "lucide-react"
 
 const LeaveManagement = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -49,7 +51,11 @@ const LeaveManagement = () => {
       case "profile":
         return (
           <div>
-            <h2 style={styles.contentTitle}>👤 Thông tin cá nhân</h2>
+            <h2 style={styles.contentTitle}>
+              <User2Icon size={22} />
+              <span>Thông tin cá nhân</span>
+            </h2>
+            <Profile />
           </div>
         );
 
@@ -110,7 +116,6 @@ const styles = {
     background: "#ffffff",
     padding: "40px",
     borderRadius: "16px",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
     overflow: "auto",
     position: "relative",
   },
@@ -129,7 +134,7 @@ const styles = {
     padding: "60px 50px",
     borderRadius: "20px",
     background: "linear-gradient(145deg, #f8fafc, #ffffff)",
-    boxShadow: "0 12px 35px rgba(0,0,0,0.05)",
+    // boxShadow: "0 12px 35px rgba(0,0,0,0.05)",
     maxWidth: "500px",
   },
 
@@ -156,7 +161,9 @@ const styles = {
 
   contentTitle: {
     margin: 0,
-    fontSize: "22px",
+    display: "flex",
+    alignItems: "center",
+    fontSize: "23px",
     fontWeight: "600",
     color: "#0f172a",
     borderBottom: "2px solid #e2e8f0",
