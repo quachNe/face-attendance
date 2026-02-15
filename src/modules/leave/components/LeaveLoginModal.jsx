@@ -1,19 +1,33 @@
 import React, { useState } from "react";
-import { User, Lock, X } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
+import { stylesError } from "../../admin/style/Styles.js";
+import { User, Lock, X, Eye, EyeOff } from "lucide-react";
 
 export default function LeaveLoginModal({ onClose }) {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async (e) => {
     e.preventDefault();
-    const result = await login(username, password);
-    if (result.success) {
-      onClose();
-    } else {
-      alert(result.message || "Đăng nhập thất bại");
+    setError("");
+
+    if (!username.trim() || !password.trim()) {
+      setError("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+
+    try {
+      const result = await login(username, password);
+
+      if (result.success) {
+        onClose();
+      } else {
+        setError(result.message || "Tên đăng nhập hoặc mật khẩu không đúng");
+      }
+    } catch (err) {
+      setError("Lỗi kết nối server");
     }
   };
 
@@ -43,14 +57,20 @@ export default function LeaveLoginModal({ onClose }) {
           <div style={styles.inputGroup}>
             <Lock size={18} />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Mật khẩu"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
             />
+            <span 
+              onClick={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </span>
           </div>
-
+          {error && <p style={{...stylesError.message, marginBottom:"-5px", marginTop:"-5px"}}>{error}</p>}
           <button type="submit" style={styles.button}>
             Đăng nhập
           </button>
@@ -128,4 +148,10 @@ const styles = {
     cursor: "pointer",
     fontWeight: "600",
   },
+  eyeIcon: {
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+  },
+
 };

@@ -52,21 +52,21 @@ export default function LeaveMenu({ active, setActive, onLoginClick }) {
 }
 
 const styles = {
-  menuCard: {
-    background: "#ffffff",
-    padding: "20px",
-    borderRadius: "12px",
-  },
+    menuCard: {
+        background: "#ffffff",
+        padding: "20px",
+        borderRadius: "12px",
+    },
 
-  menuItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "14px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginBottom: "10px",
-    transition: "0.2s",
-    fontWeight: "500",
-  },
+    menuItem: {
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "14px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        marginBottom: "10px",
+        transition: "0.2s",
+        fontWeight: "500",
+    },
 };

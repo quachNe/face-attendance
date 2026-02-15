@@ -1,4 +1,5 @@
 import { useAuth } from "../../../context/AuthContext";
+import { User, LogIn, LogOut } from "lucide-react";
 
 function LeaveHeader({ onLoginClick }) {
   const { user, logout } = useAuth();
@@ -20,20 +21,28 @@ function LeaveHeader({ onLoginClick }) {
       <div style={styles.userContainer}>
         {!user ? (
           <button onClick={onLoginClick} style={styles.loginBtn}>
+            <LogIn size={18} style={{ marginRight: "6px" }} />
             Đăng nhập
           </button>
         ) : (
           <>
-            <span style={styles.username}>
-              Xin chào, {user.name}
-            </span>
+            <div style={styles.userInfo}>
+              <User size={18} />
+              <span style={styles.username}>
+                Xin chào, {user.name}
+              </span>
+            </div>
+
             <span style={styles.divider}>|</span>
+
             <button onClick={logout} style={styles.logoutBtn}>
+              <LogOut size={18} style={{ marginRight: "6px" }} />
               Đăng xuất
             </button>
           </>
         )}
       </div>
+
     </div>
   );
 }
@@ -86,23 +95,29 @@ const styles = {
   divider: {
     opacity: 0.7
   },
+  userInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px"
+  },
 
   loginBtn: {
-    background: "none",
+    background: "none",display:"flex",
+    justifyContent:"center",
     border: "none",
     color: "white",
     cursor: "pointer",
-    textDecoration: "underline",
     fontSize: "14px",
     padding: 0,
     },
 
   logoutBtn: {
+    display:"flex",
+    justifyContent:"center",
     background: "none",
     border: "none",
     color: "white",
     cursor: "pointer",
-    textDecoration: "underline",
     fontSize: "14px"
   }
 };

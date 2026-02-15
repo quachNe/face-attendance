@@ -1,333 +1,369 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 import { updateProfile } from "../../../services/EmployeeService.js";
 import { stylesError } from "../../admin/style/Styles.js";
+
 export default function Profile() {
-    const { user } = useAuth();
-    const [error, setError] = useState("");
+  const { user, setUser } = useAuth();
+  const [error, setError] = useState("");
 
-    /* ================= INITIAL DATA ================= */
-
-    const initialProfile = {
-        fullName: user?.name || "",
-        dob: user?.dob || "",
-        email: user?.email || "",
-        phone: user?.phone || "",
-        role:
-        user?.role === "admin"
-            ? "Quản trị viên"
-            : user?.role
-            ? "Nhân viên"
-            : "",
-        username: user?.username || "",
-    };
-
-    const [profile, setProfile] = useState(initialProfile);
-
-    const initialPassword = {
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-    };
-
-    const [password, setPassword] = useState(initialPassword);
-
-    const [show, setShow] = useState({
-        old: false,
-        new: false,
-        confirm: false,
-    });
-
-    /* ================= HANDLERS ================= */
-
-    const handleProfileChange = (e) => {
-        setProfile((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-        }));
-    };
-
-    const handlePasswordChange = (e) => {
-        setError("");   // thêm dòng này
-        setPassword((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    const handleUpdateProfile = () => {
-        console.log("Update profile:", profile);
-    };
-    const handleLogout = () => {
-        localStorage.clear();
-        window.location.reload();
-    };
-
-    // XỬ LÝ ĐỔI MẬT KHẨU
-    const handleSubmit = async () => {
-        setError(""); // reset lỗi trước
-
-        if (!password.oldPassword || !password.newPassword || !password.confirmPassword) {
-            setError("Vui lòng nhập đầy đủ thông tin");
-            return;
-        }
-
-        if (password.newPassword.length < 6) {
-            setError("Mật khẩu mới phải có ít nhất 6 ký tự");
-            return;
-        }
-
-        if (password.oldPassword === password.newPassword) {
-            setError("Mật khẩu mới phải khác mật khẩu hiện tại");
-            return;
-        }
-
-        if (password.newPassword !== password.confirmPassword) {
-            setError("Mật khẩu xác nhận không khớp");
-            return;
-        }
-
-        try {
-            const payload = {
-                oldPassword: password.oldPassword,
-                password: password.newPassword,
-            };
-
-            const res = await updateProfile(payload);
-
-            if (res.status === 200 || res.status === 204) {
-                alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
-                handleLogout();
-                return;
-            }
-
-            setError(res.data?.message || "Đổi mật khẩu thất bại!");
-        } catch (err) {
-            if (err.response?.status === 400) {
-                setError(err.response.data?.message || "Mật khẩu cũ không đúng");
-                return;
-            }
-
-            console.error(err);
-            setError("Lỗi kết nối server");
-        }
-    };
-
-
-  const handleCancelProfile = () => {
-    setProfile(initialProfile);
+  const initialProfile = {
+    name: user?.name || "",
+    dob: user?.dob || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    username: user?.username || "",
+    role:
+      user?.role === "admin"
+        ? "Quản trị viên"
+        : user?.role
+        ? "Nhân viên"
+        : "",
   };
 
-  const handleCancelPassword = () => {
-    setPassword(initialPassword);
-    setShow({
-      old: false,
-      new: false,
-      confirm: false,
-    });
+  const [profile, setProfile] = useState(initialProfile);
+
+  useEffect(() => {
+    setProfile(initialProfile);
+  }, [user]);
+
+  const [password, setPassword] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [show, setShow] = useState({
+    old: false,
+    new: false,
+    confirm: false,
+  });
+
+  /* ================= HANDLERS ================= */
+
+  const handleProfileChange = (e) => {
+    setProfile((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePasswordChange = (e) => {
+    setError("");
+    setPassword((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  /* ================= UPDATE PROFILE ================= */
+
+  const handleUpdateProfile = async () => {
+    setError("");
+
+    if (!profile.name || !profile.dob || !profile.email || !profile.phone) {
+      setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      const payload = {
+        name: profile.name,
+        dob: profile.dob,
+        email: profile.email,
+        phone: profile.phone,
+      };
+
+      const res = await updateProfile(payload);
+
+      if (res.status === 200 || res.status === 204) {
+        const updatedUser = { ...user, ...payload };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        alert("Cập nhật thông tin thành công");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Lỗi kết nối server");
+    }
+  };
+
+  /* ================= UPDATE PASSWORD ================= */
+
+  const handleSubmit = async () => {
+    setError("");
+
+    if (!password.oldPassword || !password.newPassword || !password.confirmPassword) {
+      setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    if (password.newPassword.length < 6) {
+      setError("Mật khẩu mới phải có ít nhất 6 ký tự");
+      return;
+    }
+
+    if (password.newPassword !== password.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      return;
+    }
+
+    try {
+      const payload = {
+        oldPassword: password.oldPassword,
+        password: password.newPassword,
+      };
+
+      const res = await updateProfile(payload);
+
+      if (res.status === 200 || res.status === 204) {
+        alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+        localStorage.clear();
+        window.location.reload();
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Mật khẩu cũ không đúng");
+    }
   };
 
   /* ================= STYLE ================= */
 
-    const styles = {
-        container: {
-            display: "flex",
-            gap: "50px",
-            padding: "10px",
-            minHeight: "70vh",
-        },
-        card: {
-            flex: 1,
-            background: "#fff",
-            padding: "30px",
-            display: "flex",
-            flexDirection: "column",
-        },
+  const styles = {
+    wrapper: {
+      width: "100%",
+      padding: "20px",
+      boxSizing: "border-box",
+    },
 
-        title: {
-            fontSize: "22px",
-            fontWeight: "700",
-            marginBottom: "30px",
-            color: "#1f2937",
-            textAlign: "center",
-        },
+    container: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "30px",
+      alignItems: "flex-start",
+    },
 
-        formGroup: {
-            display: "flex",
-            flexDirection: "column",
-            marginBottom: "18px",
-            width: "100%",
-        },
+    card: {
+      flex: "1 1 480px",
+      background: "#fff",
+      padding: "30px",
+      borderRadius: "16px",
+      boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+      display: "flex",
+      flexDirection: "column",
+    },
 
-        label: {
-            fontSize: "14px",
-            marginBottom: "6px",
-            color: "#6b7280",
-        },
+    title: {
+      fontSize: "25px",
+      fontWeight: "600",
+      marginBottom: "20px",
+      textAlign: "center",
+    },
 
-        input: {
-            width: "100%",
-            padding: "10px 10px 15px 10px",
-            borderRadius: "10px",
-            border: "1px solid #e5e7eb",
-            fontSize: "14px",
-            outline: "none",
-        },
+    row: {
+      display: "flex",
+      gap: "15px",
+      flexWrap: "wrap",
+      marginBottom: "15px",
+    },
 
-        disabledInput: {
-            padding: "10px 12px",
-            borderRadius: "10px",
-            border: "1px solid #e5e7eb",
-            fontSize: "14px",
-            backgroundColor: "#f3f4f6",
-            cursor: "not-allowed",
-        },
+    half: {
+      flex: "1 1 48%",
+    },
 
-        buttonGroup: {
-            display: "flex",
-            gap: "10px",
-            marginTop: "15px",
-        },
+    formGroup: {
+      marginBottom: "15px",
+    },
 
-        primaryButton: {
-            flex: 1,
-            padding: "12px",
-            borderRadius: "12px",
-            border: "none",
-            background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-            color: "#fff",
-            fontWeight: "600",
-            cursor: "pointer",
-        },
+    label: {
+      fontSize: "13px",
+      color: "#6b7280",
+      marginBottom: "5px",
+      display: "block",
+    },
 
-        cancelButton: {
-            flex: 1,
-            padding: "12px",
-            borderRadius: "12px",
-            border: "1px solid #d1d5db",
-            background: "#fff",
-            color: "#374151",
-            fontWeight: "600",
-            cursor: "pointer",
-        },
+    input: {
+      width: "100%",
+      padding: "10px 12px",
+      borderRadius: "8px",
+      border: "1px solid #e5e7eb",
+      fontSize: "14px",
+    },
 
-        divider: {
-            width: "1px",
-            backgroundColor: "#e5e7eb",
-        },
+    disabledInput: {
+      width: "100%",
+      padding: "10px 12px",
+      borderRadius: "8px",
+      border: "1px solid #e5e7eb",
+      backgroundColor: "#f3f4f6",
+      fontSize: "14px",
+      cursor: "not-allowed",
+    },
 
-        inputWrapper: {
-            position: "relative",
-            width: "100%",
-        },
+    buttonGroup: {
+      display: "flex",
+      gap: "12px",
+      marginTop: "10px",
+    },
 
-        eyeIcon: {
-            position: "absolute",
-            right: "14px",
-            top: "50%",
-            transform: "translateY(-50%)",   // CĂN GIỮA CHUẨN
-            cursor: "pointer",
-            color: "#6b7280",
-        },
-    };
+    primaryButton: {
+      flex: 1,
+      padding: "10px",
+      borderRadius: "8px",
+      border: "none",
+      background: "#2563eb",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: "600",
+    },
+
+    cancelButton: {
+      flex: 1,
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #d1d5db",
+      background: "#fff",
+      cursor: "pointer",
+      fontWeight: "600",
+    },
+
+    inputWrapper: {
+      position: "relative",
+    },
+
+    eyeIcon: {
+      position: "absolute",
+      right: "10px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      cursor: "pointer",
+    },
+  };
 
   /* ================= JSX ================= */
 
     return (
-        <div style={styles.container}>
-            {/* LEFT */}
-            <div style={styles.card}>
-                <h2 style={styles.title}>THÔNG TIN CÁ NHÂN</h2>
+        <div style={styles.wrapper}>
+            <div style={styles.container}>
+                {/* LEFT CARD */}
+                <div style={styles.card}>
+                    <h2 style={styles.title}>Thông tin cá nhân</h2>
 
-                {["fullName", "dob", "email", "phone"].map((field) => (
-                <div key={field} style={styles.formGroup}>
-                    <label style={styles.label}>
-                    {field === "fullName" && "Họ và tên"}
-                    {field === "dob" && "Ngày sinh"}
-                    {field === "email" && "Email"}
-                    {field === "phone" && "Số điện thoại"}{" "}
-                    <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input
-                    style={styles.input}
-                    type={field === "dob" ? "date" : field === "email" ? "email" : "text"}
-                    name={field}
-                    value={profile[field]}
-                    onChange={handleProfileChange}
-                    />
-                </div>
-                ))}
+                    {/* Full Name */}
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>Họ và tên <span style={{ color: "red" }}> *</span></label>
+                        <input
+                        style={styles.input}
+                        type="text"
+                        name="name"
+                        value={profile.name}
+                        onChange={handleProfileChange}
+                        />
+                    </div>
 
-                <div style={styles.formGroup}>
-                    <label style={styles.label}>Chức vụ</label>
-                    <input style={styles.disabledInput} value={profile.role} disabled />
-                </div>
+                    {/* DOB + PHONE */}
+                    <div style={styles.row}>
+                        <div style={styles.half}>
+                        <label style={styles.label}>Ngày sinh <span style={{ color: "red" }}> *</span></label>
+                        <input
+                            style={styles.input}
+                            type="date"
+                            name="dob"
+                            value={profile.dob}
+                            onChange={handleProfileChange}
+                        />
+                        </div>
 
-                <div style={styles.formGroup}>
-                    <label style={styles.label}>Tên đăng nhập</label>
-                    <input style={styles.disabledInput} value={profile.username} disabled />
-                </div>
+                        <div style={styles.half}>
+                        <label style={styles.label}>Số điện thoại <span style={{ color: "red" }}> *</span></label>
+                        <input
+                            style={styles.input}
+                            type="text"
+                            name="phone"
+                            value={profile.phone}
+                            onChange={handleProfileChange}
+                        />
+                        </div>
+                    </div>
 
-                <div style={styles.buttonGroup}>
-                    <button style={styles.cancelButton} onClick={handleCancelProfile}>
-                        Huỷ
-                    </button>
-                    <button style={styles.primaryButton} onClick={handleUpdateProfile}>
+                    {/* Email */}
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>Email <span style={{ color: "red" }}> *</span></label>
+                        <input
+                        style={styles.input}
+                        type="text"
+                        name="email"
+                        value={profile.email}
+                        onChange={handleProfileChange}
+                        />
+                    </div>
+
+                    {/* Username + Role */}
+                    <div style={styles.row}>
+                        <div style={styles.half}>
+                        <label style={styles.label}>Tên đăng nhập</label>
+                        <input style={styles.disabledInput} value={profile.username} disabled />
+                        </div>
+
+                        <div style={styles.half}>
+                        <label style={styles.label}>Chức vụ</label>
+                        <input style={styles.disabledInput} value={profile.role} disabled />
+                        </div>
+                    </div>
+                    {error && <p style={stylesError.message}>{error}</p>}
+                    <div style={styles.buttonGroup}>
+                        <button style={styles.cancelButton}>Huỷ</button>
+                        <button style={styles.primaryButton} onClick={handleUpdateProfile}>
                         Cập nhật
-                    </button>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div style={styles.divider}></div>
+                {/* RIGHT CARD */}
+                <div style={styles.card}>
+                    <h2 style={styles.title}>Đổi mật khẩu</h2>
 
-            {/* RIGHT */}
-            <div style={styles.card}>
-                <h2 style={styles.title}>ĐỔI MẬT KHẨU</h2>
-
-                {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
-                    <div key={field} style={styles.formGroup}>
+                    {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
+                        <div key={field} style={styles.formGroup}>
                         <label style={styles.label}>
-                        {field === "oldPassword" && "Mật khẩu cũ"}
-                        {field === "newPassword" && "Mật khẩu mới"}
-                        {field === "confirmPassword" && "Xác nhận mật khẩu"}{" "}
-                        <span style={{ color: "red" }}>*</span>
+                            {field === "oldPassword" && "Mật khẩu cũ"}
+                            {field === "newPassword" && "Mật khẩu mới"}
+                            {field === "confirmPassword" && "Xác nhận mật khẩu"} <span style={{ color: "red" }}> *</span>
                         </label>
 
                         <div style={styles.inputWrapper}>
                             <input
-                                style={{ ...styles.input, paddingRight: "40px" }}
-                                type={show[field.split("Password")[0]] ? "text" : "password"}
-                                name={field}
-                                value={password[field]}
-                                onChange={handlePasswordChange}
+                            style={{ ...styles.input, paddingRight: "35px" }}
+                            type={show[field.split("Password")[0]] ? "text" : "password"}
+                            name={field}
+                            value={password[field]}
+                            onChange={handlePasswordChange}
                             />
                             <span
-                                style={styles.eyeIcon}
-                                onClick={() =>
+                            style={styles.eyeIcon}
+                            onClick={() =>
                                 setShow((prev) => ({
-                                    ...prev,
-                                    [field.split("Password")[0]]: !prev[field.split("Password")[0]],
+                                ...prev,
+                                [field.split("Password")[0]]:
+                                    !prev[field.split("Password")[0]],
                                 }))
-                                }
+                            }
                             >
-                                {show[field.split("Password")[0]] ? (
-                                <EyeOff size={18} />
-                                ) : (
-                                <Eye size={18} />
-                                )}
+                            {show[field.split("Password")[0]] ? (
+                                <EyeOff size={16} />
+                            ) : (
+                                <Eye size={16} />
+                            )}
                             </span>
                         </div>
-                    </div>
-                ))}
-                {error && <p style={stylesError.message}>{error}</p>}
-                <div style={styles.buttonGroup}>
-                    <button style={styles.cancelButton} onClick={handleCancelPassword}>
-                        Huỷ
-                    </button>
-                    <button style={styles.primaryButton} onClick={handleSubmit}>
+                        </div>
+                    ))}
+
+                    <div style={styles.buttonGroup}>
+                        <button style={styles.cancelButton}>Huỷ</button>
+                        <button style={styles.primaryButton} onClick={handleSubmit}>
                         Cập nhật
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

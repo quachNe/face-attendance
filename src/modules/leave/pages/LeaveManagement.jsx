@@ -5,7 +5,7 @@ import LeaveFooter from "../components/LeaveFooter";
 import LeaveLoginModal from "../components/LeaveLoginModal";
 import { useAuth } from "../../../context/AuthContext";
 import Profile from "../components/Profile";
-import {User2Icon} from "lucide-react"
+import { User2Icon, CalendarDays, FileText } from "lucide-react"
 
 const LeaveManagement = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -37,20 +37,26 @@ const LeaveManagement = () => {
       case "request":
         return (
           <div>
-            <h2 style={styles.contentTitle}>📝 Gửi đơn xin nghỉ phép</h2>
+            <h2 style={styles.contentTitle}>
+              <CalendarDays size={22} />
+              <span>Gửi đơn xin nghỉ phép</span>
+            </h2>
           </div>
         );
 
       case "status":
         return (
           <div>
-            <h2 style={styles.contentTitle}>📊 Trạng thái đơn nghỉ phép</h2>
+            <h2 style={styles.contentTitle}>
+              <FileText size={22} />
+              <span>Trạng thái đơn nghỉ phép</span>
+            </h2>
           </div>
         );
 
       case "profile":
         return (
-          <div>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <h2 style={styles.contentTitle}>
               <User2Icon size={22} />
               <span>Thông tin cá nhân</span>
@@ -105,6 +111,7 @@ const styles = {
     display: "flex",
     gap: "24px",
     padding: "24px 40px",
+    overflow: "hidden", // QUAN TRỌNG
   },
 
   left: {
@@ -116,9 +123,10 @@ const styles = {
     background: "#ffffff",
     padding: "40px",
     borderRadius: "16px",
-    overflow: "auto",
-    position: "relative",
+    display: "flex",
+    flexDirection: "column",
   },
+
 
   /* ================= EMPTY STATE ================= */
 
