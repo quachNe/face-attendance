@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Styles, ButtonStyles } from "../style/Styles.js";
+import { Styles } from "../style/Styles.js";
 const LeaveRequest = ({ onCancel }) => {
     const [formData, setFormData] = useState({
         leaveType: "Nghỉ phép năm",
@@ -24,12 +24,12 @@ const LeaveRequest = ({ onCancel }) => {
         <div style={styles.container}>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.formGroup}>
-                    <label style={styles.label}>Loại nghỉ phép</label>
+                    <label style={Styles.label}>Loại nghỉ phép <span style={Styles.required}>*</span></label>
                     <select
                         name="leaveType"
                         value={formData.leaveType}
                         onChange={handleChange}
-                        style={styles.input}
+                        style={Styles.input}
                     >
                         <option>Nghỉ phép năm</option>
                         <option>Nghỉ ốm</option>
@@ -40,42 +40,42 @@ const LeaveRequest = ({ onCancel }) => {
 
                 <div style={styles.row}>
                     <div style={{ ...styles.formGroup, flex: 1 }}>
-                        <label style={styles.label}>Từ ngày</label>
+                        <label style={Styles.label}>Từ ngày <span style={Styles.required}>*</span></label>
                         <input
                         type="date"
                         name="startDate"
                         required
                         onChange={handleChange}
-                        style={styles.input}
+                        style={Styles.input}
                         />
                     </div>
                     <div style={{ ...styles.formGroup, flex: 1 }}>
-                        <label style={styles.label}>Đến ngày</label>
+                        <label style={Styles.label}>Đến ngày <span style={Styles.required}>*</span></label>
                         <input
                         type="date"
                         name="endDate"
                         required
                         onChange={handleChange}
-                        style={styles.input}
+                        style={Styles.input}
                         />
                     </div>
                 </div>
                 <div style={styles.formGroup}>
-                    <label style={styles.label}>Lý do nghỉ phép</label>
+                    <label style={Styles.label}>Lý do nghỉ phép <span style={Styles.required}>*</span></label>
                     <textarea
                         name="reason"
                         placeholder="Nhập lý do chi tiết..."
                         required
                         onChange={handleChange}
-                        style={{ ...styles.input, height: "120px", resize: "none" }}
+                        style={{ ...Styles.input, height: "120px", resize: "none" }}
                     />
                 </div>
 
-                <div style={ButtonStyles.actions}>
-                    <button type="button" onClick={onCancel} style={ButtonStyles.cancelBtn}>
+                <div style={Styles.actions}>
+                    <button type="button" onClick={onCancel} style={Styles.cancelBtn}>
                         Hủy bỏ
                     </button>
-                    <button type="submit" style={ButtonStyles.saveBtn}>
+                    <button type="submit" style={Styles.saveBtn}>
                         Gửi đơn
                     </button>
                 </div>
@@ -87,25 +87,8 @@ const LeaveRequest = ({ onCancel }) => {
 export default LeaveRequest;
 
 const styles = {
-    container: { maxWidth: "100%" },
-    contentTitle: {
-        margin: 0,
-        fontSize: "22px",
-        fontWeight: "600",
-        color: "#0f172a",
-        borderBottom: "2px solid #e2e8f0",
-        paddingBottom: "10px",
-        marginBottom: "20px",
-    },
-    form: { display: "flex", flexDirection: "column", gap: "20px" },
-    formGroup: { display: "flex", flexDirection: "column", gap: "8px" },
+    // container: { maxWidth: "100%" },
+    form: { display: "flex", flexDirection: "column", gap: "30px" },
+    formGroup: { display: "flex", flexDirection: "column", gap: "15px" },
     row: { display: "flex", gap: "20px" },
-    label: { fontSize: "14px", fontWeight: "600", color: "#475569" },
-    input: {
-        padding: "12px 16px",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        fontSize: "15px",
-        background: "#f8fafc",
-    },
 };

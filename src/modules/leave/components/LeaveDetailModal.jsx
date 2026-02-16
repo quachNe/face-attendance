@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Styles, ButtonStyles } from "../style/Styles";
+import { Styles } from "../style/Styles";
 import { X } from "lucide-react";
 
 const LeaveDetailModal = ({ leave, onClose }) => {
@@ -20,21 +20,19 @@ const LeaveDetailModal = ({ leave, onClose }) => {
     <div style={Styles.overlay} onClick={handleClose}>
       <div
         style={{
-          ...modal.content,
+          ...Styles.content,
           opacity: animate ? 1 : 0,
           transform: animate ? "translateY(0)" : "translateY(-30px)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* CLOSE */}
-        <div style={ButtonStyles.closeBtn} onClick={handleClose}>
+        <div style={Styles.closeBtn} onClick={handleClose}>
           <X size={18} />
         </div>
 
         {/* HEADER */}
-        <div style={modal.header}>
-          <h2 style={Styles.title}>Chi tiết đơn nghỉ phép</h2>
-        </div>
+        <h2 style={Styles.title}>Chi tiết đơn nghỉ phép</h2>
 
         <div style={modal.divider} />
 
@@ -83,18 +81,6 @@ const LeaveDetailModal = ({ leave, onClose }) => {
 export default LeaveDetailModal;
 
 const modal = {
-    content: {
-        position: "relative",
-        background: "#ffffff",
-        padding: "32px 28px",
-        borderRadius: "20px",
-        width: "480px",
-        boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        transition: "all 0.25s cubic-bezier(.4,0,.2,1)",
-    },
 
     header: {
         textAlign: "center",

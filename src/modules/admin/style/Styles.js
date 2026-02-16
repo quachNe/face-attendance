@@ -434,7 +434,7 @@ export const styleTable = {
     borderTop: "4px solid #0ca1a1",
     borderRadius: "50%",
     animation: "spin 20s linear infinite",
-    transform: "translateY(70px)", // 👈 đẩy xuống
+    transform: "translateY(70px)",
   },
 
   loadingOverlay: {
@@ -447,3 +447,28 @@ export const styleTable = {
     zIndex: 10,
   },
 };
+
+
+export const datePickerStyles = `
+  .custom-date-input {
+    color-scheme: dark !important;
+  }
+
+  .custom-date-input::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1) !important;
+    opacity: 1 !important;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+  /* Fix icon size cho TIME trên Chrome */
+  input[type="time"].custom-date-input::-webkit-calendar-picker-indicator {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Fix text trong input time */
+  input[type="time"].custom-date-input::-webkit-datetime-edit {
+    color: #fff !important;
+  }
+`;

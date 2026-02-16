@@ -42,8 +42,8 @@ const AttendanceHistory = () => {
             onChange={(e) => setDate(e.target.value)}
           />
           <div style={Styles.rightActions}>
-            <button style={stylesButton.btnExcel}><AiOutlineFileExcel /> Xuất Excel</button>
-            <button style={stylesButton.btnPdf}><FiFileText /> Xuất PDF</button>
+            <button style={stylesButton.btnExcel}><AiOutlineFileExcel  size={18}/> Xuất Excel</button>
+            <button style={stylesButton.btnPdf}><FiFileText size={18}/> Xuất PDF</button>
           </div>
         </div>
       </div>

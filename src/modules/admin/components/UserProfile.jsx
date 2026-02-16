@@ -8,7 +8,7 @@ import {
   Briefcase,
   Calendar,
 } from "lucide-react";
-import { styleModel, stylesButton, stylesError } from "../style/Styles";
+import { styleModel, stylesButton, stylesError, datePickerStyles } from "../style/Styles";
 import {
   getEmployeeById,
   updateEmployee,
@@ -16,6 +16,7 @@ import {
 import { useAuth } from "../../../context/AuthContext";
 
 const UserProfile = ({ onClose }) => {
+  
   const { user } = useAuth();
 
   const [animate, setAnimate] = useState(false);
@@ -117,119 +118,123 @@ const UserProfile = ({ onClose }) => {
   };
 
   return (
-    <div
-      style={styleModel.modalOverlay}
-      onClick={handleClose}
-    >
+    <>
+      <style>{datePickerStyles}</style>
       <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          ...styleModel.modal,
-          width: 500,
-          padding: "30px 24px",
-          transform: animate
-            ? "translateY(0)"
-            : "translateY(-40px)",
-          opacity: animate ? 1 : 0,
-          transition: "all 0.25s ease",
-          animation: shake ? "shake 0.35s" : "none",
-        }}
+        style={styleModel.modalOverlay}
+        onClick={handleClose}
       >
-        <h2 style={styleModel.modalTitle}>
-          THÔNG TIN NGƯỜI DÙNG
-        </h2>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            ...styleModel.modal,
+            width: 500,
+            padding: "30px 24px",
+            transform: animate
+              ? "translateY(0)"
+              : "translateY(-40px)",
+            opacity: animate ? 1 : 0,
+            transition: "all 0.25s ease",
+            animation: shake ? "shake 0.35s" : "none",
+          }}
+        >
+          <h2 style={styleModel.modalTitle}>
+            THÔNG TIN NGƯỜI DÙNG
+          </h2>
 
-        <div style={styleModel.formGridShift}>
-          {[
-            ["name", "Họ và tên", <User size={18} />],
-            ["dob", "Ngày sinh", <Calendar size={18} />],
-            ["email", "Email", <Mail size={18} />],
-            ["phone", "Số điện thoại", <Phone size={18} />],
-            ["role", "Chức vụ", <Briefcase size={18} />],
-          ].map(([key, label, icon]) => (
-            <div key={key} style={styleModel.formGroup}>
-              <label style={styleModel.label}>
-                {label}
-                {key !== "role" && (
-                  <span style={{ color: "red" }}> *</span>
-                )}
-              </label>
+          <div style={styleModel.formGridShift}>
+            {[
+              ["name", "Họ và tên", <User size={18} />],
+              ["dob", "Ngày sinh", <Calendar size={18} />],
+              ["email", "Email", <Mail size={18} />],
+              ["phone", "Số điện thoại", <Phone size={18} />],
+              ["role", "Chức vụ", <Briefcase size={18} />],
+            ].map(([key, label, icon]) => (
+              <div key={key} style={styleModel.formGroup}>
+                <label style={styleModel.label}>
+                  {label}
+                  {key !== "role" && (
+                    <span style={{ color: "red" }}> *</span>
+                  )}
+                </label>
 
-              <div style={stylesUserProfile.inputBox}>
-                <span style={stylesUserProfile.icon}>
-                  {icon}
-                </span>
+                <div style={stylesUserProfile.inputBox}>
+                  <span style={stylesUserProfile.icon}>
+                    {icon}
+                  </span>
 
-                <input
-                  type={
-                    key === "dob"
-                      ? "date"
-                      : key === "phone"
-                      ? "tel"
-                      : "text"
-                  }
-                  disabled={key === "role"}
-                  value={form[key]}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    if (key === "phone") {
-                      value = value.replace(/\D/g, "");
+                  <input
+                    type={
+                      key === "dob"
+                        ? "date"
+                        : key === "phone"
+                        ? "tel"
+                        : "text"
                     }
-                    handleChange(key, value);
-                  }}
-                  style={stylesUserProfile.input}
-                />
+                    className={key === "dob" ? "custom-date-input" : ""}
+                    disabled={key === "role"}
+                    value={form[key]}
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      if (key === "phone") {
+                        value = value.replace(/\D/g, "");
+                      }
+                      handleChange(key, value);
+                    }}
+                    style={stylesUserProfile.input}
+                  />
+                </div>
               </div>
+            ))}
+
+            {error && (
+              <p style={stylesError.message}>{error}</p>
+            )}
+
+            <div style={stylesButton.actions}>
+              <button
+                style={{
+                  ...stylesButton.btnCancel,
+                  ...(hover === "cancel" &&
+                    stylesButton.btnCancelHover),
+                }}
+                onMouseEnter={() => setHover("cancel")}
+                onMouseLeave={() => setHover(null)}
+                onClick={handleClose}
+              >
+                <X size={18} /> Hủy
+              </button>
+
+              <button
+                style={{
+                  ...stylesButton.btnSave,
+                  ...(hover === "save" &&
+                    stylesButton.btnSaveHover),
+                }}
+                onMouseEnter={() => setHover("save")}
+                onMouseLeave={() => setHover(null)}
+                onClick={handleSubmit}
+              >
+                <Save size={18} /> Lưu
+              </button>
             </div>
-          ))}
-
-          {error && (
-            <p style={stylesError.message}>{error}</p>
-          )}
-
-          <div style={stylesButton.actions}>
-            <button
-              style={{
-                ...stylesButton.btnCancel,
-                ...(hover === "cancel" &&
-                  stylesButton.btnCancelHover),
-              }}
-              onMouseEnter={() => setHover("cancel")}
-              onMouseLeave={() => setHover(null)}
-              onClick={handleClose}
-            >
-              <X size={18} /> Hủy
-            </button>
-
-            <button
-              style={{
-                ...stylesButton.btnSave,
-                ...(hover === "save" &&
-                  stylesButton.btnSaveHover),
-              }}
-              onMouseEnter={() => setHover("save")}
-              onMouseLeave={() => setHover(null)}
-              onClick={handleSubmit}
-            >
-              <Save size={18} /> Lưu
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* SHAKE KEYFRAME */}
-      <style>
-        {`
-        @keyframes shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-6px); }
-          50% { transform: translateX(6px); }
-          75% { transform: translateX(-4px); }
-          100% { transform: translateX(0); }
-        }
-      `}
-      </style>
-    </div>
+        {/* SHAKE KEYFRAME */}
+        <style>
+          {`
+          @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
+          }
+        `}
+        </style>
+      </div>
+    </>
   );
 };
 

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { updateProfile } from "../../../services/EmployeeService.js";
-import { stylesError } from "../../admin/style/Styles.js";
-import { Styles, ButtonStyles } from "../style/Styles.js";
+import { Styles } from "../style/Styles.js";
 import { X } from "lucide-react";
 
-export default function ProfileModal({ onClose }) {
+export default function ProfileStyles({ onClose }) {
   const { user, setUser } = useAuth();
   const [error, setError] = useState("");
   const [animate, setAnimate] = useState(false);
@@ -128,7 +127,7 @@ export default function ProfileModal({ onClose }) {
     <div style={Styles.overlay} onClick={handleClose}>
       <div
         style={{
-          ...modal.content,
+          ...Styles.content,
           opacity: animate ? 1 : 0,
           transform: animate ? "translateY(0)" : "translateY(-20px)",
           animation: shake ? "shake 0.4s" : "",
@@ -136,84 +135,84 @@ export default function ProfileModal({ onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* CLOSE BUTTON */}
-        <div style={ButtonStyles.closeBtn} onClick={handleClose}>
+        <div style={Styles.closeBtn} onClick={handleClose}>
           <X size={18} />
         </div>
 
-        <h2 style={modal.title}>Thông tin cá nhân</h2>
+        <h2 style={Styles.title}>Thông tin cá nhân</h2>
 
-{/* HỌ TÊN */}
-<div style={modal.group}>
-  <label style={modal.label}>
-    Họ và tên <span style={modal.required}>*</span>
-  </label>
-  <input
-    name="name"
-    value={profile.name}
-    onChange={handleChange}
-    style={modal.input}
-  />
-</div>
+        {/* HỌ TÊN */}
+        <div style={modal.group}>
+          <label style={Styles.label}>
+            Họ và tên <span style={Styles.required}>*</span>
+          </label>
+          <input
+            name="name"
+            value={profile.name}
+            onChange={handleChange}
+            style={Styles.input}
+          />
+        </div>
 
-{/* NGÀY SINH */}
-<div style={modal.group}>
-  <label style={modal.label}>
-    Ngày sinh <span style={modal.required}>*</span>
-  </label>
-  <input
-    type="date"
-    name="dob"
-    value={profile.dob}
-    onChange={handleChange}
-    style={modal.input}
-  />
-</div>
+        {/* NGÀY SINH */}
+        <div style={modal.group}>
+          <label style={Styles.label}>
+            Ngày sinh <span style={Styles.required}>*</span>
+          </label>
+          <input
+            type="date"
+            name="dob"
+            value={profile.dob}
+            onChange={handleChange}
+            style={Styles.input}
+          />
+        </div>
 
-{/* SỐ ĐIỆN THOẠI */}
-<div style={modal.group}>
-  <label style={modal.label}>
-    Số điện thoại <span style={modal.required}>*</span>
-  </label>
-  <input
-    name="phone"
-    value={profile.phone}
-    onChange={handleChange}
-    style={modal.input}
-  />
-</div>
+        {/* SỐ ĐIỆN THOẠI */}
+        <div style={modal.group}>
+          <label style={Styles.label}>
+            Số điện thoại <span style={Styles.required}>*</span>
+          </label>
+          <input
+            name="phone"
+            value={profile.phone}
+            onChange={handleChange}
+            style={Styles.input}
+          />
+        </div>
 
-{/* EMAIL */}
-<div style={modal.group}>
-  <label style={modal.label}>
-    Email <span style={modal.required}>*</span>
-  </label>
-  <input
-    name="email"
-    value={profile.email}
-    onChange={handleChange}
-    style={modal.input}
-  />
-</div>
+        {/* EMAIL */}
+        <div style={modal.group}>
+          <label style={Styles.label}>
+            Email <span style={Styles.required}>*</span>
+          </label>
+          <input
+            name="email"
+            value={profile.email}
+            onChange={handleChange}
+            style={Styles.input}
+          />
+        </div>
 
-{/* USERNAME */}
-<div style={modal.group}>
-  <label style={modal.label}>Tên đăng nhập</label>
-  <input value={profile.username} disabled style={modal.disabled} />
-</div>
+        {/* USERNAME */}
+        <div style={modal.group}>
+          <label style={Styles.label}>Tên đăng nhập</label>
+          <input value={profile.username} disabled style={Styles.disabled} />
+        </div>
 
-{/* ROLE */}
-<div style={modal.group}>
-  <label style={modal.label}>Chức vụ</label>
-  <input value={profile.role} disabled style={modal.disabled} />
-</div>
+        {/* ROLE */}
+        <div style={modal.group}>
+          <label style={Styles.label}>Chức vụ</label>
+          <input value={profile.role} disabled style={Styles.disabled} />
+        </div>
 
         {error && <p style={stylesError.message}>{error}</p>}
 
-        <div style={modal.actions}>
-          <button onClick={handleClose} style={ButtonStyles.cancelBtn}>
+        <div style={Styles.actions}>
+          <button onClick={handleClose} style={Styles.cancelBtn}>
             Huỷ
           </button>
-          <button onClick={handleUpdate} style={ButtonStyles.saveBtn}>
+          <button onClick={handleUpdate} style={Styles.saveBtn}>
             Lưu thay đổi
           </button>
         </div>
@@ -238,70 +237,23 @@ export default function ProfileModal({ onClose }) {
 /* ================= STYLE ================= */
 
 const modal = {
-    content: {
-        position: "relative",
-        background: "#fff",
-        padding: "35px 30px",
-        borderRadius: "18px",
-        width: "430px",
-        boxShadow: "0 25px 60px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "14px",
-        transition: "all 0.2s ease",
-    },
     
-    title: {
-        margin: 0,
-        fontSize: "20px",
-        fontWeight: "600",
-        textAlign: "center",
-        color: "#0f172a",
-    },
 
     row: {
         display: "flex",
     },
-
-    input: {
-        width: "100%",
-        padding: "11px 14px",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        fontSize: "14px",
-        outline: "none",
-    },
-
-    disabled: {
-        width: "100%",
-        padding: "11px 14px",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        background: "#f1f5f9",
-        fontSize: "14px",
-    },
-
-    actions: {
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: "12px",
-        marginTop: "10px",
-    },
-
+    
+    
     
     group: {
         display: "flex",
         flexDirection: "column",
-        gap: "6px",
+        gap: "10px",
     },
 
     label: {
         fontSize: "13px",
         fontWeight: "500",
         color: "#475569",
-    },
-
-    required: {
-        color: "#ef4444",
     },
 };

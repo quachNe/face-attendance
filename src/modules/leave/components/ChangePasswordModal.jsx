@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { Eye, EyeOff, X } from "lucide-react";
 import { updateProfile } from "../../../services/EmployeeService.js";
-import { stylesButton, stylesError } from "../../admin/style/Styles.js";
-import { Styles, ButtonStyles } from "../style/Styles.js";
+import { Styles } from "../style/Styles";
 
 export default function ChangePasswordModal({ onClose }) {
     const { logout } = useAuth();
@@ -127,7 +126,7 @@ export default function ChangePasswordModal({ onClose }) {
         <div style={Styles.overlay} onClick={handleClose}>
             <div
                 style={{
-                ...modal.content,
+                ...Styles.content,
                 opacity: animate ? 1 : 0,
                 transform: animate ? "translateY(0)" : "translateY(-20px)",
                 animation: shake ? "shake 0.4s" : "",
@@ -135,22 +134,22 @@ export default function ChangePasswordModal({ onClose }) {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* CLOSE BUTTON */}
-                <div style={ButtonStyles.closeBtn} onClick={handleClose}>
+                <div style={Styles.closeBtn} onClick={handleClose}>
                     <X size={18} />
                 </div>
 
-                <h2 style={modal.title}>Đổi mật khẩu</h2>
+                <h2 style={Styles.title}>Đổi mật khẩu</h2>
 
                 {/* OLD PASSWORD */}
                 <div style={modal.field}>
-                    <label style={modal.label}>Mật khẩu cũ</label>
+                    <label style={Styles.label}>Mật khẩu cũ <span style={Styles.required}>*</span></label>
                     <div style={modal.inputWrapper}>
                         <input
                             type={show.old ? "text" : "password"}
                             name="oldPassword"
                             value={password.oldPassword}
                             onChange={handleChange}
-                            style={modal.input}
+                            style={Styles.input}
                         />
                         <span
                             style={modal.icon}
@@ -163,14 +162,14 @@ export default function ChangePasswordModal({ onClose }) {
 
                 {/* NEW PASSWORD */}
                 <div style={modal.field}>
-                    <label style={modal.label}>Mật khẩu mới</label>
+                    <label style={Styles.label}>Mật khẩu mới <span style={Styles.required}>*</span></label>
                     <div style={modal.inputWrapper}>
                         <input
                             type={show.new ? "text" : "password"}
                             name="newPassword"
                             value={password.newPassword}
                             onChange={handleChange}
-                            style={modal.input}
+                            style={Styles.input}
                         />
                         <span
                             style={modal.icon}
@@ -201,14 +200,14 @@ export default function ChangePasswordModal({ onClose }) {
 
                 {/* CONFIRM PASSWORD */}
                 <div style={modal.field}>
-                <label style={modal.label}>Xác nhận mật khẩu</label>
+                <label style={Styles.label}>Xác nhận mật khẩu <span style={Styles.required}>*</span></label>
                     <div style={modal.inputWrapper}>
                         <input
                             type={show.confirm ? "text" : "password"}
                             name="confirmPassword"
                             value={password.confirmPassword}
                             onChange={handleChange}
-                            style={modal.input}
+                            style={Styles.input}
                         />
                         <span
                             style={modal.icon}
@@ -221,13 +220,13 @@ export default function ChangePasswordModal({ onClose }) {
                     </div>
                 </div>
 
-                {error && <p style={stylesError.message}>{error}</p>}
+                {error && <p style={Styles.message}>{error}</p>}
 
-                <div style={ButtonStyles.actions}>
-                    <button onClick={handleClose} style={ButtonStyles.cancelBtn}>
+                <div style={Styles.actions}>
+                    <button onClick={handleClose} style={Styles.cancelBtn}>
                         Huỷ
                     </button>
-                    <button onClick={handleSubmit} style={ButtonStyles.saveBtn}>
+                    <button onClick={handleSubmit} style={Styles.saveBtn}>
                         Lưu thay đổi
                     </button>
                 </div>
@@ -251,50 +250,14 @@ export default function ChangePasswordModal({ onClose }) {
 /* ================= STYLE ================= */
 
 const modal = {
-    content: {
-        position: "relative",
-        background: "#fff",
-        padding: "35px 30px",
-        borderRadius: "18px",
-        width: "420px",
-        boxShadow: "0 25px 60px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "18px",
-        transition: "all 0.2s ease",
-    },
-
-    title: {
-        margin: 0,
-        fontSize: "20px",
-        fontWeight: "600",
-        textAlign: "center",
-        color: "#0f172a",
-    },
-
     field: {
         display: "flex",
         flexDirection: "column",
         gap: "6px",
     },
 
-    label: {
-        fontSize: "13px",
-        fontWeight: "500",
-        color: "#334155",
-    },
-
     inputWrapper: {
         position: "relative",
-    },
-
-    input: {
-        width: "100%",
-        padding: "12px 40px 12px 14px",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        fontSize: "14px",
-        outline: "none",
     },
 
     icon: {

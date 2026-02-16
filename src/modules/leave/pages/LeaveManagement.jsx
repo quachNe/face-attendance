@@ -4,7 +4,7 @@ import LeaveMenu from "../components/LeaveMenu";
 import LeaveFooter from "../components/LeaveFooter";
 import LeaveLoginModal from "../components/LeaveLoginModal";
 import { useAuth } from "../../../context/AuthContext";
-import { User2Icon, CalendarDays, FileText } from "lucide-react";
+import { FolderOpen , CalendarDays, FileText } from "lucide-react";
 import LeaveRequest from "../components/LeaveRequest";
 import LeaveStatus from "../components/LeaveStatus";
 import ProfileModal from "../components/ProfileModal";
@@ -28,8 +28,14 @@ const LeaveManagement = () => {
       return (
         <div style={styles.emptyWrapper}>
           <div style={styles.emptyCard}>
-            <div style={styles.emptyIcon}>📂</div>
-            <h2 style={styles.emptyTitle}>Chưa chọn chức năng</h2>
+            <div style={styles.emptyIcon}>
+              <FolderOpen size={80} strokeWidth={1.5} />
+            </div>
+
+            <h2 style={styles.emptyTitle}>
+              Chưa chọn chức năng
+            </h2>
+
             <p style={styles.emptyDesc}>
               Vui lòng chọn một chức năng bên trái để bắt đầu sử dụng hệ thống
               quản lý đơn xin nghỉ phép.
@@ -68,7 +74,6 @@ const LeaveManagement = () => {
 
   return (
     <div style={styles.page}>
-      {/* ✅ CHỈ 1 HEADER */}
       <LeaveHeader
         onLoginClick={() => setShowLogin(true)}
         onShowProfile={() => setShowProfile(true)}
@@ -144,11 +149,6 @@ const styles = {
 
   emptyCard: {
     textAlign: "center",
-    padding: "60px 50px",
-    borderRadius: "20px",
-    background: "linear-gradient(145deg, #f8fafc, #ffffff)",
-    // boxShadow: "0 12px 35px rgba(0,0,0,0.05)",
-    maxWidth: "500px",
   },
 
   emptyIcon: {

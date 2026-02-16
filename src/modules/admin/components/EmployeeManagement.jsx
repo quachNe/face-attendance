@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Styles, DEFAULT_FACE, stylesButton, stylesError, stylesForm, styleTable, styleModel } from "../style/Styles";
+import { Styles, stylesButton, stylesForm, styleTable} from "../style/Styles";
 import {
   Plus,
   Pencil,
@@ -15,35 +15,7 @@ import { getEmployees, updateEmployee, createEmployee } from "../../../services/
 import { getShifts } from "../../../services/ShiftService";
 import { exportEmployeePDF } from "../../../utils/exportPDF";
 import * as XLSX from "xlsx";
-
-// CSS global cho input date (chỉ inject 1 lần)
-const datePickerStyles = `
-  .custom-date-input {
-    color-scheme: dark; /* giúp icon trắng/sáng ở Firefox và một số trường hợp Chrome */
-  }
-
-  .custom-date-input::-webkit-calendar-picker-indicator {
-    filter: brightness(0) invert(1); /* biến icon thành trắng hoàn toàn */
-    opacity: 1 !important;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-  }
-
-  .custom-date-input::-webkit-inner-spin-button,
-  .custom-date-input::-webkit-clear-button {
-    display: none; /* ẩn các nút spin nếu có */
-  }
-`;
-
-// // Inject CSS một lần duy nhất khi component mount
-if (!document.getElementById("date-picker-custom-style")) {
-  const styleSheet = document.createElement("style");
-  styleSheet.id = "date-picker-custom-style";
-  styleSheet.type = "text/css";
-  styleSheet.innerText = datePickerStyles;
-  document.head.appendChild(styleSheet);
-}
+import EmployeeModal from "./EmployeeModal";
 
 const EmployeeManagement = () => {
   const [users, setUsers] = useState([]);
@@ -59,70 +31,6 @@ const EmployeeManagement = () => {
     id: null,
     type: null,
   });
-  // ===== WEBCAM =====
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  const [showCamModal, setShowCamModal] = useState(false);
-  const [camStream, setCamStream] = useState(null);
-
-  const openCameraModal = async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-    });
-
-    setCamStream(stream);
-    setShowCamModal(true);
-
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    }, 100);
-  } catch (err) {
-    alert("Không thể mở webcam");
-  }
-};
-  const closeCameraModal = () => {
-  if (camStream) {
-    camStream.getTracks().forEach(track => track.stop());
-  }
-  setCamStream(null);
-  setShowCamModal(false);
-};
-const captureFromCamera = () => {
-  const video = videoRef.current;
-  const canvas = canvasRef.current;
-  if (!video || !canvas) return;
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0);
-
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-
-    const file = new File([blob], "face.jpg", { type: "image/jpeg" });
-    const previewUrl = URL.createObjectURL(blob);
-
-    // clear preview cũ
-    if (form.face_preview) {
-      URL.revokeObjectURL(form.face_preview);
-    }
-
-    setForm(prev => ({
-      ...prev,
-      face_preview: previewUrl,
-      face_file: file,
-      face_image: false,
-    }));
-
-    closeCameraModal();
-  }, "image/jpeg");
-};
 
   const [form, setForm] = useState({
     name: "",
@@ -555,177 +463,18 @@ const captureFromCamera = () => {
           </div>
         </div>
       </div>
-      {/*------------------------ MODAL------------------------*/}
-      {showModal && (
-        <div style={styleModel.modalOverlay}>
-          <div style={styleModel.modal}>
-            <h2 style={styleModel.modalTitle}>{editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}</h2>
-            <div style={styleModel.faceBox}>
-              <div style={{ position: "relative" }}>
-                <img
-                  src={form.face_preview ? form.face_preview : DEFAULT_FACE}
-                  alt=""
-                  style={styleModel.facePreview}
-                />
+      <EmployeeModal
+        show={showModal}
+        editId={editId}
+        form={form}
+        setForm={setForm}
+        shifts={shifts}
+        error={error}
+        setError={setError}
+        onClose={() => setShowModal(false)}
+        onSave={handleSave}
+      />
 
-                {/* BADGE trạng thái */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 6,
-                    right: 6,
-                    background: form.face_image ? "#2e7d32" : "#e53935",
-                    color: "#fff",
-                    fontSize: 11,
-                    padding: "2px 6px",
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    width: "max-content",
-                  }}
-                >
-                  {form.face_image ? "Đã Nhận Diện" : "Chưa Nhận Diện"}
-                </div>
-              </div>
-                  <button
-                    type="button"
-                    onClick={openCameraModal}
-                    style={{
-                      ...stylesButton.uploadBtn,
-                      background: "none",
-                      border: "1px dashed #9ca3af",
-                      borderRadius: 8,
-                      justifyContent: "center",
-                      width: "50%",
-                    }}
-                  >
-                    <Camera size={18} />Chụp ảnh khuôn mặt
-                  </button>
-            </div>
-            <div style={styleModel.formGrid}>
-              {[
-                ["Họ tên", "name"],
-                ["Ngày sinh", "dob", "date"],
-                ["Email", "email", "email"],
-                ["SĐT", "phone", "tel"],
-              ].map(([label, key, type]) => (
-                <div key={key} style={styleModel.formGroup}>
-                  <label style={styleModel.label}>{label}<span style={{ color: "red" }}> *</span></label>
-                  <input
-                    type={type || "text"}
-                    inputMode={key === "phone" ? "numeric" : undefined}
-                    pattern={key === "phone" ? "[0-9]*" : undefined}
-                    maxLength={key === "phone" ? 11 : undefined}
-                    className={type === "date" ? "custom-date-input" : ""}
-                    style={{
-                      ...styleModel.formInput,
-                      ...(type === "date" ? { color: "#ffffff" } : {}),
-                    }}
-                    value={form[key] || ""}
-                    onChange={(e) => {
-                      let value = e.target.value;
-
-                      // chỉ cho nhập số nếu là phone
-                      if (key === "phone") {
-                        value = value.replace(/\D/g, "");
-                      }
-
-                      setForm({ ...form, [key]: value });
-                    }}
-                  />
-                </div>
-              ))}
-
-              <div style={styleModel.formGroup}>
-                <label style={styleModel.label}>Vai trò <span style={{ color: "red" }}>*</span></label>
-                <select
-                  style={styleModel.formInput}
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
-                > 
-                  <option value="EMPLOYEE">Nhân Viên</option>
-                  <option value="ADMIN">Quản Trị Viên</option>
-                </select>
-              </div>
-
-              <div style={styleModel.formGroup}>
-                <label style={styleModel.label}>Ca làm việc <span style={{ color: "red" }}>*</span></label>
-                <select
-                  style={styleModel.formInput}
-                  value={form.shift || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, shift: Number(e.target.value) })
-                  }
-                >
-                  {shifts.map(s => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            {/* ERROR */}
-            {error && (
-              <p style={stylesError.message}>
-                {error}
-              </p>
-            )}
-
-            {/* ACTION */}
-            <div style={stylesButton.actions}>
-              <button style={stylesButton.btnCancel} onClick={() =>  {setShowModal(false); setError("")}}>
-                <X /> Hủy
-              </button>
-              <button style={stylesButton.btnSave} onClick={handleSave}>
-                <Save /> Lưu
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/*------------------------ MODAL WEBCAM------------------------*/}
-      {showCamModal && (
-        <div style={styleModel.modalOverlay}>
-          <div style={{ ...styleModel.modal, width: 360 }}>
-            <h3 style={{ textAlign: "center", marginBottom: 12 }}>
-              <Camera size={18} /> Chụp ảnh khuôn mặt
-            </h3>
-
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              style={{
-                width: "100%",
-                borderRadius: 12,
-                border: "2px solid #0ca1a1",
-              }}
-            />
-
-            <div
-              style={{
-                marginTop: 12,
-                display: "flex",
-                justifyContent: "center",
-                
-                gap: 12,
-              }}
-            >
-              <button onClick={closeCameraModal} style={stylesButton.btnCancel}>
-                <X size={18} /> Hủy
-              </button>
-              <button onClick={captureFromCamera} style={stylesButton.btnSave}>
-                <Camera size={18} /> Chụp
-              </button>
-              
-            </div>
-
-            <canvas ref={canvasRef} hidden />
-          </div>
-        </div>
-      )}
     </>
   );
 };
