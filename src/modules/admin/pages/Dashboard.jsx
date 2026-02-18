@@ -1,13 +1,15 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import SideBar from "../components/layout/SideBar"
+import NavBar from "../components/layout/NavBar";
 import backgroundImg from "/background.jpg";
 
 const Dashboard = () => {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar />
+      {/* Sibar */}
+      <SideBar />
 
+      {/* Navbar && Rightbar*/}
       <div
         style={{
           flex: 1,
@@ -18,9 +20,7 @@ const Dashboard = () => {
           backgroundPosition: "center",
         }}
       >
-        <Navbar />
-
-        {/* 🔥 PHẦN QUAN TRỌNG */}
+        <NavBar />
         <div
           style={{
             flex: 1,

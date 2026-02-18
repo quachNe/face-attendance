@@ -5,7 +5,7 @@ import {
     stylesError,
     styleModel,
     datePickerStyles
-} from "../style/Styles";
+} from "../../style/Styles";
 import { Camera, Save, X } from "lucide-react";
 
 const captureSteps = [
@@ -272,10 +272,10 @@ const EmployeeModal = ({
                             })
                             }
                         >
-                            <option value="EMPLOYEE">
+                            <option value="employee">
                                 Nhân Viên
                             </option>
-                            <option value="ADMIN">
+                            <option value="admin">
                                 Quản Trị Viên
                             </option>
                         </select>
@@ -292,32 +292,24 @@ const EmployeeModal = ({
                             Ca làm việc <span style={{color:"red"}}>*</span>
                         </label>
                         <select
-                            style={
-                                styleModel.formInput
-                            }
-                            value={
-                                form.shift || ""
-                            }
+                            style={styleModel.formInput}
+                            value={form.shift_id || ""}
                             onChange={(e) =>
                                 setForm({
-                                    ...form,
-                                    shift: Number(
-                                    e.target.value
-                                    ),
+                                ...form,
+                                shift_id: Number(e.target.value),
                                 })
                             }
-                        >
-                            {shifts.map(
-                                (s) => (
-                                    <option
-                                    key={s.id}
-                                    value={s.id}
-                                    >
-                                    {s.name}
-                                    </option>
-                                )
-                            )}
-                        </select>
+                            >
+                            <option value="">-- Chọn ca làm việc --</option>
+
+                            {shifts.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                {s.name}
+                                </option>
+                            ))}
+                            </select>
+
                         </div>
                     </div>
 

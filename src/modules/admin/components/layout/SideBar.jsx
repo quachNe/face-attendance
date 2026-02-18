@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Users2, ClipboardCheck, BarChart3, Clock, Plane } from "lucide-react";
 import logoImg from "/Logo1.png";
 
-const Sidebar = () => {
+const SideBar = () => {
 
   const renderMenu = (to, label, Icon) => {
     return (
@@ -70,7 +70,7 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default SideBar;
 
 export const stylesSidebar = {
   sidebar: {

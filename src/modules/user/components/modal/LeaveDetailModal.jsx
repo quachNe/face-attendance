@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { Styles } from "../style/Styles";
+import { Styles } from "../../style/Styles";
 
 const LeaveDetailModal = ({ leave, onClose }) => {
   const [animate, setAnimate] = useState(false);

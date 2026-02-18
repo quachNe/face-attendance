@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthContext";
 import {Settings, Lock, LogOut} from "lucide-react"
 export default function LeaveDropdown({
   onClose,

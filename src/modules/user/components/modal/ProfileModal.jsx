@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../../context/AuthContext";
-import { updateProfile } from "../../../services/EmployeeService.js";
-import { Styles } from "../style/Styles.js";
+import { useAuth } from "../../../../context/AuthContext.jsx";
+import { updateProfile } from "../../../../services/EmployeeService.js";
+import { Styles } from "../../style/Styles.js";
 import { X } from "lucide-react";
 
 export default function ProfileStyles({ onClose }) {

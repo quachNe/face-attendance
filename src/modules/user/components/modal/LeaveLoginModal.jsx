@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useAuth } from "../../../context/AuthContext";
-import { stylesError } from "../../admin/style/Styles.js";
+import { useAuth } from "../../../../context/AuthContext.jsx";
+import { stylesError } from "../../../admin/style/Styles.js";
 import { User, Lock, X, Eye, EyeOff } from "lucide-react";
 
 export default function LeaveLoginModal({ onClose }) {

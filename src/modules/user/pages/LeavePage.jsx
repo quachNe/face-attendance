@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import LeaveHeader from "../components/LeaveHeader";
-import LeaveMenu from "../components/LeaveMenu";
-import LeaveFooter from "../components/LeaveFooter";
-import LeaveLoginModal from "../components/LeaveLoginModal";
+import LeaveHeader from "../components/layout/LeaveHeader";
+import LeaveMenu from "../components/layout/LeaveMenu";
+import LeaveFooter from "../components/layout/LeaveFooter";
+import LeaveLoginModal from "../components/modal/LeaveLoginModal";
 import { useAuth } from "../../../context/AuthContext";
 import { FolderOpen , CalendarDays, FileText } from "lucide-react";
-import LeaveRequest from "../components/LeaveRequest";
-import LeaveStatus from "../components/LeaveStatus";
-import ProfileModal from "../components/ProfileModal";
-import ChangePasswordModal from "../components/ChangePasswordModal";
+import LeaveRequest from "./LeaveRequest";
+import LeaveStatus from "./LeaveStatus";
+import ProfileModal from "../components/modal/ProfileModal";
+import ChangePasswordModal from "../components/modal/ChangePasswordModal";
 
-const LeaveManagement = () => {
+const LeavePage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -107,7 +107,7 @@ const LeaveManagement = () => {
   );
 };
 
-export default LeaveManagement;
+export default LeavePage;
 
 const styles = {
   page: {

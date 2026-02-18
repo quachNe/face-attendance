@@ -21,7 +21,7 @@ import {
   updateShift,
   deleteShift,
 } from "../../../services/ShiftService";
-import ShiftModal from "./ShiftModal";
+import ShiftModal from "../components/modal/ShiftModal";
 
 
 const ShiftManagement = () => {
@@ -75,7 +75,6 @@ const ShiftManagement = () => {
     setEditId(null);
     setForm({ name: "", start_time: "", end_time: "" });
     setShowModal(true);
-    setTimeout(() => setAnimate(true), 10);
   };
 
   const openEditModal = (s) => {
@@ -86,13 +85,11 @@ const ShiftManagement = () => {
       end_time: s.end_time || "",
     });
     setShowModal(true);
-    setTimeout(() => setAnimate(true), 10);
   };
 
   /* ================= CLOSE MODAL ================= */
 
   const handleCloseModal = () => {
-    setAnimate(false);
     setTimeout(() => {
       setShowModal(false);
       setError("");
@@ -104,8 +101,6 @@ const ShiftManagement = () => {
   const handleSave = async () => {
     if (!form.name || !form.start_time || !form.end_time) {
       setError("Vui lòng nhập đầy đủ thông tin");
-      setShake(true);
-      setTimeout(() => setShake(false), 400);
       return;
     }
 
@@ -122,8 +117,6 @@ const ShiftManagement = () => {
     } catch (err) {
       console.error(err);
       setError("Lưu ca làm việc thất bại");
-      setShake(true);
-      setTimeout(() => setShake(false), 400);
     }
   };
 

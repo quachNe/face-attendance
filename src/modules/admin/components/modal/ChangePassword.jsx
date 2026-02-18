@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Eye, EyeOff, Save, X } from "lucide-react";
-import { useAuth } from "../../../context/AuthContext.jsx";
-import { updateEmployee } from "../../../services/EmployeeService.js";
+import { useAuth } from "../../../../context/AuthContext.jsx";
+import { updateEmployee } from "../../../../services/EmployeeService.js";
 import {
   stylesButton,
   stylesError,
   styleModel,
-} from "../style/Styles";
+} from "../../style/Styles.js";
 
 const ChangePassword = ({ onClose }) => {
   const { user } = useAuth();

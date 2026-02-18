@@ -4,7 +4,6 @@ import { FiFileText } from "react-icons/fi";
 import { Styles, stylesButton, stylesForm, styleTable} from "../style/Styles";
 import { ClipboardCheck} from "lucide-react";
 import { getLogs } from "../../../services/AttendanceService";
-
 const AttendanceHistory = () => {
   const [records, setRecords] = useState([]);
   const [date, setDate] = useState(

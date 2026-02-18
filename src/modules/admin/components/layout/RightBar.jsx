@@ -1,9 +1,9 @@
 import React from "react";
-import EmployeeManagement from "./EmployeeManagement";
-import AttendanceHistory from "./AttendanceHistory";
-import ShiftManagement from "./ShiftManagement";
+import EmployeeManagement from "../../pages/EmployeeManagement";
+import AttendanceHistory from "../../pages/AttendanceHistory";
+import ShiftManagement from "../../pages/ShiftManagement";
 import backgroundImg from "/background.jpg";
-import SystemStatistics from "./SystemStatistics";
+import SystemStatistics from "../../pages/SystemStatistics";
 
 const Rightbar = ({ activePage }) => {
   return (

@@ -8,12 +8,12 @@ import {
   Briefcase,
   Calendar,
 } from "lucide-react";
-import { styleModel, stylesButton, stylesError, datePickerStyles } from "../style/Styles";
+import { styleModel, stylesButton, stylesError, datePickerStyles } from "../../style/Styles";
 import {
   getEmployeeById,
   updateEmployee,
-} from "../../../services/EmployeeService";
-import { useAuth } from "../../../context/AuthContext";
+} from "../../../../services/EmployeeService";
+import { useAuth } from "../../../../context/AuthContext";
 import { toast } from "react-toastify";
 
 const UserProfile = ({ onClose }) => {

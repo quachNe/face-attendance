@@ -1,6 +1,6 @@
 import React from "react";
-import { useAuth } from "../../../context/AuthContext";
-import { CalendarDays, FileText, User2Icon } from "lucide-react";
+import { useAuth } from "../../../../context/AuthContext";
+import { CalendarDays, FileText } from "lucide-react";
 
 export default function LeaveMenu({ active, setActive, onLoginClick }) {
     const { user } = useAuth();

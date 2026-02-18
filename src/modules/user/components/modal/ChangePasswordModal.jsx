@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../../context/AuthContext.jsx";
 import { Eye, EyeOff, X } from "lucide-react";
-import { updateProfile } from "../../../services/EmployeeService.js";
-import { Styles } from "../style/Styles";
+import { updateProfile } from "../../../../services/EmployeeService.js";
+import { Styles } from "../../style/Styles.js";
 
 export default function ChangePasswordModal({ onClose }) {
     const { logout } = useAuth();

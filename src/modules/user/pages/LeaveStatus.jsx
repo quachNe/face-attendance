@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Eye, Trash2 } from "lucide-react";
-import LeaveDetailModal from "./LeaveDetailModal.jsx";
+import LeaveDetailModal from "../components/modal/LeaveDetailModal.jsx"
 import { getLeave } from "../../../services/LeaveService.js";
 import { useAuth } from "../../../context/AuthContext.jsx";
 

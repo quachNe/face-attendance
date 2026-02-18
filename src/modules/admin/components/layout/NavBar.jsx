@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, use } from "react";
 import { User, Settings, Lock, LogOut, Bold } from "lucide-react";
-import ChangePassword from "./ChangePassWord";
-import UserProfile from "./UserProfile";
-import { useAuth } from "../../../context/AuthContext";
+import ChangePassword from "../modal/ChangePassword";
+import UserProfile from "../modal/UserProfile";
+import { useAuth } from "../../../../context/AuthContext";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);

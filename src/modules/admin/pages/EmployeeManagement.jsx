@@ -15,7 +15,7 @@ import { getEmployees, updateEmployee, createEmployee } from "../../../services/
 import { getShifts } from "../../../services/ShiftService";
 import { exportEmployeePDF } from "../../../utils/exportPDF";
 import * as XLSX from "xlsx";
-import EmployeeModal from "./EmployeeModal";
+import EmployeeModal from "../components/modal/EmployeeModal"
 import { toast } from "react-toastify"
 
 const EmployeeManagement = () => {
@@ -41,7 +41,7 @@ const EmployeeManagement = () => {
     email: "",
     phone: "",
     role: "",
-    shift: "",
+    shift_id: "",
     face_preview: null,
     face_file: null,
   });
@@ -57,7 +57,7 @@ const EmployeeManagement = () => {
       email: "",
       phone: "",
       role: "EMPLOYEE",
-      shift: "",
+      shift_id: "",
       face_preview: null,
       face_file: null,
     });
@@ -70,9 +70,8 @@ const EmployeeManagement = () => {
     setEditId(u.id);
     setForm({
       ...u,
-      username: u.username,
-      role : u.role == "admin" ? "ADMIN" : "EMPLOYEE",
-      shift: u.shift_id,
+      role: u.role === "admin" ? "ADMIN" : "EMPLOYEE",
+      shift_id: u.shift_id,
       face_preview: null,
       face_file: null,
       face_image: !!u.face_image,
@@ -138,7 +137,7 @@ const EmployeeManagement = () => {
         email: form.email,
         phone: form.phone,
         role: form.role,
-        shift: form.shift,
+        shift_id: form.shift_id,
         image: imageBase64,
       };
 
@@ -175,7 +174,7 @@ const EmployeeManagement = () => {
       email: form.email,
       phone: form.phone,
       role: form.role || "EMPLOYEE",
-      shift: form.shift,
+      shift_id: form.shift_id,
       image: imageBase64,
     };
 
@@ -219,14 +218,13 @@ const EmployeeManagement = () => {
         phone: u.phone || "",
         role: u.role,
         shift_id: u.shift_id || null,
-        shift_name: u.shift || "",
+        shift_name: u.shift_name || "",
         face_image: u.face_image || null,
       }));
-      const userNotAdmin = mappedUsers.filter(
-        u => u.role !== "admin"
+      const userNotRootAdmin = mappedUsers.filter(
+        u => u.username !== "admin"
       );
-      setUsers(userNotAdmin);
-      console.log("Fetched users:", userNotAdmin);
+      setUsers(userNotRootAdmin);
     } catch (error) {
       console.error(error);
     }

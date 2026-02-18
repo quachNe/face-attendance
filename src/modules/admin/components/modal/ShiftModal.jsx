@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { styleModel, stylesButton, stylesError, datePickerStyles} from "../style/Styles";
+import { styleModel, stylesButton, stylesError, datePickerStyles} from "../../style/Styles";
 import { Save, X } from "lucide-react";
 
 const ShiftModal = ({
