@@ -1,17 +1,13 @@
-import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-import Rightbar from "../components/Rightbar";
 import backgroundImg from "/background.jpg";
 
 const Dashboard = () => {
-  const [activePage, setActivePage] = useState("employee");
-
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar setActivePage={setActivePage} />
+      <Sidebar />
 
-      {/* RIGHT COLUMN – BACKGROUND CHUNG */}
       <div
         style={{
           flex: 1,
@@ -20,11 +16,30 @@ const Dashboard = () => {
           backgroundImage: `url(${backgroundImg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          overflow: "hidden",
         }}
       >
         <Navbar />
-        <Rightbar activePage={activePage} />
+
+        {/* 🔥 PHẦN QUAN TRỌNG */}
+        <div
+          style={{
+            flex: 1,
+            height: "calc(100vh - 60px)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              padding: 32,
+              background: "rgba(1,1,5,0.85)",
+              color: "#e5e7eb",
+              overflowY: "auto",
+            }}
+          >
+            <Outlet />
+          </div>
+        </div>
       </div>
     </div>
   );

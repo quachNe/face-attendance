@@ -14,11 +14,12 @@ import {
   updateEmployee,
 } from "../../../services/EmployeeService";
 import { useAuth } from "../../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const UserProfile = ({ onClose }) => {
   
   const { user } = useAuth();
-
+  console.log(user);
   const [animate, setAnimate] = useState(false);
   const [shake, setShake] = useState(false);
   const [hover, setHover] = useState(null);
@@ -107,11 +108,11 @@ const UserProfile = ({ onClose }) => {
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      alert("Đổi thông tin thành công!!")
-      // handleClose();
+      toast.success("Đổi thông tin thành công!!")
+      handleClose();
     } catch (err) {
       console.error(err);
-      setError("Cập nhật thất bại");
+       toast.success("Cập nhật thất bại");
       setShake(true);
       setTimeout(() => setShake(false), 400);
     }

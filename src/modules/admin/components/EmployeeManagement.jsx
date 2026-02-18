@@ -16,6 +16,7 @@ import { getShifts } from "../../../services/ShiftService";
 import { exportEmployeePDF } from "../../../utils/exportPDF";
 import * as XLSX from "xlsx";
 import EmployeeModal from "./EmployeeModal";
+import { toast } from "react-toastify"
 
 const EmployeeManagement = () => {
   const [users, setUsers] = useState([]);
@@ -144,7 +145,7 @@ const EmployeeManagement = () => {
       try {
         const {data} = await updateEmployee(editId, payload);
         if (!data.success) {
-          alert(data.message || "Lỗi cập nhật nhân viên");
+          toast.success(data.message || "Lỗi cập nhật nhân viên");
           return;
         }
 
@@ -153,6 +154,7 @@ const EmployeeManagement = () => {
           u.id === editId ? data.user : u
         ));
         setShowModal(false);
+        toast.success("Cập nhật nhân viên thành công");
         fetchEmployee();
       } catch (err) {
         console.error(err);
@@ -180,12 +182,13 @@ const EmployeeManagement = () => {
     try {
       const {data} = await createEmployee(payload);
       if (!data.success) {
-        alert(data.message || "Lỗi tạo nhân viên");
+        toast(data.message || "Lỗi tạo nhân viên");
         return;
       }
       
       await fetchEmployee();
       setShowModal(false);
+      toast.success("Thêm nhân viên thành công");
     } catch (err) {
       console.error(err);
     }

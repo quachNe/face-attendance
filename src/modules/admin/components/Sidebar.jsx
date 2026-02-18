@@ -1,51 +1,41 @@
-import React, { useState } from "react";
-import { Users2, ClipboardCheck, BarChart3, Clock, Plane   } from "lucide-react";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { Users2, ClipboardCheck, BarChart3, Clock, Plane } from "lucide-react";
 import logoImg from "/Logo1.png";
-const Sidebar = ({ setActivePage }) => {
 
-  const [activeMenu, setActiveMenu] = useState("employee");
-  const [hoverMenu, setHoverMenu] = useState(null);
+const Sidebar = () => {
 
-  const handleClick = (key) => {
-    setActiveMenu(key);
-    setActivePage(key);
-  };
-
-  const renderMenu = (key, label, Icon) => {
-    const isActive = activeMenu === key;
-    const isHover = hoverMenu === key;
-
+  const renderMenu = (to, label, Icon) => {
     return (
-      <div
-        key={key}
-        onClick={() => handleClick(key)}
-        onMouseEnter={() => setHoverMenu(key)}
-        onMouseLeave={() => setHoverMenu(null)}
-        style={{
+      <NavLink
+        to={to}
+        style={({ isActive }) => ({
           ...stylesSidebar.menuItem,
           ...(isActive && stylesSidebar.menuItemActive),
-          ...(isHover && !isActive && stylesSidebar.menuItemHover),
-        }}
+          textDecoration: "none",
+          color: "inherit",
+        })}
       >
-        {isActive && <div style={stylesSidebar.activeBar} />}
-
-        <Icon size={20} color={isActive ? "#fff" : "#94a3b8"} />
-
-        <span
-          style={{
-            ...stylesSidebar.menuText,
-            ...(isActive && stylesSidebar.activeText),
-          }}
-        >
-          {label}
-        </span>
-      </div>
+        {({ isActive }) => (
+          <>
+            {isActive && <div style={stylesSidebar.activeBar} />}
+            <Icon size={20} color={isActive ? "#fff" : "#94a3b8"} />
+            <span
+              style={{
+                ...stylesSidebar.menuText,
+                ...(isActive && stylesSidebar.activeText),
+              }}
+            >
+              {label}
+            </span>
+          </>
+        )}
+      </NavLink>
     );
   };
 
   return (
     <aside style={stylesSidebar.sidebar}>
-      {/* HEADER – CAO BẰNG NAVBAR */}
       <div style={stylesSidebar.header}>
         <div style={stylesSidebar.logoBox}>
           <div style={stylesSidebar.logoIcon}>
@@ -67,19 +57,19 @@ const Sidebar = ({ setActivePage }) => {
         </div>
       </div>
 
-      {/* MENU */}
       <div style={stylesSidebar.menuList}>
-        {renderMenu("employee", "Nhân viên", Users2)}
-        {renderMenu("shift", "Ca làm việc", Clock)}
-        {renderMenu("leave", "Nghỉ phép", Plane  )}
-        {renderMenu("history", "Điểm danh", ClipboardCheck)}
-        {renderMenu("stats", "Thống kê", BarChart3)}
+        {renderMenu("/admin/dashboard/employees", "Nhân viên", Users2)}
+        {renderMenu("/admin/dashboard/shift", "Ca làm việc", Clock)}
+        {renderMenu("/admin/dashboard/leave", "Nghỉ phép", Plane)}
+        {renderMenu("/admin/dashboard/history", "Điểm danh", ClipboardCheck)}
+        {renderMenu("/admin/dashboard/stats", "Thống kê", BarChart3)}
       </div>
 
       <div style={{ flex: 1 }} />
     </aside>
   );
 };
+
 export default Sidebar;
 
 export const stylesSidebar = {

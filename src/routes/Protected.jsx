@@ -7,7 +7,7 @@ const Protected = ({ children, allowedRoles }) => {
   if (loading) return null; // hoặc spinner
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   // Nếu có truyền allowedRoles thì check role

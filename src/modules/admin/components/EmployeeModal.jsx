@@ -273,10 +273,10 @@ const EmployeeModal = ({
                             }
                         >
                             <option value="EMPLOYEE">
-                            Nhân Viên
+                                Nhân Viên
                             </option>
                             <option value="ADMIN">
-                            Quản Trị Viên
+                                Quản Trị Viên
                             </option>
                         </select>
                         </div>
@@ -293,29 +293,29 @@ const EmployeeModal = ({
                         </label>
                         <select
                             style={
-                            styleModel.formInput
+                                styleModel.formInput
                             }
                             value={
-                            form.shift || ""
+                                form.shift || ""
                             }
                             onChange={(e) =>
-                            setForm({
-                                ...form,
-                                shift: Number(
-                                e.target.value
-                                ),
-                            })
+                                setForm({
+                                    ...form,
+                                    shift: Number(
+                                    e.target.value
+                                    ),
+                                })
                             }
                         >
                             {shifts.map(
-                            (s) => (
-                                <option
-                                key={s.id}
-                                value={s.id}
-                                >
-                                {s.name}
-                                </option>
-                            )
+                                (s) => (
+                                    <option
+                                    key={s.id}
+                                    value={s.id}
+                                    >
+                                    {s.name}
+                                    </option>
+                                )
                             )}
                         </select>
                         </div>
@@ -352,19 +352,19 @@ const EmployeeModal = ({
                                 stylesButton.btnSave
                             }
                             onClick={() => {
-                                if (
-                                    faceFiles.length !== 3
-                                ) {
-                                setError("Vui lòng chụp đủ 3 ảnh");
-                                setShake(true);
-                                setTimeout( () =>
-                                    setShake(
-                                        false
-                                    ),
-                                    400
-                                );
-                                return;
-                                }
+                                // if (
+                                //     faceFiles.length !== 3
+                                // ) {
+                                //     setError("Vui lòng chụp đủ 3 ảnh");
+                                //     setShake(true);
+                                //     setTimeout( () =>
+                                //         setShake(
+                                //             false
+                                //         ),
+                                //         400
+                                //     );
+                                //     return;
+                                // }
                                 onSave();
                             }}
                         >

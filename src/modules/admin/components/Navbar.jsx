@@ -6,7 +6,6 @@ import { useAuth } from "../../../context/AuthContext";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  // const user = JSON.parse(localStorage.getItem("user"));
   const {user} = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -14,7 +13,7 @@ const Navbar = () => {
   // XỬ LÝ ĐĂNG XUẤT
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    window.location.href = "/admin/login";
   };
 
   // click ngoài thì đóng dropdown

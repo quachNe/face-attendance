@@ -338,7 +338,7 @@ const Scan = () => {
         </div>
         <button
           style={styles.adminBtn}
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/admin/login")}
         >
           <ShieldCheck size={18} />
           Admin Login

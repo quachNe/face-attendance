@@ -38,7 +38,7 @@ const Login = () => {
       return;
     }
 
-    navigate("/dashboard");
+    navigate("/admin/dashboard");
   };
 
 
