@@ -10,8 +10,6 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Save,
-  X,
   Clock,
 } from "lucide-react";
 
@@ -22,6 +20,7 @@ import {
   deleteShift,
 } from "../../../services/ShiftService";
 import ShiftModal from "../components/modal/ShiftModal";
+import { toast } from "react-toastify";
 
 
 const ShiftManagement = () => {
@@ -32,7 +31,7 @@ const ShiftManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState("");
-
+  const [initialForm, setInitialForm] = useState(null);
   const [form, setForm] = useState({
     name: "",
     start_time: "",
@@ -72,21 +71,36 @@ const ShiftManagement = () => {
   /* ================= OPEN MODAL ================= */
 
   const openAddModal = () => {
+    const empty = { name: "", start_time: "", end_time: "" };
+
     setEditId(null);
-    setForm({ name: "", start_time: "", end_time: "" });
+    setForm(empty);
+    setInitialForm(empty);   // ⭐ lưu bản gốc (trắng)
     setShowModal(true);
   };
 
   const openEditModal = (s) => {
-    setEditId(s.id);
-    setForm({
+    const data = {
       name: s.name || "",
       start_time: s.start_time || "",
       end_time: s.end_time || "",
-    });
+    };
+
+    setEditId(s.id);
+    setForm(data);
+    setInitialForm(data);   // ⭐ lưu trạng thái ban đầu
     setShowModal(true);
   };
 
+  const handleResetForm = () => {
+    if (editId) {
+      setForm(initialForm);
+    } else {
+      setForm({ name: "", start_time: "", end_time: "" });
+    }
+
+    setError("");
+  };
   /* ================= CLOSE MODAL ================= */
 
   const handleCloseModal = () => {
@@ -107,8 +121,10 @@ const ShiftManagement = () => {
     try {
       if (editId) {
         await updateShift(editId, form);
+        toast.success("Cập nhật ca làm việc thành công");
       } else {
         await createShift(form);
+        toast.success("Thêm ca làm việc thành công");
       }
 
       await fetchShifts();
@@ -116,7 +132,7 @@ const ShiftManagement = () => {
       handleCloseModal();
     } catch (err) {
       console.error(err);
-      setError("Lưu ca làm việc thất bại");
+      toast.error("Lưu ca làm việc thất bại");
     }
   };
 
@@ -130,7 +146,14 @@ const ShiftManagement = () => {
     <>
       {/* ================= HEADER ================= */}
       <div style={Styles.header}>
-        <h1 style={Styles.title}>
+        <h1
+          style={{
+            ...Styles.title,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
           <Clock /> QUẢN LÝ CA LÀM VIỆC
         </h1>
 
@@ -183,11 +206,10 @@ const ShiftManagement = () => {
                       key={s.id}
                       onClick={() => setSelectedId(s.id)}
                       style={{
-                        background:
-                          selectedId === s.id
-                            ? "#0ca1a120"
-                            : "transparent",
+                        background:selectedId === s.id ? "#0ca1a120" : "transparent",
+                        cursor: "pointer",
                       }}
+                      
                     >
                       <td style={styleTable.td}>{i + 1}</td>
                       <td style={styleTable.td}>{s.name}</td>
@@ -238,10 +260,8 @@ const ShiftManagement = () => {
       {/* ================= MODAL ================= */}
       <ShiftModal
         show={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setError("");
-        }}
+        onClose={handleCloseModal}
+        onReset={handleResetForm}   // ⭐ thêm dòng này
         onSave={handleSave}
         editId={editId}
         form={form}

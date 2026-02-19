@@ -9,7 +9,8 @@ import {
   Users2,
   FileSpreadsheet,
   Save,
-  X
+  X,
+  ScanFace, CameraOff 
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
 import { getShifts } from "../../../services/ShiftService";
@@ -32,7 +33,7 @@ const EmployeeManagement = () => {
     id: null,
     type: null,
   });
-
+  const [initialForm, setInitialForm] = useState(null);
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -49,34 +50,49 @@ const EmployeeManagement = () => {
   //  MỞ MODEL THÊM NHÂN VIÊN
   const openAddModal = () => {
     setEditId(null);
-    setForm({
+
+    const emptyForm = {
       name: "",
       username: "",
       password: "",
       dob: "",
       email: "",
       phone: "",
-      role: "EMPLOYEE",
+      role: "",
       shift_id: "",
       face_preview: null,
       face_file: null,
-    });
+    };
+
+    setForm(emptyForm);
+    setInitialForm(emptyForm);
     setShowModal(true);
   };
 
   //  MỞ MODEL SỬA NHÂN VIÊN
   const openEditModal = (u) => {
     if (!u || !u.id) return;
-    setEditId(u.id);
-    setForm({
+
+    const editForm = {
       ...u,
       role: u.role === "admin" ? "ADMIN" : "EMPLOYEE",
       shift_id: u.shift_id,
       face_preview: null,
       face_file: null,
       face_image: !!u.face_image,
-    });
+    };
+
+    setEditId(u.id);
+    setForm(editForm);
+    setInitialForm(editForm);
     setShowModal(true);
+  };
+
+  const handleReset = () => {
+    if (!initialForm) return;
+
+    setForm(initialForm);
+    setError("");
   };
 
   // TẠO USERNAME TỰ ĐỘNG THEO DẠNG NVYYYYXXXX (YYYY: Năm hiện tại, XXXX: Số thứ tự)
@@ -107,7 +123,7 @@ const EmployeeManagement = () => {
     }
   );
 
-  // TẠO MẬT KHẨU TỪ NGÀY SINH THEO ĐỊNH DẠNG DDMMYYYY
+  // TẠO MẬT KHẨU TỪ NGÀY SINH THEO ĐỊNH DẠNG NVYYYYXXXX
   const generatePassword = (dob) => {
     if (!dob) return "";
     const d = new Date(dob);
@@ -119,7 +135,7 @@ const EmployeeManagement = () => {
 
   // LƯU THÔNG TIN NHÂN VIÊN (THÊM MỚI HOẶC SỬA)
   const handleSave = async () => {
-    if (!form.name || !form.dob || !form.email || !form.phone) {
+    if (!form.name || !form.dob || !form.email || !form.phone || !form.role || !form.shift_id) {
       setError("Vui lòng điền đầy đủ thông tin bắt buộc");
       return;
     }
@@ -188,6 +204,7 @@ const EmployeeManagement = () => {
       await fetchEmployee();
       setShowModal(false);
       toast.success("Thêm nhân viên thành công");
+      setError("");
     } catch (err) {
       console.error(err);
     }
@@ -332,9 +349,18 @@ const EmployeeManagement = () => {
       {/*------------------------ HEADER ------------------------*/}
       <div style={Styles.header}>
         {/*------------------------ TITLE ------------------------*/}
-        <h1 style={Styles.title}>
-          <Users2 /> QUẢN LÝ NHÂN VIÊN
+        <h1
+          style={{
+            ...Styles.title,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <Users2 />
+          QUẢN LÝ NHÂN VIÊN
         </h1>
+
         
         <div style={Styles.actions}>
           {/*------------------------ SEARCH ------------------------*/}
@@ -351,8 +377,8 @@ const EmployeeManagement = () => {
             onChange={(e) => setFilterRole(e.target.value)}
           >
             <option value="all">Tất Cả</option>
-            <option value="ADMIN">Quản Trị Viên</option>
-            <option value="EMPLOYEE">Nhân Viên</option>
+            <option value="admin">Quản Trị Viên</option>
+            <option value="employee">Nhân Viên</option>
           </select>
           <div style={Styles.rightActions}>
             {/*------------------------ ADD ------------------------*/}
@@ -402,6 +428,7 @@ const EmployeeManagement = () => {
                       onClick={() => setSelectedId(u.id)}
                       style={{
                         background: selectedId === u.id ? "#0ca1a120" : "transparent",
+                        cursor: "pointer",
                       }}
                     >
                       <td style={styleTable.td}>{i + 1}</td>
@@ -414,7 +441,9 @@ const EmployeeManagement = () => {
                       </td>
                       <td style={styleTable.td}>{u.shift_name || "—"}</td>
                       <td style={{ ...styleTable.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
-                        {u.face_image ? "✓" : "✕"}
+                        {u.face_image ? 
+                          <ScanFace size={18} color="#22c55e" /> : <CameraOff size={18} color="#ef4444" 
+                        />}
                       </td>
                       <td style={styleTable.td}>
                         <div style={stylesButton.actionIcons}>
@@ -466,16 +495,16 @@ const EmployeeManagement = () => {
       </div>
       <EmployeeModal
         show={showModal}
-        editId={editId}
+        onClose={() => setShowModal(false)}
+        onSave={handleSave}
+        onReset={handleReset}
         form={form}
         setForm={setForm}
+        editId={editId}
         shifts={shifts}
         error={error}
         setError={setError}
-        onClose={() => setShowModal(false)}
-        onSave={handleSave}
       />
-
     </>
   );
 };

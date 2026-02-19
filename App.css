@@ -23,8 +23,6 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-
-/* ===== RESET DATE INPUT ===== */
 .date-input {
   width: 260px;
   height: 42px;
@@ -39,21 +37,6 @@
   -webkit-appearance: none;
 }
 
-/* ===== ICON LỊCH ===== */
-.date-input::-webkit-calendar-picker-indicator {
-  background-color: #bdaff4;   /* nền trắng */
-  padding: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-
-  /* đổi icon từ trắng → đen */
-  filter: invert(0);
-}
-
-/* hover cho xịn */
-.date-input::-webkit-calendar-picker-indicator:hover {
-  background-color: #e5e7eb;
-}
 
 @keyframes logo-spin {
   from {

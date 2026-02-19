@@ -49,7 +49,7 @@ const styles = {
 
   overlay: {
     height: "100%",
-    padding: 32,
+    padding: 30,
     background: "rgba(1,1,5,0.85)",
     color: "#e5e7eb",
   },

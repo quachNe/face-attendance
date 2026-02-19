@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FiFileText } from "react-icons/fi";
-import { Styles, stylesButton, stylesForm, styleTable} from "../style/Styles";
-import { ClipboardCheck} from "lucide-react";
+import { Styles, stylesButton, stylesForm, styleTable, datePickerStyles} from "../style/Styles";
+import { ClipboardCheck } from "lucide-react";
 import { getLogs } from "../../../services/AttendanceService";
 const AttendanceHistory = () => {
   const [records, setRecords] = useState([]);
@@ -30,8 +30,18 @@ const AttendanceHistory = () => {
 
   return (
     <>
+      <style>{datePickerStyles}</style>
       <div style={Styles.header}>
-        <h1 style={Styles.title}><ClipboardCheck/> QUẢN LÝ ĐIỂM DANH</h1>
+        <h1
+          style={{
+            ...Styles.title,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <ClipboardCheck /> QUẢN LÝ ĐIỂM DANH
+        </h1>
         <div style={Styles.actions}>
           <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
           <input type="date" 
@@ -81,7 +91,7 @@ const AttendanceHistory = () => {
                   </tr>
                 ) : (
                   records.map((r, i) => (
-                    <tr key={r.id || i}>
+                    <tr key={r.id || i} >
                       <td style={styleTable.td}>{i + 1}</td>
                       <td style={styleTable.td}>{r.name}</td>
                       <td style={styleTable.td}>{r.time}</td>

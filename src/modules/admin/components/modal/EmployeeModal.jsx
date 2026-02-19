@@ -24,6 +24,7 @@ const EmployeeModal = ({
     shifts,
     error,
     setError,
+    onReset
 }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
@@ -153,7 +154,6 @@ const EmployeeModal = ({
             <style>{datePickerStyles}</style>
             <div
                 style={styleModel.modalOverlay}
-                onClick={handleClose}
             >
                 <div
                     onClick={(e) => e.stopPropagation()}
@@ -169,7 +169,22 @@ const EmployeeModal = ({
                         ? "shake 0.35s"
                         : "none",
                     }}
-                >
+                >   
+                    {/* NÚT X */}
+                    <button
+                        onClick={handleClose}
+                        style={{
+                            position: "absolute",
+                            top: 12,
+                            right: 12,
+                            border: "none",
+                            background: "transparent",
+                            cursor: "pointer",
+                            color: "#fff",
+                        }}
+                    >
+                        <X size={20}/>
+                    </button>
                     <h2 style={styleModel.modalTitle}>
                         {editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}
                     </h2>
@@ -249,65 +264,42 @@ const EmployeeModal = ({
                             </div>
                         ))}
 
-                        <div
-                        style={
-                            styleModel.formGroup
-                        }
-                        >
-                        <label
-                            style={styleModel.label}
-                        >
-                            Vai trò <span style={{color:"red"}}>*</span>
-                        </label>
-                        <select
-                            style={
-                            styleModel.formInput
-                            }
-                            value={form.role}
-                            onChange={(e) =>
-                            setForm({
-                                ...form,
-                                role:
-                                e.target.value,
-                            })
-                            }
-                        >
-                            <option value="employee">
-                                Nhân Viên
-                            </option>
-                            <option value="admin">
-                                Quản Trị Viên
-                            </option>
-                        </select>
+                        <div style={ styleModel.formGroup } >
+                            <label style={styleModel.label} >
+                                Vai trò <span style={{color:"red"}}>*</span>
+                            </label>
+                            <select
+                                style={ styleModel.formInput }
+                                value={form.role}
+                                onChange={(e) => setForm({ ...form, role: e.target.value, })
+                                }
+                            >   
+                                <option value="">-- Chọn vai trò --</option>
+                                <option value="EMPLOYEE">Nhân Viên</option>
+                                <option value="ADMIN">Quản Trị Viên</option>
+                            </select>
                         </div>
 
-                        <div
-                        style={
-                            styleModel.formGroup
-                        }
+                        <div style={styleModel.formGroup}
                         >
-                        <label
-                            style={styleModel.label}
-                        >
-                            Ca làm việc <span style={{color:"red"}}>*</span>
-                        </label>
-                        <select
-                            style={styleModel.formInput}
-                            value={form.shift_id || ""}
-                            onChange={(e) =>
-                                setForm({
-                                ...form,
-                                shift_id: Number(e.target.value),
-                                })
-                            }
+                            <label style={styleModel.label} >
+                                Ca làm việc <span style={{color:"red"}}>*</span>
+                            </label>
+                            <select
+                                style={styleModel.formInput}
+                                value={form.shift_id || ""}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        shift_id: Number(e.target.value),
+                                    })
+                                }
                             >
-                            <option value="">-- Chọn ca làm việc --</option>
+                                <option value="">-- Chọn ca làm việc --</option>
 
-                            {shifts.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                {s.name}
-                                </option>
-                            ))}
+                                {shifts.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                ))}
                             </select>
 
                         </div>
@@ -323,42 +315,17 @@ const EmployeeModal = ({
                         </p>
                     )}
 
-                    <div
-                        style={
-                            stylesButton.actions
-                        }
-                    >
+                    <div style={ stylesButton.actions } >
                         <button
-                            style={
-                                stylesButton.btnCancel
-                            }
-                            onClick={
-                                handleClose
-                            }
+                            style={stylesButton.btnCancel}
+                            onClick={onReset}
                         >
                             <X /> Hủy
                         </button>
 
                         <button
-                            style={
-                                stylesButton.btnSave
-                            }
-                            onClick={() => {
-                                // if (
-                                //     faceFiles.length !== 3
-                                // ) {
-                                //     setError("Vui lòng chụp đủ 3 ảnh");
-                                //     setShake(true);
-                                //     setTimeout( () =>
-                                //         setShake(
-                                //             false
-                                //         ),
-                                //         400
-                                //     );
-                                //     return;
-                                // }
-                                onSave();
-                            }}
+                            style={stylesButton.btnSave}
+                            onClick={() => onSave()}
                         >
                             <Save /> Lưu
                         </button>
@@ -380,12 +347,8 @@ const EmployeeModal = ({
 
             {showCamModal && (
                 <div
-                    style={
-                        styleModel.modalOverlay
-                    }
-                    onClick={
-                        closeCameraModal
-                    }
+                    style={styleModel.modalOverlay}
+                    onClick={closeCameraModal}
                 >
                     <div
                         onClick={(e) =>e.stopPropagation()}
@@ -397,32 +360,18 @@ const EmployeeModal = ({
                             transition: "all 0.25s ease",
                         }}
                     >
-                        <h3
-                            style={{
-                                textAlign:
-                                "center",
-                            }}
-                        >
-                            {
-                                captureSteps[faceFiles.length]
-                            }
-                        </h3>
-
+                        <h3 style={{textAlign:"center",}}>{captureSteps[faceFiles.length]}</h3>
                         <video
                             ref={videoRef}
                             autoPlay
                             playsInline
-                            style={{
-                                width: "100%",
-                                borderRadius: 12,
-                            }}
+                            style={{width: "100%", borderRadius: 12,}}
                         />
 
                         <div
                             style={{
                                 marginTop: 12,
-                                textAlign:
-                                "center",
+                                textAlign:"center",
                             }}
                         >
                             {faceFiles.length}/3 ảnh
@@ -432,29 +381,20 @@ const EmployeeModal = ({
                             style={{
                                 marginTop: 12,
                                 display: "flex",
-                                justifyContent:
-                                "center",
+                                justifyContent:"center",
                                 gap: 12,
                             }}
                         >
                             <button
-                                onClick={
-                                closeCameraModal
-                                }
-                                style={
-                                stylesButton.btnCancel
-                                }
+                                onClick={closeCameraModal}
+                                style={stylesButton.btnCancel}
                             >
                                 <X /> Hủy
                             </button>
 
                             <button
-                                onClick={
-                                captureFromCamera
-                                }
-                                style={
-                                stylesButton.btnSave
-                                }
+                                onClick={captureFromCamera}
+                                style={stylesButton.btnSave}
                             >
                                 <Camera /> Chụp
                             </button>

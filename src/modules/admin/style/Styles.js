@@ -24,18 +24,18 @@ export const Styles = {
   
   /* ====== HEADER ====== */
   header: {
-    marginBottom: 24,
+    marginBottom: 30,
   },
 
   title: {
     display: "flex",
     alignItems: "center",
     gap: 5,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 800,
     letterSpacing: 1.2,
     color: "#ffffff",
-    marginBottom: 18,
+    marginBottom: 25,
   },
 
   /* ====== ACTION BAR ====== */
@@ -67,10 +67,10 @@ export const styleModel = {
   },
 
   modal: {
-    width: 520,
+    width: 550,
     background: "#020617",
-    padding: 28,
-    borderRadius: 18,
+    padding: 20,
+    borderRadius: 20,
     border: "1px solid #1e293b",
   },
 
@@ -79,13 +79,13 @@ export const styleModel = {
     fontSize: 22,
     fontWeight: 800,
     color: "#ffffff",
-    marginBottom: 20,
+    marginBottom: 30,
   },
 
   formGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: 16,
+    gap: 15,
   },
 
   formGroup: {
@@ -95,16 +95,16 @@ export const styleModel = {
   },
 
   label: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#94a3b8",
     fontWeight: 600,
   },
 
   formInput: {
     width: "100%",
-    height: 44,
+    height: 45,
     padding: "0 14px",
-    borderRadius: 12,
+    borderRadius: 10,
     background: "#020617",
     border: "1px solid #334155",
     color: "#e5e7eb",
@@ -114,7 +114,7 @@ export const styleModel = {
     display: "flex",
     justifyContent: "flex-end",
     gap: 10,
-    marginTop: 24,
+    marginTop: 25,
   },
 
   formGridShift: {
@@ -390,23 +390,30 @@ export const stylesForm = {
 
 // USING IN TABLES
 export const styleTable = {
+  /* ===== WRAPPER ===== */
   tableWrapper: {
     background: "#020617",
     borderRadius: 16,
     border: "1px solid #1e293b",
     overflow: "hidden",
+    position: "relative",
   },
 
+  /* ===== SCROLL CONTAINER ===== */
   tableScroll: {
-    maxHeight: "75vh",
-    overflowY: "auto",
+    maxHeight: "calc(100vh - 260px)",
+    overflow: "auto",
+    scrollbarWidth: "thin",                 // Firefox
+    scrollbarColor: "#0ca1a1 transparent",  // Firefox
   },
 
+  /* ===== TABLE ===== */
   table: {
     width: "100%",
     borderCollapse: "collapse",
   },
 
+  /* ===== HEADER ===== */
   th: {
     padding: 14,
     textAlign: "center",
@@ -418,35 +425,40 @@ export const styleTable = {
     top: 0,
     zIndex: 5,
     borderBottom: "1px solid #1e293b",
+    letterSpacing: 0.3,
   },
 
+  /* ===== CELL ===== */
   td: {
     padding: 14,
     textAlign: "center",
     fontSize: 15,
     borderBottom: "1px solid #1e293b",
+    color: "#e5e7eb",
   },
 
+  /* ===== LOADING SPINNER ===== */
   spinner: {
     width: 42,
     height: 42,
     border: "4px solid #e5e7eb",
     borderTop: "4px solid #0ca1a1",
     borderRadius: "50%",
-    animation: "spin 20s linear infinite",
-    transform: "translateY(70px)",
+    animation: "spin 1s linear infinite",
   },
 
+  /* ===== LOADING OVERLAY ===== */
   loadingOverlay: {
     position: "absolute",
     inset: 0,
-    background: "rgba(255,255,255,0.6)",
+    background: "rgba(1,1,5,0.6)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
   },
 };
+
 
 
 export const datePickerStyles = `

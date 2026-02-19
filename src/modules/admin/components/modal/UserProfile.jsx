@@ -17,9 +17,8 @@ import { useAuth } from "../../../../context/AuthContext";
 import { toast } from "react-toastify";
 
 const UserProfile = ({ onClose }) => {
-  
   const { user } = useAuth();
-  console.log(user);
+  const [initialForm, setInitialForm] = useState(null);
   const [animate, setAnimate] = useState(false);
   const [shake, setShake] = useState(false);
   const [hover, setHover] = useState(null);
@@ -38,19 +37,30 @@ const UserProfile = ({ onClose }) => {
   const fetchUser = async () => {
     try {
       const { data } = await getEmployeeById(user.id);
-      setForm({
+
+      const userData = {
         name: data.name || "",
         dob: data.dob || "",
         email: data.email || "",
         phone: data.phone || "",
         address: data.address || "",
         role: data.role?.toUpperCase() || "",
-      });
+      };
+
+      setForm(userData);
+      setInitialForm(userData);
     } catch (err) {
       console.error(err);
     }
   };
+  const resetFormProfile = () => {
+    if (initialForm) {
+      setForm(initialForm);
+    }
 
+    setError("");
+    setShake(false);
+  };
   /* ================= MOUNT ================= */
   useEffect(() => {
     fetchUser();
@@ -123,7 +133,6 @@ const UserProfile = ({ onClose }) => {
       <style>{datePickerStyles}</style>
       <div
         style={styleModel.modalOverlay}
-        onClick={handleClose}
       >
         <div
           onClick={(e) => e.stopPropagation()}
@@ -139,6 +148,21 @@ const UserProfile = ({ onClose }) => {
             animation: shake ? "shake 0.35s" : "none",
           }}
         >
+        {/* NÚT X */}
+          <button
+            onClick={handleClose}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                color: "#fff",
+              }}
+          >
+            <X size={20}/>
+          </button>
           <h2 style={styleModel.modalTitle}>
             THÔNG TIN NGƯỜI DÙNG
           </h2>
@@ -201,7 +225,7 @@ const UserProfile = ({ onClose }) => {
                 }}
                 onMouseEnter={() => setHover("cancel")}
                 onMouseLeave={() => setHover(null)}
-                onClick={handleClose}
+                onClick={resetFormProfile}
               >
                 <X size={18} /> Hủy
               </button>

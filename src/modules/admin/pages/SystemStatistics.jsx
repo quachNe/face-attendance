@@ -14,7 +14,14 @@ const SystemStatistics = () => {
     <>  
         {/* HEADER */}
         <div style={Styles.header}>
-          <h1 style={Styles.title}>
+          <h1
+            style={{
+              ...Styles.title,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
             <BarChart3 /> THỐNG KÊ HỆ THỐNG
           </h1>
         </div>

@@ -78,6 +78,23 @@ const ChangePassword = ({ onClose }) => {
   };
 
   /* ================= SUBMIT ================= */
+  const resetForm = () => {
+    setForm({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+    setShow({
+      old: false,
+      new: false,
+      confirm: false,
+    });
+
+    setError("");
+    setShake(false);
+  };
+
 
   const handleSubmit = async () => {
     if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
@@ -138,7 +155,7 @@ const ChangePassword = ({ onClose }) => {
   };
 
   return (
-    <div style={styleModel.modalOverlay} onClick={handleClose}>
+    <div style={styleModel.modalOverlay}>
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -153,6 +170,21 @@ const ChangePassword = ({ onClose }) => {
           animation: shake ? "shake 0.35s" : "none",
         }}
       >
+        {/* NÚT X */}
+        <button
+          onClick={handleClose}
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              color: "#fff",
+            }}
+        >
+          <X size={20}/>
+        </button>
         <h2 style={styleModel.modalTitle}>ĐỔI MẬT KHẨU</h2>
 
         <div style={styleModel.formGridShift}>
@@ -242,7 +274,7 @@ const ChangePassword = ({ onClose }) => {
         <div style={stylesButton.actions}>
           <button
             style={stylesButton.btnCancel}
-            onClick={handleClose}
+            onClick={resetForm}
           >
             <X size={18} /> Hủy
           </button>

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Users2, ClipboardCheck, BarChart3, Clock, Plane } from "lucide-react";
+import { Users , CalendarCheck, BarChart3, Clock, ClipboardCheck  } from "lucide-react";
 import logoImg from "/Logo1.png";
 
 const SideBar = () => {
@@ -58,10 +58,10 @@ const SideBar = () => {
       </div>
 
       <div style={stylesSidebar.menuList}>
-        {renderMenu("/admin/dashboard/employees", "Nhân viên", Users2)}
+        {renderMenu("/admin/dashboard/employees", "Nhân viên", Users )}
         {renderMenu("/admin/dashboard/shift", "Ca làm việc", Clock)}
-        {renderMenu("/admin/dashboard/leave", "Nghỉ phép", Plane)}
-        {renderMenu("/admin/dashboard/history", "Điểm danh", ClipboardCheck)}
+        {renderMenu("/admin/dashboard/leave", "Nghỉ phép", CalendarCheck)}
+        {renderMenu("/admin/dashboard/history", "Điểm danh", ClipboardCheck )}
         {renderMenu("/admin/dashboard/stats", "Thống kê", BarChart3)}
       </div>
 

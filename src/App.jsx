@@ -13,6 +13,7 @@ import SystemStatistics from "./modules/admin/pages/SystemStatistics";
 import EmployeeManagement from "./modules/admin/pages/EmployeeManagement";
 import AttendanceHistory from "./modules/admin/pages/AttendanceHistory";
 import ShiftManagement from "./modules/admin/pages/ShiftManagement";
+import LeaveManagement from "./modules/admin/pages/LeaveManagement";
 
 function App() {
   return (
@@ -48,7 +49,7 @@ function App() {
           <Route path="employees" element={<EmployeeManagement />} />
           <Route path="history" element={<AttendanceHistory />} />
           <Route path="shift" element={<ShiftManagement />} />
-          <Route path="leave" element={<div>Chưa làm</div>} />
+          <Route path="leave" element={<LeaveManagement />} />
           <Route path="stats" element={<SystemStatistics />} />
           </Route>
       </Routes>

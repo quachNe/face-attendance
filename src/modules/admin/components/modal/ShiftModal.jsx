@@ -5,6 +5,7 @@ import { Save, X } from "lucide-react";
 const ShiftModal = ({
     show,
     onClose,
+    onReset,
     onSave,
     editId,
     form,
@@ -37,7 +38,7 @@ const ShiftModal = ({
     const handleClose = () => {
         setAnimate(false);
         setTimeout(() => {
-        onClose();
+            onClose();
         }, 250);
     };
 
@@ -56,7 +57,6 @@ const ShiftModal = ({
             <style>{datePickerStyles}</style>
             <div
                 style={styleModel.modalOverlay}
-                onClick={handleClose}
             >
                 <div
                     onClick={(e) => e.stopPropagation()}
@@ -71,7 +71,22 @@ const ShiftModal = ({
                         transition: "all 0.25s ease",
                         animation: shake ? "shake 0.35s" : "none",
                     }}
-                >
+                >   
+                {/* NÚT X */}
+                    <button
+                        onClick={handleClose}
+                        style={{
+                            position: "absolute",
+                            top: 12,
+                            right: 12,
+                            border: "none",
+                            background: "transparent",
+                            cursor: "pointer",
+                            color: "#fff",
+                        }}
+                    >
+                        <X size={20}/>
+                    </button>
                     <h2 style={styleModel.modalTitle}>
                         {editId
                             ? "SỬA CA LÀM VIỆC"
@@ -135,7 +150,7 @@ const ShiftModal = ({
                     <div style={stylesButton.actions}>
                         <button
                             style={stylesButton.btnCancel}
-                            onClick={handleClose}
+                            onClick={onReset}
                         >
                             <X /> Hủy
                         </button>
