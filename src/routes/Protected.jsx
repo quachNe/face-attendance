@@ -12,7 +12,7 @@ const Protected = ({ children, allowedRoles }) => {
 
   // Nếu có truyền allowedRoles thì check role
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return children;

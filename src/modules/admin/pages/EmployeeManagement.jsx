@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Styles, stylesButton, stylesForm, styleTable} from "../style/Styles";
+import React, { useState, useEffect } from "react";
+import { Styles, stylesButton, stylesForm, styleTable, tooltipStyle} from "../style/Styles";
 import {
   Plus,
   Pencil,
   Trash2,
   FileText,
-  Camera ,
   Users2,
   FileSpreadsheet,
-  Save,
-  X,
-  ScanFace, CameraOff 
+  ScanFace, 
+  CameraOff 
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
 import { getShifts } from "../../../services/ShiftService";
@@ -361,44 +359,44 @@ const EmployeeManagement = () => {
           QUẢN LÝ NHÂN VIÊN
         </h1>
 
-        
-        <div style={Styles.actions}>
-          {/*------------------------ SEARCH ------------------------*/}
-          <input
-            placeholder="Tìm theo tên, ngày sinh, email, SĐT"
-            style={stylesForm.searchInput}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          {/*------------------------ FILLTER ------------------------*/}
-          <select
-            style={stylesForm.filterSelect}
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            <option value="all">Tất Cả</option>
-            <option value="admin">Quản Trị Viên</option>
-            <option value="employee">Nhân Viên</option>
-          </select>
-          <div style={Styles.rightActions}>
-            {/*------------------------ ADD ------------------------*/}
-            <button style={stylesButton.btnAdd} onClick={openAddModal}>
-              <Plus size={18} /> Thêm
-            </button>
-            {/*------------------------ EXPORT EXCEL ------------------------*/}
-            <button style={stylesButton.btnExcel} onClick={handleExportExcel}>
-              <FileSpreadsheet size={18} /> Xuất Excel
-            </button>
-            {/*------------------------ EXPORT PDF ------------------------*/}
-            <button
-            style={stylesButton.btnPdf}
-            onClick={() => exportEmployeePDF(users)}
-          >
-            <FileText size={18} /> Xuất PDF
-          </button>
-
+        <form autoComplete="off">
+          <div style={Styles.actions}>
+            {/*------------------------ SEARCH ------------------------*/}
+            <input
+              placeholder="Tìm theo tên, ngày sinh, email, SĐT"
+              style={stylesForm.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {/*------------------------ FILLTER ------------------------*/}
+            <select
+              style={stylesForm.filterSelect}
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+            >
+              <option value="all">Tất Cả</option>
+              <option value="admin">Quản Trị Viên</option>
+              <option value="employee">Nhân Viên</option>
+            </select>
+            <div style={Styles.rightActions}>
+              {/*------------------------ ADD ------------------------*/}
+              <button style={stylesButton.btnAdd} onClick={openAddModal}>
+                <Plus size={18} /> Thêm
+              </button>
+              {/*------------------------ EXPORT EXCEL ------------------------*/}
+              <button style={stylesButton.btnExcel} onClick={handleExportExcel}>
+                <FileSpreadsheet size={18} /> Xuất Excel
+              </button>
+              {/*------------------------ EXPORT PDF ------------------------*/}
+              <button
+                style={stylesButton.btnPdf}
+                onClick={() => exportEmployeePDF(users)}
+              >
+                <FileText size={18} /> Xuất PDF
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
       {/*------------------------ CONTENT ------------------------*/}
       <div style={{ position: "relative" }}>
@@ -436,53 +434,62 @@ const EmployeeManagement = () => {
                       <td style={styleTable.td}>{u.dob || "—"}</td>
                       <td style={styleTable.td}>{u.email || "—"}</td>
                       <td style={styleTable.td}>{u.phone || "—"}</td>
-                      <td style={styleTable.td}>
-                        {u.role === "admin" ? "Quản trị viên" : "Nhân viên"}
-                      </td>
+                      <td style={styleTable.td}> {u.role === "admin" ? "Quản trị viên" : "Nhân viên"} </td>
                       <td style={styleTable.td}>{u.shift_name || "—"}</td>
                       <td style={{ ...styleTable.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
-                        {u.face_image ? 
-                          <ScanFace size={18} color="#22c55e" /> : <CameraOff size={18} color="#ef4444" 
-                        />}
+                        {u.face_image ? <ScanFace size={18} color="#22c55e" /> : <CameraOff size={18} color="#ef4444" />}
                       </td>
                       <td style={styleTable.td}>
                         <div style={stylesButton.actionIcons}>
-                          {/* EDIT */}
-                          <div
-                            style={{
-                              ...stylesButton.iconBoxEdit,
-                              ...stylesButton.iconBoxBase,
-                              ...(hoverIcon.id === u.id &&
-                                hoverIcon.type === "edit" &&
-                                stylesButton.iconBoxEditHover),
-                            }}
-                            onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
-                            onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(u);
-                            }}
-                          >
-                            <Pencil size={15} />
+                            {/* EDIT */}
+                            <div style={tooltipStyle.wrapper}>
+                              <div
+                                style={{
+                                  ...stylesButton.iconBoxEdit,
+                                  ...stylesButton.iconBoxBase,
+                                  ...(hoverIcon.id === u.id &&
+                                    hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
+                                }}
+                                onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
+                                onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditModal(u);
+                                }}
+                              >
+                                <Pencil size={15} />
+                              </div>
+                              {hoverIcon.id === u.id && hoverIcon.type === "edit" && (
+                                <div style={tooltipStyle.tooltip}>
+                                  Chỉnh sửa
+                                  <div style={tooltipStyle.arrow} />
+                                </div>
+                              )}
                           </div>
-
-                          {/* DELETE */}
-                          <div
-                            style={{
-                              ...stylesButton.iconBoxDelete,
-                              ...stylesButton.iconBoxBase,
-                              ...(hoverIcon.id === u.id &&
-                                hoverIcon.type === "delete" &&
-                                stylesButton.iconBoxDeleteHover),
-                            }}
-                            onMouseEnter={() => setHoverIcon({ id: u.id, type: "delete" })}
-                            onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setUsers(prev => prev.filter(item => item?.id !== u.id));
-                            }}
-                          >
-                            <Trash2 size={15} />
+                          <div style={tooltipStyle.wrapper}>
+                            {/* DELETE */}
+                            <div
+                              style={{
+                                ...stylesButton.iconBoxDelete,
+                                ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "delete" && stylesButton.iconBoxDeleteHover),
+                              }}
+                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "delete" })}
+                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setUsers(prev => prev.filter(item => item?.id !== u.id));
+                              }}
+                            >
+                              <Trash2 size={15} />
+                            </div>
+                            {hoverIcon.id === u.id && hoverIcon.type === "delete" && (
+                              <div style={tooltipStyle.tooltip}>
+                                Xóa
+                                <div style={tooltipStyle.arrow} />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>

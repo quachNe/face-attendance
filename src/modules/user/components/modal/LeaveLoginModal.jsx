@@ -20,7 +20,6 @@ export default function LeaveLoginModal({ onClose }) {
 
     try {
       const result = await login(username, password);
-
       if (result.success) {
         onClose();
       } else {

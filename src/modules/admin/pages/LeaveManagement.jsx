@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Styles, stylesForm, styleTable, stylesButton } from "../style/Styles";
+import { Styles, stylesForm, styleTable, stylesButton, tooltipStyle} from "../style/Styles";
 import { CalendarCheck, Eye  } from "lucide-react";
-import { getLeave } from "../../../services/LeaveService";
+import { getLeave, updateLeave } from "../../../services/LeaveService";
 import { toast } from "react-toastify";
+import LeaveModal from "../components/modal/LeaveModal";
 
 const LeaveManagement = () => {
+    const statusMap = {
+        pending: { text: "Chờ duyệt", color: "#f59e0b" }, // vàng
+        approved: { text: "Đã duyệt", color: "#22c55e" }, // xanh
+        rejected: { text: "Từ chối", color: "#ef4444" },  // đỏ
+    };
     const leaveTypeMap = {
         annual_leave: "Nghỉ phép hằng năm",
         sick_leave: "Nghỉ phép bệnh",
@@ -26,12 +32,20 @@ const LeaveManagement = () => {
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedLeave, setSelectedLeave] = useState(null);
     const [hoverIcon, setHoverIcon] = useState({
         id: null,
         type: null,
     });
 
     const [selectedId, setSelectedId] = useState(null);
+
+    const handleOpenModal = (leave) => {
+        setSelectedLeave(leave);
+        setShowModal(true);
+    };
+
     const fetchLeaves = async () => {
         try {
             setLoading(true);
@@ -48,6 +62,29 @@ const LeaveManagement = () => {
     useEffect(() => {
         fetchLeaves();
     }, []);
+
+    const handleUpdateStatus = async (leaveId, newStatus, response = "") => {
+        try {
+            const payload = {
+            status: newStatus,
+            response: response, // nếu backend có cột phản hồi
+            };
+
+            await updateLeave(leaveId, payload);
+
+            toast.success(
+            newStatus === "APPROVED"
+                ? "Đã duyệt đơn nghỉ"
+                : "Đã từ chối đơn nghỉ"
+            );
+
+            setShowModal(false);
+            fetchLeaves(); // reload bảng
+        } catch (error) {
+            toast.error("Cập nhật trạng thái thất bại");
+            console.error(error);
+        }
+    };
 
     const filteredLeaves = leaves.filter((l) => {
         const keyword = search.toLowerCase().trim();
@@ -73,26 +110,27 @@ const LeaveManagement = () => {
                 >
                     <CalendarCheck /> QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
                 </h1>
+                <form autoComplete="off">
+                    <div style={Styles.actions}>
+                        <input
+                            placeholder="Tìm theo tên nhân viên"
+                            style={stylesForm.searchInput}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
 
-                <div style={Styles.actions}>
-                    <input
-                        placeholder="Tìm theo tên nhân viên"
-                        style={stylesForm.searchInput}
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-
-                    <select
-                        style={stylesForm.filterSelect}
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                    >
-                        <option value="all">Tất cả</option>
-                        <option value="pending">Chờ duyệt</option>
-                        <option value="approved">Đã duyệt</option>
-                        <option value="rejected">Từ chối</option>
-                    </select>
-                </div>
+                        <select
+                            style={stylesForm.filterSelect}
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                        >
+                            <option value="all">Tất cả</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="approved">Đã duyệt</option>
+                            <option value="rejected">Từ chối</option>
+                        </select>
+                    </div>
+                </form>
             </div>
 
             {/* TABLE */}
@@ -110,12 +148,12 @@ const LeaveManagement = () => {
                             <thead>
                             <tr>
                                 {[
-                                "#",
-                                "Nhân viên",
-                                "Loại nghỉ",
-                                "Ngày gửi",
-                                "Trạng thái",
-                                "Thao tác",
+                                    "#",
+                                    "Nhân viên",
+                                    "Loại nghỉ",
+                                    "Ngày gửi",
+                                    "Trạng thái",
+                                    "Thao tác",
                                 ].map((h) => (
                                 <th key={h} style={styleTable.th}>
                                     {h}
@@ -143,23 +181,47 @@ const LeaveManagement = () => {
                                             {formatDateTimeVN(l.created_at)}
                                         </td>
                                         <td style={styleTable.td}>
-                                            {l.status === "pending" && "Chờ duyệt"}
-                                            {l.status === "approved" && "Đã duyệt"}
-                                            {l.status === "rejected" && "Từ chối"}
+                                            <span
+                                                style={{
+                                                background: statusMap[l.status]?.color,
+                                                color: "#fff",
+                                                padding: "6px 12px",
+                                                borderRadius: 999,
+                                                fontSize: 13,
+                                                fontWeight: 600,
+                                                display: "inline-block",
+                                                minWidth: 100,
+                                                textAlign: "center",
+                                                }}
+                                            >
+                                                {statusMap[l.status]?.text}
+                                            </span>
                                         </td>
                                         <td style={styleTable.td}>
                                             <div style={stylesButton.actionIcons}>
-                                                <div
-                                                    style={{
-                                                        ...stylesButton.iconBase,
-                                                        ...stylesButton.iconBoxEdit,
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleOpenModal(l);
-                                                    }}
-                                                >
-                                                    <Eye size={15} />
+                                                <div style={tooltipStyle.wrapper}>
+                                                    <div
+                                                        style={{
+                                                            ...stylesButton.iconBase,
+                                                            ...stylesButton.iconBoxEdit,
+                                                            ...(hoverIcon.id === l.id &&
+                                                                hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
+                                                        }}
+                                                        onMouseEnter={() => setHoverIcon({ id: l.id, type: "edit" })}
+                                                        onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleOpenModal(l);
+                                                        }}
+                                                    >
+                                                        <Eye size={15} />
+                                                    </div>
+                                                    {hoverIcon.id === l.id && hoverIcon.type === "edit" && (
+                                                        <div style={tooltipStyle.tooltip}>
+                                                            Chi tiết
+                                                            <div style={tooltipStyle.arrow} />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>
@@ -170,6 +232,12 @@ const LeaveManagement = () => {
                     </div>
                 </div>
             </div>
+            <LeaveModal
+                show={showModal}
+                onClose={() => setShowModal(false)}
+                leave={selectedLeave}
+                onUpdateStatus={handleUpdateStatus}
+            />
         </>
     );
 };

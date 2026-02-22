@@ -42,19 +42,22 @@ const AttendanceHistory = () => {
         >
           <ClipboardCheck /> QUẢN LÝ ĐIỂM DANH
         </h1>
-        <div style={Styles.actions}>
-          <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
-          <input type="date" 
-            style={stylesForm.filterSelect} 
-            className={"custom-date-input"} 
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-          <div style={Styles.rightActions}>
-            <button style={stylesButton.btnExcel}><AiOutlineFileExcel  size={18}/> Xuất Excel</button>
-            <button style={stylesButton.btnPdf}><FiFileText size={18}/> Xuất PDF</button>
+        <form autoComplete="off">
+          <div style={Styles.actions}>
+            <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
+              <input type="date" 
+                style={stylesForm.filterSelect} 
+                className={"custom-date-input"} 
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            
+            <div style={Styles.rightActions}>
+              <button style={stylesButton.btnExcel}><AiOutlineFileExcel  size={18}/> Xuất Excel</button>
+              <button style={stylesButton.btnPdf}><FiFileText size={18}/> Xuất PDF</button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
       <div style={{ position: "relative" }}>
         {loading && (

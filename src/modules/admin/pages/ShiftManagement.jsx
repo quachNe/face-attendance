@@ -4,6 +4,7 @@ import {
   stylesButton,
   stylesForm,
   styleTable,
+  tooltipStyle
 } from "../style/Styles";
 
 import {
@@ -36,6 +37,10 @@ const ShiftManagement = () => {
     name: "",
     start_time: "",
     end_time: "",
+  });
+  const [hoverIcon, setHoverIcon] = useState({
+    id: null,
+    type: null,
   });
 
   /* ================= FETCH ================= */
@@ -156,24 +161,25 @@ const ShiftManagement = () => {
         >
           <Clock /> QUẢN LÝ CA LÀM VIỆC
         </h1>
+        <form autoComplete="off">
+          <div style={Styles.actions}>
+            <input
+              placeholder="Tìm theo tên ca làm việc"
+              style={stylesForm.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
 
-        <div style={Styles.actions}>
-          <input
-            placeholder="Tìm theo tên ca làm việc"
-            style={stylesForm.searchInput}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          <div style={Styles.rightActions}>
-            <button
-              style={stylesButton.btnAdd}
-              onClick={openAddModal}
-            >
-              <Plus size={18} /> Thêm
-            </button>
+            <div style={Styles.rightActions}>
+              <button
+                style={stylesButton.btnAdd}
+                onClick={openAddModal}
+              >
+                <Plus size={18} /> Thêm
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
 
       {/* ================= TABLE ================= */}
@@ -221,31 +227,54 @@ const ShiftManagement = () => {
                       </td>
                       <td style={styleTable.td}>
                         <div style={stylesButton.actionIcons}>
-                          <div
-                            style={{
-                              ...stylesButton.iconBase,
-                              ...stylesButton.iconBoxEdit,
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(s);
-                            }}
-                          >
-                            <Pencil size={15} />
+                          <div style={tooltipStyle.wrapper}>
+                            <div
+                              style={{
+                                ...stylesButton.iconBase,
+                                ...stylesButton.iconBoxEdit,
+                                ...(hoverIcon.id === s.id &&
+                                hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
+                              }}
+                              onMouseEnter={() => setHoverIcon({ id: s.id, type: "edit" })}
+                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(s);
+                              }}
+                            >
+                              <Pencil size={15} />
+                            </div>
+                            {hoverIcon.id === s.id && hoverIcon.type === "edit" && (
+                              <div style={tooltipStyle.tooltip}>
+                                Chỉnh sửa
+                                <div style={tooltipStyle.arrow} />
+                              </div>
+                            )}
                           </div>
-
-                          <div
-                            style={{
-                              ...stylesButton.iconBase,
-                              ...stylesButton.iconBoxDelete,
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteShift(s.id);
-                              fetchShifts();
-                            }}
-                          >
-                            <Trash2 size={15} />
+                          <div style={tooltipStyle.wrapper}>
+                            <div
+                              style={{
+                                ...stylesButton.iconBase,
+                                ...stylesButton.iconBoxDelete,
+                                ...(hoverIcon.id === s.id &&
+                                hoverIcon.type === "delete" && stylesButton.iconBoxDeleteHover),
+                              }}
+                              onMouseEnter={() => setHoverIcon({ id: s.id, type: "delete" })}
+                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteShift(s.id);
+                                fetchShifts();
+                              }}
+                            >
+                              <Trash2 size={15} />
+                            </div>
+                            {hoverIcon.id === s.id && hoverIcon.type === "delete" && (
+                              <div style={tooltipStyle.tooltip}>
+                                Xóa
+                                <div style={tooltipStyle.arrow} />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>

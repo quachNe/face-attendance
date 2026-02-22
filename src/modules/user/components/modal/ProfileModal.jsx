@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../../context/AuthContext.jsx";
 import { updateProfile } from "../../../../services/EmployeeService.js";
-import { Styles } from "../../style/Styles.js";
+import { Styles, stylesError } from "../../style/Styles.js";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function ProfileStyles({ onClose }) {
   const { user, setUser } = useAuth();
@@ -114,7 +115,7 @@ export default function ProfileStyles({ onClose }) {
         const updatedUser = { ...user, ...payload };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         setUser(updatedUser);
-        alert("Cập nhật thành công");
+        toast.success("Cập nhật thành công");
         handleClose();
       }
     } catch (err) {
@@ -237,14 +238,9 @@ export default function ProfileStyles({ onClose }) {
 /* ================= STYLE ================= */
 
 const modal = {
-    
-
     row: {
         display: "flex",
     },
-    
-    
-    
     group: {
         display: "flex",
         flexDirection: "column",

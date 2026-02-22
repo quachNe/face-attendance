@@ -106,16 +106,16 @@ export default function ChangePasswordModal({ onClose }) {
         }
 
         try {
-        const res = await updateProfile({
-            oldPassword: password.oldPassword,
-            password: password.newPassword,
-        });
+            const res = await updateProfile({
+                oldPassword: password.oldPassword,
+                password: password.newPassword,
+            });
 
-        if (res.status === 200 || res.status === 204) {
-            alert("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.");
-            logout();
-            window.location.reload();
-        }
+            if (res.status === 200 || res.status === 204) {
+                alert("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.");
+                logout();
+                window.location.reload();
+            }
         } catch (err) {
             setError(err.response?.data?.message || "Mật khẩu cũ không đúng");
             triggerShake();
@@ -150,6 +150,7 @@ export default function ChangePasswordModal({ onClose }) {
                             value={password.oldPassword}
                             onChange={handleChange}
                             style={Styles.input}
+                            autoComplete="current-password"
                         />
                         <span
                             style={modal.icon}
@@ -170,6 +171,7 @@ export default function ChangePasswordModal({ onClose }) {
                             value={password.newPassword}
                             onChange={handleChange}
                             style={Styles.input}
+                            autoComplete="new-password"
                         />
                         <span
                             style={modal.icon}
@@ -208,6 +210,7 @@ export default function ChangePasswordModal({ onClose }) {
                             value={password.confirmPassword}
                             onChange={handleChange}
                             style={Styles.input}
+                            autoComplete="new-password"
                         />
                         <span
                             style={modal.icon}

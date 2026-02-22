@@ -74,6 +74,16 @@ export const styleModel = {
     border: "1px solid #1e293b",
   },
 
+  btnClose : {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    color: "#fff",
+  },
+
   modalTitle: {
     textAlign: "center",
     fontSize: 22,
@@ -459,7 +469,42 @@ export const styleTable = {
   },
 };
 
+export const tooltipStyle = {
+  wrapper: {
+    position: "relative",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
+  tooltip: {
+    position: "absolute",
+    bottom: "125%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "#0f172a",
+    color: "#fff",
+    padding: "6px 10px",
+    borderRadius: 6,
+    fontSize: 12,
+    whiteSpace: "nowrap",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+    pointerEvents: "none",
+    zIndex: 999,
+  },
+
+  arrow: {
+    position: "absolute",
+    top: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 0,
+    height: 0,
+    borderLeft: "6px solid transparent",
+    borderRight: "6px solid transparent",
+    borderTop: "6px solid #0f172a",
+  },
+};
 
 export const datePickerStyles = `
   .custom-date-input {

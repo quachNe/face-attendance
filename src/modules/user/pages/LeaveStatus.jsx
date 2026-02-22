@@ -95,38 +95,56 @@ const LeaveStatus = () => {
     <>
       <div style={styles.card}>
         {/* FILTER BAR */}
-        <div style={styles.filterBar}>
-          <input
-            type="text"
-            placeholder="Tìm theo loại nghỉ hoặc lý do..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={styles.search}
-          />
+        <form autoComplete="off">
+          <div style={styles.filterBar}>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={styles.select}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ duyệt</option>
-            <option value="approved">Đã duyệt</option>
-            <option value="rejected">Từ chối</option>
-          </select>
+            {/* Autofill trap */}
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              style={{
+                position: "absolute",
+                opacity: 0,
+                pointerEvents: "none",
+                height: 0,
+              }}
+            />
 
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            style={styles.select}
-          >
-            <option value="all">Tất cả loại nghỉ</option>
-            <option value="annual_leave">Nghỉ phép hằng năm</option>
-            <option value="sick_leave">Nghỉ phép bệnh</option>
-            <option value="personal_leave">Nghỉ phép cá nhân</option>
-          </select>
-        </div>
+            <input
+              type="search"
+              placeholder="Tìm theo loại nghỉ hoặc lý do..."
+              value={search}
+              name="leaveSearch"
+              autoComplete="off"
+              onChange={(e) => setSearch(e.target.value)}
+              style={styles.search}
+            />
 
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={styles.select}
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value="pending">Chờ duyệt</option>
+              <option value="approved">Đã duyệt</option>
+              <option value="rejected">Từ chối</option>
+            </select>
+
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              style={styles.select}
+            >
+              <option value="all">Tất cả loại nghỉ</option>
+              <option value="annual_leave">Nghỉ phép hằng năm</option>
+              <option value="sick_leave">Nghỉ phép bệnh</option>
+              <option value="personal_leave">Nghỉ phép cá nhân</option>
+            </select>
+
+          </div>
+        </form>
         {/* TABLE */}
         <div style={styles.tableWrapper}>
           <table style={styles.table}>

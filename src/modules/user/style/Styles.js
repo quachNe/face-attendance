@@ -108,3 +108,14 @@ export const Styles = {
         transition: "all 0.2s ease",
     },
 }
+
+export const stylesError = {
+    message: {
+        color: "red", 
+        fontSize: 14, 
+        fontWeight: "bold", 
+        marginTop: 20, 
+        textAlign: "center", 
+        marginBottom:20
+    },
+};

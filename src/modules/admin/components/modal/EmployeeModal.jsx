@@ -1,414 +1,252 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-    DEFAULT_FACE,
-    stylesButton,
-    stylesError,
-    styleModel,
-    datePickerStyles
-} from "../../style/Styles";
-import { Camera, Save, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { styleModel } from "../../style/Styles";
+import { X, CheckCircle, XCircle } from "lucide-react";
 
-const captureSteps = [
-    "Nhìn thẳng vào camera",
-    "Quay mặt sang TRÁI",
-    "Quay mặt sang PHẢI",
-];
+const LeaveModal = ({ show, leave, onClose }) => {
+  const [animate, setAnimate] = useState(false);
 
-const EmployeeModal = ({
-    show,
-    onClose,
-    onSave,
-    form,
-    setForm,
-    editId,
-    shifts,
-    error,
-    setError,
-    onReset
-}) => {
-    const videoRef = useRef(null);
-    const canvasRef = useRef(null);
-
-    const [showCamModal, setShowCamModal] = useState(false);
-    const [camStream, setCamStream] = useState(null);
-
-    const [facePreviews, setFacePreviews] = useState([]);
-    const [faceFiles, setFaceFiles] = useState([]);
-
-    const [animate, setAnimate] = useState(false);
-    const [animateCam, setAnimateCam] = useState(false);
-    const [shake, setShake] = useState(false);
-
-    /* ================= ANIMATION ================= */
-
-    useEffect(() => {
-        if (show) setTimeout(() => setAnimate(true), 10);
-        else setAnimate(false);
-    }, [show]);
-
-    useEffect(() => {
-        if (showCamModal) setTimeout(() => setAnimateCam(true), 10);
-        else setAnimateCam(false);
-    }, [showCamModal]);
-
-    /* ================= ESC ================= */
-
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") {
-                if (showCamModal) closeCameraModal();
-                else if (show) handleClose();
-            }
-        };
-        document.addEventListener("keydown", handleEsc);
-        return () => document.removeEventListener("keydown", handleEsc);
-    }, [show, showCamModal]);
-
-    /* ================= CAMERA ================= */
-
-    const openCameraModal = async () => {
-        try {
-            const stream =
-                await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "user" },
-                });
-
-            setCamStream(stream);
-            setShowCamModal(true);
-
-            setTimeout(() => {
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                }
-            }, 100);
-        } catch {
-            alert("Không thể mở webcam");
-        }
+  /* ========= ESC CLOSE ========= */
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape" && show) handleClose();
     };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [show]);
 
-    const closeCameraModal = () => {
-        setAnimateCam(false);
-        setTimeout(() => {
-            if (camStream) {
-                camStream.getTracks().forEach((t) =>
-                t.stop()
-                );
-            }
-            setCamStream(null);
-            setShowCamModal(false);
-        }, 250);
-    };
+  /* ========= OPEN ANIMATION ========= */
+  useEffect(() => {
+    if (show) setTimeout(() => setAnimate(true), 10);
+  }, [show]);
 
-    const captureFromCamera = () => {
-        if (faceFiles.length >= 3) return;
+  /* ========= CLOSE ========= */
+  const handleClose = () => {
+    setAnimate(false);
+    setTimeout(() => onClose(), 250);
+  };
 
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (!video || !canvas) return;
+  if (!show || !leave) return null;
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+  const formatDate = (d) => new Date(d).toLocaleDateString("vi-VN");
+  const formatDateTime = (d) => new Date(d).toLocaleString("vi-VN");
 
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0);
+  const leaveTypeMap = {
+    annual_leave: "Nghỉ phép năm",
+    sick_leave: "Nghỉ ốm",
+    unpaid_leave: "Nghỉ không lương",
+  };
 
-        canvas.toBlob((blob) => {
-            if (!blob) return;
-            const file = new File( [blob], `face_${faceFiles.length}.jpg`, { type: "image/jpeg" });
+  const statusMap = {
+    pending: { text: "Chờ duyệt", color: "#f59e0b" },
+    approved: { text: "Đã duyệt", color: "#22c55e" },
+    rejected: { text: "Từ chối", color: "#ef4444" },
+  };
 
-            const previewUrl = URL.createObjectURL(blob);
+  const days =
+    Math.ceil(
+      (new Date(leave.end_date) - new Date(leave.start_date)) /
+        (1000 * 60 * 60 * 24)
+    ) + 1;
 
-            const newFiles = [...faceFiles, file];
-            const newPreviews = [
-                ...facePreviews,
-                previewUrl,
-            ];
+  return (
+    <div style={styleModel.modalOverlay}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...styleModel.modal,
+          width: 650,
+          padding: "30px 26px",
+          transform: animate ? "translateY(0)" : "translateY(-40px)",
+          opacity: animate ? 1 : 0,
+          transition: "all 0.25s ease",
+        }}
+      >
+        {/* NÚT X */}
+        <button
+          onClick={handleClose}
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
+          <X size={20} />
+        </button>
 
-            setFaceFiles(newFiles);
-            setFacePreviews(newPreviews);
+        {/* TITLE */}
+        <h2 style={styleModel.modalTitle}>
+          CHI TIẾT ĐƠN NGHỈ PHÉP
+        </h2>
 
-            setForm((prev) => ({
-                ...prev,
-                face_files: newFiles,
-                face_image: newFiles.length === 3,
-            }));
+        {/* ===== GRID THÔNG TIN ===== */}
+        <div style={styles.infoGrid}>
+          <Info
+            label="Nhân viên"
+            value={leave.user?.name || "Không rõ"}
+          />
 
-            if (newFiles.length === 3) {
-                setTimeout(closeCameraModal, 600);
-            }
-        }, "image/jpeg");
-    };
+          <Info
+            label="Loại nghỉ"
+            value={leaveTypeMap[leave.leave_type]}
+          />
 
-    const handleClose = () => {
-        setAnimate(false);
-        setTimeout(() => {
-            onClose();
-            setError("");
-        }, 250);
-    };
+          <Info
+            label="Ngày gửi"
+            value={formatDateTime(leave.created_at)}
+          />
 
-    if (!show) return null;
-
-    return (
-        <>  
-            <style>{datePickerStyles}</style>
+          <div>
+            <div style={styles.label}>Trạng thái</div>
             <div
-                style={styleModel.modalOverlay}
+              style={{
+                ...styles.statusBadge,
+                background: statusMap[leave.status].color,
+              }}
             >
-                <div
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                        ...styleModel.modal,
-                        width: 520,
-                        transform: animate
-                        ? "translateY(0)"
-                        : "translateY(-40px)",
-                        opacity: animate ? 1 : 0,
-                        transition: "all 0.25s ease",
-                        animation: shake
-                        ? "shake 0.35s"
-                        : "none",
-                    }}
-                >   
-                    {/* NÚT X */}
-                    <button
-                        onClick={handleClose}
-                        style={{
-                            position: "absolute",
-                            top: 12,
-                            right: 12,
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            color: "#fff",
-                        }}
-                    >
-                        <X size={20}/>
-                    </button>
-                    <h2 style={styleModel.modalTitle}>
-                        {editId ? "SỬA NHÂN VIÊN" : "THÊM NHÂN VIÊN"}
-                    </h2>
-
-                    {/* 3 FACE PREVIEW */}
-                    <div style={styleModel.faceBox}>
-                        <div
-                            style={{
-                                display: "flex",
-                                gap: 12,
-                                justifyContent: "center",
-                            }}
-                        >
-                            {[0, 1, 2].map((i) => (
-                                <div key={i}>
-                                    <img
-                                        src={
-                                            facePreviews[i] ||
-                                            DEFAULT_FACE
-                                        }
-                                        alt=""
-                                        style={{
-                                            width: 90,
-                                            height: 90,
-                                            borderRadius: 12,
-                                            objectFit: "cover",
-                                            border: facePreviews[i] ? "2px solid #0ca1a1" : "1px dashed #ccc",
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={openCameraModal}
-                            style={{
-                                ...stylesButton.uploadBtn,
-                                marginTop: 12,
-                            }}
-                        >
-                            <Camera size={18} /> Chụp ảnh
-                        </button>
-                    </div>
-
-                    {/* FORM giữ nguyên */}
-                    <div style={styleModel.formGrid}>
-                        {[["Họ tên", "name"], ["Ngày sinh", "dob", "date"], ["Email", "email", "email"],["SĐT", "phone", "tel"],].map(([label, key, type]) => (
-                            <div
-                                key={key}
-                                style={
-                                    styleModel.formGroup
-                                }
-                            >
-                                <label
-                                    style={styleModel.label}
-                                >
-                                    {label} <span style={{color:"red"}}>*</span>
-                                </label>
-                                <input
-                                    type={type || "text"}
-                                    value={
-                                        form[key] || ""
-                                    }
-                                    className={type === "date" ? "custom-date-input" : ""}
-                                    style={
-                                        styleModel.formInput
-                                    }
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            [key]:
-                                                e.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                        ))}
-
-                        <div style={ styleModel.formGroup } >
-                            <label style={styleModel.label} >
-                                Vai trò <span style={{color:"red"}}>*</span>
-                            </label>
-                            <select
-                                style={ styleModel.formInput }
-                                value={form.role}
-                                onChange={(e) => setForm({ ...form, role: e.target.value, })
-                                }
-                            >   
-                                <option value="">-- Chọn vai trò --</option>
-                                <option value="EMPLOYEE">Nhân Viên</option>
-                                <option value="ADMIN">Quản Trị Viên</option>
-                            </select>
-                        </div>
-
-                        <div style={styleModel.formGroup}
-                        >
-                            <label style={styleModel.label} >
-                                Ca làm việc <span style={{color:"red"}}>*</span>
-                            </label>
-                            <select
-                                style={styleModel.formInput}
-                                value={form.shift_id || ""}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        shift_id: Number(e.target.value),
-                                    })
-                                }
-                            >
-                                <option value="">-- Chọn ca làm việc --</option>
-
-                                {shifts.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-
-                        </div>
-                    </div>
-
-                    {error && (
-                        <p
-                            style={
-                                stylesError.message
-                            }
-                        >
-                            {error}
-                        </p>
-                    )}
-
-                    <div style={ stylesButton.actions } >
-                        <button
-                            style={stylesButton.btnCancel}
-                            onClick={onReset}
-                        >
-                            <X /> Hủy
-                        </button>
-
-                        <button
-                            style={stylesButton.btnSave}
-                            onClick={() => onSave()}
-                        >
-                            <Save /> Lưu
-                        </button>
-                    </div>
-                </div>
-
-                <style>
-                    {`
-                    @keyframes shake {
-                        0% { transform: translateX(0); }
-                        25% { transform: translateX(-6px); }
-                        50% { transform: translateX(6px); }
-                        75% { transform: translateX(-4px); }
-                        100% { transform: translateX(0); }
-                    }
-                    `}
-                </style>
+              {statusMap[leave.status].text}
             </div>
+          </div>
 
-            {showCamModal && (
-                <div
-                    style={styleModel.modalOverlay}
-                    onClick={closeCameraModal}
-                >
-                    <div
-                        onClick={(e) =>e.stopPropagation()}
-                        style={{
-                            ...styleModel.modal,
-                            width: 380,
-                            transform: animateCam ? "translateY(0)" : "translateY(-40px)",
-                            opacity: animateCam ? 1 : 0,
-                            transition: "all 0.25s ease",
-                        }}
-                    >
-                        <h3 style={{textAlign:"center",}}>{captureSteps[faceFiles.length]}</h3>
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            style={{width: "100%", borderRadius: 12,}}
-                        />
+          <Info label="Từ ngày" value={formatDate(leave.start_date)} />
+          <Info label="Đến ngày" value={formatDate(leave.end_date)} />
 
-                        <div
-                            style={{
-                                marginTop: 12,
-                                textAlign:"center",
-                            }}
-                        >
-                            {faceFiles.length}/3 ảnh
-                        </div>
+          <Info label="Số ngày nghỉ" value={`${days} ngày`} />
+        </div>
 
-                        <div
-                            style={{
-                                marginTop: 12,
-                                display: "flex",
-                                justifyContent:"center",
-                                gap: 12,
-                            }}
-                        >
-                            <button
-                                onClick={closeCameraModal}
-                                style={stylesButton.btnCancel}
-                            >
-                                <X /> Hủy
-                            </button>
+        {/* ===== LÝ DO ===== */}
+        <Section title="Lý do nghỉ">
+          <div style={styles.box}>{leave.reason}</div>
+        </Section>
 
-                            <button
-                                onClick={captureFromCamera}
-                                style={stylesButton.btnSave}
-                            >
-                                <Camera /> Chụp
-                            </button>
-                        </div>
+        {/* ===== PHẢN HỒI ===== */}
+        <Section title="Phản hồi của quản lý">
+          <textarea
+            style={styles.textarea}
+            placeholder="Nhập phản hồi..."
+          />
+        </Section>
 
-                        <canvas
-                            ref={canvasRef}
-                            hidden
-                        />
-                    </div>
-                </div>
-            )}
-        </>
-    );
+        {/* ===== ACTION ===== */}
+        {leave.status === "pending" && (
+          <div style={styles.actions}>
+            <button style={styles.btnReject}>
+              <XCircle size={18} /> Từ chối
+            </button>
+
+            <button style={styles.btnApprove}>
+              <CheckCircle size={18} /> Duyệt
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default EmployeeModal;
+const Info = ({ label, value }) => (
+  <div>
+    <div style={styles.label}>{label}</div>
+    <div style={styles.value}>{value}</div>
+  </div>
+);
+
+const Section = ({ title, children }) => (
+  <div style={{ marginTop: 18 }}>
+    <div style={styles.sectionTitle}>{title}</div>
+    {children}
+  </div>
+);
+
+export default LeaveModal;
+
+const styles = {
+  infoGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 18,
+    marginTop: 10,
+  },
+
+  label: {
+    fontSize: 13,
+    color: "#94a3b8",
+  },
+
+  value: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: "#fff",
+  },
+
+  statusBadge: {
+    display: "inline-block",
+    padding: "6px 14px",
+    borderRadius: 999,
+    fontWeight: 700,
+    fontSize: 14,
+    color: "#fff",
+  },
+
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: 700,
+    marginBottom: 8,
+  },
+
+  box: {
+    background: "#020617",
+    border: "1px solid #1e293b",
+    padding: 14,
+    borderRadius: 12,
+    lineHeight: 1.6,
+  },
+
+  textarea: {
+    width: "100%",
+    minHeight: 110,
+    background: "#020617",
+    border: "1px solid #1e293b",
+    borderRadius: 12,
+    padding: 14,
+    color: "#fff",
+    resize: "vertical",
+    fontSize: 15,
+  },
+
+  actions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: 14,
+    marginTop: 24,
+  },
+
+  btnReject: {
+    padding: "12px 20px",
+    borderRadius: 12,
+    background: "#ef4444",
+    border: "none",
+    color: "#fff",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  },
+
+  btnApprove: {
+    padding: "12px 20px",
+    borderRadius: 12,
+    background: "#22c55e",
+    border: "none",
+    color: "#fff",
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  },
+};
