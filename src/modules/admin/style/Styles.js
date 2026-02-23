@@ -304,6 +304,17 @@ export const stylesButton = {
     color: "#ef4444",
     cursor: "pointer",
   },
+  iconBoxRegisterFace: {
+    width: 30,
+    height: 30,
+    borderRadius: "50%",
+    border: "1px solid #a855f7",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#a855f7",
+    cursor: "pointer",
+  },
 
   iconBoxBase: {
     transition: "all 0.2s ease",
@@ -313,6 +324,12 @@ export const stylesButton = {
     backgroundColor: "#22d3ee",
     color: "#fff",
     transform: "scale(1.08)",
+  },
+
+  iconBoxRegisterFaceHover: {
+    background: "#a855f7",
+    color: "#fff",
+    boxShadow: "0 0 10px rgba(168,85,247,.7)",
   },
 
   iconBoxDeleteHover: {

@@ -8,13 +8,15 @@ import {
   Users2,
   FileSpreadsheet,
   ScanFace, 
-  CameraOff 
+  CameraOff,
+  Camera
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
 import { getShifts } from "../../../services/ShiftService";
 import { exportEmployeePDF } from "../../../utils/exportPDF";
 import * as XLSX from "xlsx";
 import EmployeeModal from "../components/modal/EmployeeModal"
+import CameraModal from "../components/modal/CameraModal";
 import { toast } from "react-toastify"
 
 const EmployeeManagement = () => {
@@ -27,6 +29,9 @@ const EmployeeManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const [cameraUser, setCameraUser] = useState(null);
+  
   const [hoverIcon, setHoverIcon] = useState({
     id: null,
     type: null,
@@ -65,6 +70,13 @@ const EmployeeManagement = () => {
     setForm(emptyForm);
     setInitialForm(emptyForm);
     setShowModal(true);
+  };
+
+  const openCameraModal = (u) => {
+    if (!u || !u.id) return;
+
+    setCameraUser(u);
+    setShowCameraModal(true);
   };
 
   //  MỞ MODEL SỬA NHÂN VIÊN
@@ -236,6 +248,7 @@ const EmployeeManagement = () => {
         shift_name: u.shift_name || "",
         face_image: u.face_image || null,
       }));
+      console.log(mappedUsers)
       const userNotRootAdmin = mappedUsers.filter(
         u => u.username !== "admin"
       );
@@ -439,31 +452,59 @@ const EmployeeManagement = () => {
                       </td>
                       <td style={styleTable.td}>
                         <div style={stylesButton.actionIcons}>
-                            {/* EDIT */}
-                            <div style={tooltipStyle.wrapper}>
-                              <div
-                                style={{
-                                  ...stylesButton.iconBoxEdit,
-                                  ...stylesButton.iconBoxBase,
-                                  ...(hoverIcon.id === u.id &&
-                                    hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
-                                }}
-                                onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
-                                onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openEditModal(u);
-                                }}
-                              >
-                                <Pencil size={15} />
+                          {/* EDIT */}
+                          <div style={tooltipStyle.wrapper}>
+                            <div
+                              style={{
+                                ...stylesButton.iconBoxEdit,
+                                ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
+                              }}
+                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
+                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(u);
+                              }}
+                            >
+                              <Pencil size={15} />
+                            </div>
+                            {hoverIcon.id === u.id && hoverIcon.type === "edit" && (
+                              <div style={tooltipStyle.tooltip}>
+                                Chỉnh sửa
+                                <div style={tooltipStyle.arrow} />
                               </div>
-                              {hoverIcon.id === u.id && hoverIcon.type === "edit" && (
-                                <div style={tooltipStyle.tooltip}>
-                                  Chỉnh sửa
-                                  <div style={tooltipStyle.arrow} />
-                                </div>
-                              )}
+                            )}
                           </div>
+
+
+                          <div style={tooltipStyle.wrapper}>
+                            <div
+                              style={{
+                                ...stylesButton.iconBoxRegisterFace,
+                                ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "faceRegister" && stylesButton.iconBoxRegisterFaceHover),
+                              }}
+                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "faceRegister" })}
+                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openCameraModal(u);
+                              }}
+                            >
+                              <Camera size={15} />
+                            </div>
+                            {hoverIcon.id === u.id && hoverIcon.type === "faceRegister" && (
+                              <div style={tooltipStyle.tooltip}>
+                                Đăng ký khuôn mặt
+                                <div style={tooltipStyle.arrow} />
+                              </div>
+                            )}
+                          </div>
+
+
                           <div style={tooltipStyle.wrapper}>
                             {/* DELETE */}
                             <div
@@ -509,6 +550,12 @@ const EmployeeManagement = () => {
         shifts={shifts}
         error={error}
         setError={setError}
+      />
+
+      <CameraModal
+        show={showCameraModal}
+        onClose={() => setShowCameraModal(false)}
+        userId={cameraUser?.id}
       />
     </>
   );

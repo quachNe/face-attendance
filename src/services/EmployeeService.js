@@ -24,8 +24,17 @@ export const updateEmployee = (id, payload) =>
 export const deleteEmployee = (id) =>
   API.delete(`/employees/${id}`);
 
-// ================= PROFILE (USER SELF UPDATE) =================
-
 // UPDATE PROFILE + PASSWORD
 export const updateProfile = (payload) =>
   API.put("/profile", payload);
+
+// FACE SETUP FINISH
+
+// Phân tích từng ảnh → trả embedding
+export const analyzeFaceSetup = (payload) =>
+  API.post("/face-setup/analyze", payload);
+
+
+// Gửi 3 embedding → lưu DB
+export const finishFaceSetup = (payload) =>
+  API.post("/face-setup/finish", payload);
