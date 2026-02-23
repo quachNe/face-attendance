@@ -108,7 +108,7 @@ const LeaveManagement = () => {
                         gap: 10,
                     }}
                 >
-                    <CalendarCheck /> QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
+                    <CalendarCheck /> QUẢN LÝ NGHỈ PHÉP
                 </h1>
                 <form autoComplete="off">
                     <div style={Styles.actions}>
@@ -147,86 +147,88 @@ const LeaveManagement = () => {
                         <table style={styleTable.table}>
                             <thead>
                             <tr>
-                                {[
-                                    "#",
-                                    "Nhân viên",
-                                    "Loại nghỉ",
-                                    "Ngày gửi",
-                                    "Trạng thái",
-                                    "Thao tác",
-                                ].map((h) => (
-                                <th key={h} style={styleTable.th}>
-                                    {h}
+                                {["#","Nhân viên","Loại nghỉ","Ngày gửi","Trạng thái","Thao tác",].map((column) => (
+                                <th key={column} style={styleTable.th}>
+                                    {column}
                                 </th>
                                 ))}
                             </tr>
                             </thead>
-
                             <tbody>
-                                {!loading && filteredLeaves.map((l, i) => (
-                                    <tr
-                                        key={l.id}
-                                        onClick={() => setSelectedId(l.id)}
-                                        style={{
-                                            background: selectedId === l.id ? "#0ca1a120" : "transparent",
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        <td style={styleTable.td}>{i + 1}</td>
-                                        <td style={styleTable.td}>{l.user_name}</td>
-                                        <td style={styleTable.td}>
-                                            {leaveTypeMap[l.leave_type]}
-                                        </td>
-                                        <td style={styleTable.td}>
-                                            {formatDateTimeVN(l.created_at)}
-                                        </td>
-                                        <td style={styleTable.td}>
-                                            <span
-                                                style={{
-                                                background: statusMap[l.status]?.color,
-                                                color: "#fff",
-                                                padding: "6px 12px",
-                                                borderRadius: 999,
-                                                fontSize: 13,
-                                                fontWeight: 600,
-                                                display: "inline-block",
-                                                minWidth: 100,
-                                                textAlign: "center",
-                                                }}
-                                            >
-                                                {statusMap[l.status]?.text}
-                                            </span>
-                                        </td>
-                                        <td style={styleTable.td}>
-                                            <div style={stylesButton.actionIcons}>
-                                                <div style={tooltipStyle.wrapper}>
-                                                    <div
-                                                        style={{
-                                                            ...stylesButton.iconBase,
-                                                            ...stylesButton.iconBoxEdit,
-                                                            ...(hoverIcon.id === l.id &&
-                                                                hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
-                                                        }}
-                                                        onMouseEnter={() => setHoverIcon({ id: l.id, type: "edit" })}
-                                                        onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleOpenModal(l);
-                                                        }}
-                                                    >
-                                                        <Eye size={15} />
-                                                    </div>
-                                                    {hoverIcon.id === l.id && hoverIcon.type === "edit" && (
-                                                        <div style={tooltipStyle.tooltip}>
-                                                            Chi tiết
-                                                            <div style={tooltipStyle.arrow} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                {filteredLeaves.length === 0 ? (
+                                    <tr>
+                                        <td
+                                            colSpan={6}
+                                            style={{
+                                                ...styleTable.td,
+                                                ...styleTable.notData,
+                                            }}
+                                        >
+                                            Không có dữ liệu....
                                         </td>
                                     </tr>
-                                ))}
+                                ) : ( 
+                                    !loading && filteredLeaves.map((l, i) => (
+                                        <tr
+                                            key={l.id}
+                                            onClick={() => setSelectedId(l.id)}
+                                            style={{
+                                                background: selectedId === l.id ? "#0ca1a120" : "transparent",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            <td style={styleTable.td}>{i + 1}</td>
+                                            <td style={styleTable.td}>{l.user_name}</td>
+                                            <td style={styleTable.td}> {leaveTypeMap[l.leave_type]}</td>
+                                            <td style={styleTable.td}> {formatDateTimeVN(l.created_at)}</td>
+                                            <td style={styleTable.td}>
+                                                <span
+                                                    style={{
+                                                        background: statusMap[l.status]?.color,
+                                                        color: "#fff",
+                                                        padding: "6px 12px",
+                                                        borderRadius: 999,
+                                                        fontSize: 13,
+                                                        fontWeight: 600,
+                                                        display: "inline-block",
+                                                        minWidth: 100,
+                                                        textAlign: "center",
+                                                    }}
+                                                >
+                                                    {statusMap[l.status]?.text}
+                                                </span>
+                                            </td>
+                                            <td style={styleTable.td}>
+                                                <div style={stylesButton.actionIcons}>
+                                                    <div style={tooltipStyle.wrapper}>
+                                                        <div
+                                                            style={{
+                                                                ...stylesButton.iconBase,
+                                                                ...stylesButton.iconBoxEdit,
+                                                                ...(hoverIcon.id === l.id &&
+                                                                    hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
+                                                            }}
+                                                            onMouseEnter={() => setHoverIcon({ id: l.id, type: "edit" })}
+                                                            onMouseLeave={() => setHoverIcon({ id: null, type: null })}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleOpenModal(l);
+                                                            }}
+                                                        >
+                                                            <Eye size={15} />
+                                                        </div>
+                                                        {hoverIcon.id === l.id && hoverIcon.type === "edit" && (
+                                                            <div style={tooltipStyle.tooltip}>
+                                                                Chi tiết
+                                                                <div style={tooltipStyle.arrow} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )) 
+                                )}
                             </tbody>
                         </table>
                     </div>

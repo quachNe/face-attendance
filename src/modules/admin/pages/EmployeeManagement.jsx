@@ -359,7 +359,6 @@ const EmployeeManagement = () => {
           QUẢN LÝ NHÂN VIÊN
         </h1>
 
-        <form autoComplete="off">
           <div style={Styles.actions}>
             {/*------------------------ SEARCH ------------------------*/}
             <input
@@ -396,7 +395,6 @@ const EmployeeManagement = () => {
               </button>
             </div>
           </div>
-        </form>
       </div>
       {/*------------------------ CONTENT ------------------------*/}
       <div style={{ position: "relative" }}>

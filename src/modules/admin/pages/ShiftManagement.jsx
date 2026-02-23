@@ -80,7 +80,7 @@ const ShiftManagement = () => {
 
     setEditId(null);
     setForm(empty);
-    setInitialForm(empty);   // ⭐ lưu bản gốc (trắng)
+    setInitialForm(empty);
     setShowModal(true);
   };
 
@@ -93,7 +93,7 @@ const ShiftManagement = () => {
 
     setEditId(s.id);
     setForm(data);
-    setInitialForm(data);   // ⭐ lưu trạng thái ban đầu
+    setInitialForm(data);
     setShowModal(true);
   };
 
@@ -161,7 +161,7 @@ const ShiftManagement = () => {
         >
           <Clock /> QUẢN LÝ CA LÀM VIỆC
         </h1>
-        <form autoComplete="off">
+        {/* <form autoComplete="off"> */}
           <div style={Styles.actions}>
             <input
               placeholder="Tìm theo tên ca làm việc"
@@ -179,7 +179,7 @@ const ShiftManagement = () => {
               </button>
             </div>
           </div>
-        </form>
+        {/* </form> */}
       </div>
 
       {/* ================= TABLE ================= */}
@@ -206,8 +206,20 @@ const ShiftManagement = () => {
               </thead>
 
               <tbody>
-                {!loading &&
-                  filteredShifts.map((s, i) => (
+                {filteredShifts.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                        style={{
+                          ...styleTable.td,
+                          ...styleTable.notData,
+                        }}
+                    >
+                      Không có dữ liệu....
+                    </td>
+                  </tr>
+                ) : (
+                  !loading && filteredShifts.map((s, i) => (
                     <tr
                       key={s.id}
                       onClick={() => setSelectedId(s.id)}
@@ -279,7 +291,8 @@ const ShiftManagement = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -290,7 +303,7 @@ const ShiftManagement = () => {
       <ShiftModal
         show={showModal}
         onClose={handleCloseModal}
-        onReset={handleResetForm}   // ⭐ thêm dòng này
+        onReset={handleResetForm}
         onSave={handleSave}
         editId={editId}
         form={form}

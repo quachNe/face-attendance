@@ -467,6 +467,14 @@ export const styleTable = {
     justifyContent: "center",
     zIndex: 10,
   },
+
+  notData : {
+    textAlign: "center",
+    color: "#94a3b8",
+    fontStyle: "italic",
+    padding: "16px",
+    fontWeight: "bold",
+  }
 };
 
 export const tooltipStyle = {

@@ -42,7 +42,7 @@ const AttendanceHistory = () => {
         >
           <ClipboardCheck /> QUẢN LÝ ĐIỂM DANH
         </h1>
-        <form autoComplete="off">
+        {/* <form autoComplete="off"> */}
           <div style={Styles.actions}>
             <input placeholder="Tìm kiếm nhân viên..." style={stylesForm.searchInput} />
               <input type="date" 
@@ -57,7 +57,7 @@ const AttendanceHistory = () => {
               <button style={stylesButton.btnPdf}><FiFileText size={18}/> Xuất PDF</button>
             </div>
           </div>
-        </form>
+        {/* </form> */}
       </div>
       <div style={{ position: "relative" }}>
         {loading && (
@@ -70,8 +70,8 @@ const AttendanceHistory = () => {
             <table style={styleTable.table}>
               <thead>
                 <tr>
-                  {["#","Họ Và Tên", "Giờ Vào","Giờ Ra", "Ghi Chú"].map((h) => (
-                    <th key={h} style={styleTable.th}>{h}</th>
+                  {["#","Họ Và Tên", "Giờ Vào","Giờ Ra", "Ghi Chú"].map((c) => (
+                    <th key={c} style={styleTable.th}>{c}</th>
                   ))}
                 </tr>
               </thead>
@@ -79,21 +79,17 @@ const AttendanceHistory = () => {
                 {records.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       style={{
                         ...styleTable.td,
-                        textAlign: "center",
-                        color: "#94a3b8",
-                        fontStyle: "italic",
-                        padding: "16px",
-                        fontWeight: "bold",
+                        ...styleTable.notData,
                       }}
                     >
-                      Không có dữ liệu
+                      Không có dữ liệu....
                     </td>
                   </tr>
                 ) : (
-                  records.map((r, i) => (
+                  !loading  && records.map((r, i) => (
                     <tr key={r.id || i} >
                       <td style={styleTable.td}>{i + 1}</td>
                       <td style={styleTable.td}>{r.name}</td>

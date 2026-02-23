@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styleModel, stylesButton, stylesError, datePickerStyles} from "../../style/Styles";
-import { Save, X } from "lucide-react";
+import { Save, X, RotateCcw } from "lucide-react";
 
 const ShiftModal = ({
     show,
@@ -75,15 +75,7 @@ const ShiftModal = ({
                 {/* NÚT X */}
                     <button
                         onClick={handleClose}
-                        style={{
-                            position: "absolute",
-                            top: 12,
-                            right: 12,
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            color: "#fff",
-                        }}
+                        style={styleModel.btnClose }
                     >
                         <X size={20}/>
                     </button>
@@ -152,7 +144,7 @@ const ShiftModal = ({
                             style={stylesButton.btnCancel}
                             onClick={onReset}
                         >
-                            <X /> Hủy
+                            <RotateCcw /> Làm mới
                         </button>
 
                         <button
