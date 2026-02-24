@@ -9,54 +9,54 @@ import {
   Clock,
   User,
   UserCheck,
-  ShieldCheck ,
+  ShieldCheck,
 } from "lucide-react";
+import { checkInFace } from "../../../services/AttendanceService";
 
 /* ================= STYLE ================= */
 const styles = {
   page: {
-    height: "100vh"
+    height: "100vh",
+    fontFamily: "Inter, sans-serif",
+    background: "#020617",
+    overflow: "hidden",
   },
 
   header: {
-    height: 60,
-    background: "linear-gradient(rgb(2, 6, 23) 0%, rgb(2, 6, 23) 100%)",
-    borderBottom: "1px solid rgba(12,161,161,0.35)",
-    backdropFilter: "blur(12px)",
+    height: 64,
+    background: "rgba(2,6,23,0.75)",
+    borderBottom: "1px solid rgba(0,255,255,0.25)",
+    backdropFilter: "blur(18px)",
     color: "#00ffff",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 32px",
+    padding: "0 36px",
+    fontSize: 15,
+    letterSpacing: 0.5,
   },
 
-   adminBtn: {
+  adminBtn: {
     position: "fixed",
-    top: 10,
-    right: 5,
-
+    top: 12,
+    right: 12,
     display: "flex",
     alignItems: "center",
     gap: 8,
-
-    padding: "10px 16px",
-    fontSize: 15,
+    padding: "10px 18px",
     fontWeight: 600,
-
-    color: "#00ffcc",
-    background: "rgba(0,255,204,0.12)",
-    border: "1px solid rgba(0,255,204,0.6)",
+    color: "#00ffe1",
+    background: "rgba(0,255,225,0.1)",
+    border: "1px solid rgba(0,255,225,0.5)",
     borderRadius: 999,
-
     cursor: "pointer",
-    backdropFilter: "blur(10px)",
-    boxShadow: "0 0 20px rgba(0,255,204,0.35)",
-
-    transition: "all 0.25s ease",
+    backdropFilter: "blur(12px)",
+    boxShadow: "0 0 16px rgba(0,255,225,0.45)",
+    transition: "0.25s",
   },
 
   body: {
-    height: "calc(100vh - 60px)",
+    height: "calc(100vh - 64px)",
     backgroundImage: `url(${backgroundImg})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
@@ -66,20 +66,21 @@ const styles = {
   overlay: {
     position: "absolute",
     inset: 0,
-    background: "rgba(0,0,0,0.65)",
+    background:
+      "radial-gradient(circle at center, rgba(0,0,0,0.4), rgba(0,0,0,0.9))",
   },
 
   title: {
     position: "absolute",
-    top: 100,
+    top: 90,
     left: "50%",
     transform: "translateX(-50%)",
     color: "#00ffff",
-    fontSize: 30,
-    fontWeight: 600,
-    letterSpacing: 1.5,
-    textShadow: "0 0 12px rgba(0,255,255,0.8)",
+    fontSize: 34,
+    fontWeight: 700,
+    textShadow: "0 0 18px rgba(0,255,255,0.8)",
     zIndex: 2,
+    letterSpacing: 1,
   },
 
   main: {
@@ -87,7 +88,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: 70,
+    gap: 80,
     position: "relative",
     zIndex: 1,
   },
@@ -99,13 +100,14 @@ const styles = {
   },
 
   cameraBorder: {
-    width: 440,
-    height: 440,
+    width: 460,
+    height: 460,
     borderRadius: "50%",
-    padding: 8,
+    padding: 10,
     background:
-      "conic-gradient(#00ffff, #00ff99, #0066ff, #00ffff)",
-    boxShadow: "0 0 45px rgba(0,255,255,0.6)",
+      "conic-gradient(#00ffff, #00ff99, #00bfff, #00ffff)",
+    boxShadow:
+      "0 0 60px rgba(0,255,255,0.7), inset 0 0 40px rgba(0,255,255,0.25)",
     position: "relative",
   },
 
@@ -117,98 +119,86 @@ const styles = {
     background: "#000",
   },
 
-  scanLine: {
-    position: "absolute",
-    left: "10%",
-    right: "10%",
-    height: 2,
-    background:
-      "linear-gradient(90deg, transparent, #00ffff, transparent)",
-    boxShadow: "0 0 12px #00ffff",
-    animation: "scan 1.2s linear infinite",
-  },
-
   scanBtn: (disabled) => ({
-    marginTop: 25,
-    padding: "14px 46px",
-    fontSize: 16,
-    fontWeight: 600,
+    marginTop: 28,
+    padding: "16px 54px",
+    fontSize: 17,
+    fontWeight: 700,
     borderRadius: 999,
     border: "none",
-
     cursor: disabled ? "not-allowed" : "pointer",
-
     background: disabled
-      ? "linear-gradient(135deg, #444, #666)"
-      : "linear-gradient(135deg, #4facfe, #00f2fe)",
-
-    color: disabled ? "#aaa" : "#ffffff",
-
-    textShadow: disabled
-      ? "none"
-      : "0 0 6px rgba(255,255,255,0.6)",
-
-    boxShadow: disabled
-      ? "none"
-      : "0 0 26px rgba(79,172,254,0.65)",
-
+      ? "#444"
+      : "linear-gradient(135deg,#00c6ff,#0072ff)",
+    color: "#fff",
     display: "flex",
     alignItems: "center",
-    gap: 10,
-
-    transition: "all 0.3s ease",
+    gap: 12,
+    boxShadow: disabled
+      ? "none"
+      : "0 0 25px rgba(0,150,255,0.8)",
+    transition: "0.25s",
   }),
 
+  /* ===== RESULT CARD ===== */
+
   resultBox: {
-    width: 340,
-    backdropFilter: "blur(14px)",
-    padding: 22,
-    borderRadius: 18,
+    width: 360,
+    padding: 26,
+    borderRadius: 22,
+    backdropFilter: "blur(18px)",
+    background: "rgba(15,23,42,0.75)",
+    boxShadow: "0 0 40px rgba(0,0,0,0.6)",
     color: "#fff",
   },
 
   successBox: {
-    background: "rgba(0,255,200,0.12)",
     border: "1px solid rgba(0,255,200,0.6)",
-    boxShadow: "0 0 30px rgba(0,255,200,0.35)",
+    boxShadow: "0 0 35px rgba(0,255,200,0.45)",
   },
 
   failedBox: {
-    background: "rgba(255,0,0,0.15)",
-    border: "1px solid rgba(255,0,0,0.6)",
-    boxShadow: "0 0 30px rgba(255,0,0,0.35)",
+    border: "1px solid rgba(255,70,70,0.6)",
+    boxShadow: "0 0 35px rgba(255,70,70,0.45)",
     textAlign: "center",
   },
 
   titleSuccess: {
-    color: "#00ffcc",
+    color: "#00ffd0",
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    marginBottom: 10,
+    gap: 12,
+    fontSize: 22,
+    fontWeight: 700,
   },
 
   titleFail: {
     color: "#ff6b6b",
     display: "flex",
     justifyContent: "center",
-    gap: 10,
-    marginBottom: 10,
+    gap: 12,
+    fontSize: 22,
+    fontWeight: 700,
   },
 
   row: {
     display: "flex",
     alignItems: "center",
-    gap: 8,
-    marginTop: 6,
-    fontSize: 14,
+    gap: 10,
+    marginTop: 10,
+    fontSize: 16,
+    opacity: 0.95,
   },
 
   capturedImg: {
-    width: "100%",
-    borderRadius: 14,
-    margin: "12px 0",
-    border: "2px solid #00ffcc",
+    width: 120,
+    height: 120,
+    borderRadius: "50%",
+    objectFit: "cover",
+    margin: "16px auto",
+    display: "block",
+    border: "3px solid #00ffcc",
+    boxShadow: "0 0 25px rgba(0,255,200,0.8)",
   },
 };
 /* ========================================= */
@@ -231,111 +221,121 @@ const Scan = () => {
     message: "",
   });
 
-  /* CLOCK */
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  /* AI VOICE */
+  /* =========================================================
+     🔊 GIỌNG ĐỌC CHẬM — RÕ — CHUẨN KIOSK
+  ========================================================= */
   const speakSuccess = (name, type) => {
     window.speechSynthesis.cancel();
 
     let text = "Điểm danh thành công.";
 
     if (type === "CHECK_IN") {
-      text = `Xin chào ${name}. Bạn đã check in vào ca làm việc.`;
+      text = `Xin chào ${name}. Bạn đã chấm công vào thành công. Chúc bạn một ngày làm việc hiệu quả.`;
     }
 
     if (type === "CHECK_OUT") {
-      text = `Tạm biệt ${name}. Bạn đã check out ra ca.`;
+      text = `Tạm biệt ${name}. Bạn đã chấm công ra về thành công. Hẹn gặp lại bạn.`;
     }
 
     const utter = new SpeechSynthesisUtterance(text);
+
+    // 🔥 TỐI ƯU GIỌNG
     utter.lang = "vi-VN";
-    utter.rate = 0.95;
-    utter.pitch = 1.05;
+    utter.rate = 0.85;     // 👉 nói chậm
+    utter.pitch = 1;       // cao độ tự nhiên
+    utter.volume = 1;
 
-    window.speechSynthesis.speak(utter);
+    // 🔥 CHỌN GIỌNG VIỆT TỐT NHẤT
+    const voices = speechSynthesis.getVoices();
+
+    const vietnameseVoice =
+      voices.find(v => v.lang === "vi-VN") ||
+      voices.find(v => v.lang.includes("vi")) ||
+      voices[0];
+
+    if (vietnameseVoice) utter.voice = vietnameseVoice;
+
+    speechSynthesis.speak(utter);
   };
+  /* ========================================================= */
 
-
-
-  /* SCAN */
   const handleScan = async () => {
     if (loading) return;
-
     setLoading(true);
     setFailed(false);
 
     try {
       const imageSrc = webcamRef.current.getScreenshot();
-      if (!imageSrc) throw new Error("Không lấy được ảnh");
 
-      const res = await fetch("http://localhost:5000/api/checkin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: imageSrc }),
-      });
+      const { data } = await checkInFace(imageSrc);
 
-      const data = await res.json();
       setLoading(false);
 
       if (data.success) {
-        const fixedTime = new Date();
-        setCheckinTime(fixedTime);
-
-        setUserInfo({
-          name: data.name || "",
-          status: data.status || "",
-          type: data.type || "", // CHECK_IN | CHECK_OUT
-          message: data.message || "",
-        });
-
+        setCheckinTime(new Date());
+        setUserInfo(data);
         setCapturedImage(imageSrc);
         setSuccess(true);
 
-        // Đọc giọng AI theo CHECK_IN / CHECK_OUT
         speakSuccess(data.name, data.type);
 
         setTimeout(() => {
           setSuccess(false);
           setCapturedImage(null);
         }, 4500);
+
       } else {
-        setErrorMsg(data.message || "Không nhận diện được!");
+        let msg =
+          data.message ||
+          "Không nhận diện được khuôn mặt\n\nVui lòng nhìn thẳng camera.";
+
+        if (msg.toLowerCase().includes("spoof")) {
+          msg =
+            "Không thể xác thực khuôn mặt\n\nHệ thống phát hiện dấu hiệu giả mạo.\n\nVui lòng đứng trực tiếp trước camera.";
+        }
+
+        setErrorMsg(msg);
         setFailed(true);
-
-        setTimeout(() => {
-          setFailed(false);
-          setErrorMsg("");
-        }, 4000);
+        setTimeout(() => setFailed(false), 4000);
       }
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
-      setErrorMsg("Lỗi kết nối máy chủ!");
-      setFailed(true);
 
-      setTimeout(() => {
-        setFailed(false);
-        setErrorMsg("");
-      }, 4000);
+    } catch (err) {
+      setLoading(false);
+
+      // ⭐️ ĐỌC LỖI TỪ SERVER (QUAN TRỌNG)
+      if (err.response?.data) {
+        let msg =
+          err.response.data.message ||
+          "Không nhận diện được khuôn mặt";
+
+        if (msg.toLowerCase().includes("spoof")) {
+          msg =
+            "Không thể xác thực khuôn mặt\n\nHệ thống phát hiện dấu hiệu giả mạo.\n\nVui lòng đứng trực tiếp trước camera.";
+        }
+
+        setErrorMsg(msg);
+      } else {
+        setErrorMsg("Lỗi kết nối máy chủ!");
+      }
+
+      setFailed(true);
+      setTimeout(() => setFailed(false), 4000);
     }
   };
-
   return (
     <div style={styles.page}>
+      {/* HEADER */}
       <div style={styles.header}>
         <div>
-          {time.toLocaleDateString("vi-VN", {
-            weekday: "long",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })}{" "}
-          | {time.toLocaleTimeString()}
+          {time.toLocaleDateString("vi-VN")} |{" "}
+          {time.toLocaleTimeString()}
         </div>
+
         <button
           style={styles.adminBtn}
           onClick={() => navigate("/admin/login")}
@@ -345,11 +345,15 @@ const Scan = () => {
         </button>
       </div>
 
+      {/* BODY */}
       <div style={styles.body}>
         <div style={styles.overlay} />
-        <div style={styles.title}>HỆ THỐNG ĐIỂM DANH KHUÔN MẶT</div>
+        <div style={styles.title}>
+          HỆ THỐNG ĐIỂM DANH KHUÔN MẶT
+        </div>
 
         <div style={styles.main}>
+          {/* CAMERA */}
           <div style={styles.cameraWrap}>
             <div style={styles.cameraBorder}>
               <div style={styles.cameraInner}>
@@ -362,10 +366,13 @@ const Scan = () => {
                     height: 420,
                     facingMode: "user",
                   }}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               </div>
-              {loading && <div style={styles.scanLine} />}
             </div>
 
             <button
@@ -374,18 +381,29 @@ const Scan = () => {
               style={styles.scanBtn(loading)}
             >
               <ScanFace size={20} />
-              {loading ? "Đang nhận diện..." : "Quét Khuôn Mặt"}
+              {loading
+                ? "Đang nhận diện..."
+                : "Quét Khuôn Mặt"}
             </button>
           </div>
 
+          {/* SUCCESS */}
           {success && (
-            <div style={{ ...styles.resultBox, ...styles.successBox }}>
+            <div
+              style={{
+                ...styles.resultBox,
+                ...styles.successBox,
+              }}
+            >
               <h3 style={styles.titleSuccess}>
                 <CheckCircle2 /> {userInfo.message}
               </h3>
 
               {capturedImage && (
-                <img src={capturedImage} style={styles.capturedImg} />
+                <img
+                  src={capturedImage}
+                  style={styles.capturedImg}
+                />
               )}
 
               <p style={styles.row}>
@@ -395,31 +413,34 @@ const Scan = () => {
                 <UserCheck /> {userInfo.status}
               </p>
               <p style={styles.row}>
-                <Clock />
-                {checkinTime &&
-                  checkinTime.toLocaleTimeString("vi-VN")}
+                <Clock />{" "}
+                {checkinTime?.toLocaleTimeString("vi-VN")}
               </p>
             </div>
           )}
 
+          {/* FAILED */}
           {failed && (
-            <div style={{ ...styles.resultBox, ...styles.failedBox }}>
+            <div
+              style={{
+                ...styles.resultBox,
+                ...styles.failedBox,
+              }}
+            >
               <h3 style={styles.titleFail}>
-                <XCircle /> Không nhận diện được
+                <XCircle />
+                {errorMsg.includes("giả mạo")
+                  ? " Phát hiện giả mạo"
+                  : " Không nhận diện được"}
               </h3>
-              <p>{errorMsg}</p>
+
+              <p style={{ whiteSpace: "pre-line" }}>
+                {errorMsg}
+              </p>
             </div>
           )}
         </div>
       </div>
-
-      <style>{`
-        @keyframes scan {
-          0% { top: 15%; opacity: .3 }
-          50% { top: 50%; opacity: 1 }
-          100% { top: 85%; opacity: .3 }
-        }
-      `}</style>
     </div>
   );
 };
