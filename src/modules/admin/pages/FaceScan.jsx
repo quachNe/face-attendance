@@ -226,9 +226,7 @@ const Scan = () => {
     return () => clearInterval(timer);
   }, []);
 
-  /* =========================================================
-     🔊 GIỌNG ĐỌC CHẬM — RÕ — CHUẨN KIOSK
-  ========================================================= */
+  /* =========== GIỌNG ĐỌC ============== */
   const speakSuccess = (name, type) => {
     window.speechSynthesis.cancel();
 
@@ -244,13 +242,13 @@ const Scan = () => {
 
     const utter = new SpeechSynthesisUtterance(text);
 
-    // 🔥 TỐI ƯU GIỌNG
+    // TỐI ƯU GIỌNG
     utter.lang = "vi-VN";
-    utter.rate = 0.85;     // 👉 nói chậm
-    utter.pitch = 1;       // cao độ tự nhiên
+    utter.rate = 0.85;
+    utter.pitch = 1;
     utter.volume = 1;
 
-    // 🔥 CHỌN GIỌNG VIỆT TỐT NHẤT
+    // CHỌN GIỌNG VIỆT TỐT NHẤT
     const voices = speechSynthesis.getVoices();
 
     const vietnameseVoice =
@@ -262,8 +260,8 @@ const Scan = () => {
 
     speechSynthesis.speak(utter);
   };
-  /* ========================================================= */
 
+  /* =========================== XỬ LÝ ĐIỂM DANH ============================== */
   const handleScan = async () => {
     if (loading) return;
     setLoading(true);
@@ -327,6 +325,7 @@ const Scan = () => {
       setTimeout(() => setFailed(false), 4000);
     }
   };
+  
   return (
     <div style={styles.page}>
       {/* HEADER */}

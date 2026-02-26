@@ -118,8 +118,8 @@ const EmployeeModal = ({
                 }
               >
                 <option value="">-- Chọn --</option>
-                <option value="EMPLOYEE">Nhân viên</option>
-                <option value="ADMIN">Quản trị viên</option>
+                <option value="employee">Nhân viên</option>
+                <option value="admin">Quản trị viên</option>
               </select>
             </div>
 

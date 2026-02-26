@@ -22,6 +22,7 @@ import {
 } from "../../../services/ShiftService";
 import ShiftModal from "../components/modal/ShiftModal";
 import { toast } from "react-toastify";
+import ShiftTable from "../components/table/ShiftTable";
 
 
 const ShiftManagement = () => {
@@ -183,121 +184,16 @@ const ShiftManagement = () => {
       </div>
 
       {/* ================= TABLE ================= */}
-      <div style={{ position: "relative" }}>
-        {loading && (
-          <div style={styleTable.loadingOverlay}>
-            <div style={styleTable.spinner}></div>
-          </div>
-        )}
-
-        <div style={styleTable.tableWrapper}>
-          <div style={styleTable.tableScroll}>
-            <table style={styleTable.table}>
-              <thead>
-                <tr>
-                  {["#", "Tên Ca", "Giờ Bắt Đầu", "Giờ Kết Thúc", "Thao Tác"].map(
-                    (h) => (
-                      <th key={h} style={styleTable.th}>
-                        {h}
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredShifts.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                        style={{
-                          ...styleTable.td,
-                          ...styleTable.notData,
-                        }}
-                    >
-                      Không có dữ liệu....
-                    </td>
-                  </tr>
-                ) : (
-                  !loading && filteredShifts.map((s, i) => (
-                    <tr
-                      key={s.id}
-                      onClick={() => setSelectedId(s.id)}
-                      style={{
-                        background:selectedId === s.id ? "#0ca1a120" : "transparent",
-                        cursor: "pointer",
-                      }}
-                      
-                    >
-                      <td style={styleTable.td}>{i + 1}</td>
-                      <td style={styleTable.td}>{s.name}</td>
-                      <td style={styleTable.td}>
-                        {s.start_time || "—"}
-                      </td>
-                      <td style={styleTable.td}>
-                        {s.end_time || "—"}
-                      </td>
-                      <td style={styleTable.td}>
-                        <div style={stylesButton.actionIcons}>
-                          <div style={tooltipStyle.wrapper}>
-                            <div
-                              style={{
-                                ...stylesButton.iconBase,
-                                ...stylesButton.iconBoxEdit,
-                                ...(hoverIcon.id === s.id &&
-                                hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
-                              }}
-                              onMouseEnter={() => setHoverIcon({ id: s.id, type: "edit" })}
-                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditModal(s);
-                              }}
-                            >
-                              <Pencil size={15} />
-                            </div>
-                            {hoverIcon.id === s.id && hoverIcon.type === "edit" && (
-                              <div style={tooltipStyle.tooltip}>
-                                Chỉnh sửa
-                                <div style={tooltipStyle.arrow} />
-                              </div>
-                            )}
-                          </div>
-                          <div style={tooltipStyle.wrapper}>
-                            <div
-                              style={{
-                                ...stylesButton.iconBase,
-                                ...stylesButton.iconBoxDelete,
-                                ...(hoverIcon.id === s.id &&
-                                hoverIcon.type === "delete" && stylesButton.iconBoxDeleteHover),
-                              }}
-                              onMouseEnter={() => setHoverIcon({ id: s.id, type: "delete" })}
-                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteShift(s.id);
-                                fetchShifts();
-                              }}
-                            >
-                              <Trash2 size={15} />
-                            </div>
-                            {hoverIcon.id === s.id && hoverIcon.type === "delete" && (
-                              <div style={tooltipStyle.tooltip}>
-                                Xóa
-                                <div style={tooltipStyle.arrow} />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <ShiftTable
+        loading={loading}
+        shifts={filteredShifts}
+        selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        hoverIcon={hoverIcon}
+        setHoverIcon={setHoverIcon}
+        openEditModal={openEditModal}
+        // handleDelete={handleDelete}
+      />
 
       {/* ================= MODAL ================= */}
       <ShiftModal

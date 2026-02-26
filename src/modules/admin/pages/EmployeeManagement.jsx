@@ -2,22 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Styles, stylesButton, stylesForm, styleTable, tooltipStyle} from "../style/Styles";
 import {
   Plus,
-  Pencil,
-  Trash2,
   FileText,
   Users2,
   FileSpreadsheet,
-  ScanFace, 
-  CameraOff,
-  Camera
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
 import { getShifts } from "../../../services/ShiftService";
-import { exportEmployeePDF } from "../../../utils/exportPDF";
-import * as XLSX from "xlsx";
+import { exportEmployeePDF } from "../../../utils/exportEmployeePDF";
+import { exportEmployeeExcel } from "../../../utils/exportEmployeeExcel";
 import EmployeeModal from "../components/modal/EmployeeModal"
 import CameraModal from "../components/modal/CameraModal";
 import { toast } from "react-toastify"
+import EmployeeTable from "../components/table/EmployeeTable";
 
 const EmployeeManagement = () => {
   const [users, setUsers] = useState([]);
@@ -85,7 +81,7 @@ const EmployeeManagement = () => {
 
     const editForm = {
       ...u,
-      role: u.role === "admin" ? "ADMIN" : "EMPLOYEE",
+      role: u.role,
       shift_id: u.shift_id,
       face_preview: null,
       face_file: null,
@@ -276,85 +272,6 @@ const EmployeeManagement = () => {
     fetchShifts();
   }, []);
 
-  // XUẤT DANH SÁCH NHÂN VIÊN RA EXCEL
-  const handleExportExcel = () => {
-    if (!filteredUsers.length) {
-      alert("Không có dữ liệu để xuất");
-      return;
-    }
-
-    const tableData = filteredUsers.map((u, index) => ({
-      STT: index + 1,
-      "Họ và tên": u.name,
-      "Ngày sinh": u.dob || "",
-      Email: u.email || "",
-      "Số điện thoại": u.phone || "",
-      "Chức vụ": u.role === "admin" ? "Quản trị viên" : "Nhân viên",
-      "Ca làm việc": u.shift_name || "",
-      "Khuôn mặt": u.face_image ? "Đã nhận diện" : "Chưa nhận diện",
-    }));
-
-    // 👉 Sheet bắt đầu từ A1 (KHÔNG tiêu đề)
-    const worksheet = XLSX.utils.json_to_sheet(tableData);
-    const range = XLSX.utils.decode_range(worksheet["!ref"]);
-
-    /* ===== HEADER (DÒNG 1) ===== */
-    for (let C = range.s.c; C <= range.e.c; C++) {
-      const headerCell = XLSX.utils.encode_cell({ r: 0, c: C });
-      const cell = worksheet[headerCell];
-      if (!cell) continue;
-
-      cell.s = {
-        font: { bold: true },
-        alignment: { horizontal: "center", vertical: "center" },
-        border: {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
-          left: { style: "thin" },
-          right: { style: "thin" },
-        },
-      };
-    }
-
-    /* ===== BODY (KẺ BẢNG) ===== */
-    for (let R = 1; R <= range.e.r; R++) {
-      for (let C = range.s.c; C <= range.e.c; C++) {
-        const addr = XLSX.utils.encode_cell({ r: R, c: C });
-        const cell = worksheet[addr];
-        if (!cell) continue;
-
-        cell.s = {
-          border: {
-            top: { style: "thin" },
-            bottom: { style: "thin" },
-            left: { style: "thin" },
-            right: { style: "thin" },
-          },
-          alignment: {
-            vertical: "center",
-            horizontal: [0, 2, 7].includes(C) ? "center" : "left",
-          },
-        };
-      }
-    }
-
-    /* ===== WIDTH ===== */
-    worksheet["!cols"] = [
-      { wch: 6 },   // STT
-      { wch: 24 },  // Họ tên
-      { wch: 14 },  // Ngày sinh
-      { wch: 28 },  // Email
-      { wch: 16 },  // SĐT
-      { wch: 16 },  // Chức vụ
-      { wch: 18 },  // Ca
-      { wch: 18 },  // Khuôn mặt
-    ];
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "NhanVien");
-    XLSX.writeFile(workbook, "Danh_sach_nhan_vien.xlsx");
-  };
-
   return (
     <>
       {/*------------------------ HEADER ------------------------*/}
@@ -396,7 +313,10 @@ const EmployeeManagement = () => {
                 <Plus size={18} /> Thêm
               </button>
               {/*------------------------ EXPORT EXCEL ------------------------*/}
-              <button style={stylesButton.btnExcel} onClick={handleExportExcel}>
+              <button 
+                style={stylesButton.btnExcel} 
+                onClick={() => exportEmployeeExcel(filteredUsers)}
+              >
                 <FileSpreadsheet size={18} /> Xuất Excel
               </button>
               {/*------------------------ EXPORT PDF ------------------------*/}
@@ -410,135 +330,17 @@ const EmployeeManagement = () => {
           </div>
       </div>
       {/*------------------------ CONTENT ------------------------*/}
-      <div style={{ position: "relative" }}>
-        {loading && (
-          <div style={styleTable.loadingOverlay}>
-            <div style={styleTable.spinner}></div>
-          </div>
-        )}
-        <div style={styleTable.tableWrapper}>
-          <div style={styleTable.tableScroll} className="custom-scroll">
-            <table style={styleTable.table}>
-              <thead>
-                <tr>
-                  {["#", "Họ Và Tên", "Ngày Sinh", "Email", "SĐT", "Chức Vụ", "Ca","Khuôn Mặt", "Thao Tác"].map((h) => (
-                    <th key={h} style={styleTable.th}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {!loading && filteredUsers
-                  .filter(u => u && u.id)
-                  .map((u, i) => (
-                    <tr
-                      key={u.id}
-                      onClick={() => setSelectedId(u.id)}
-                      style={{
-                        background: selectedId === u.id ? "#0ca1a120" : "transparent",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <td style={styleTable.td}>{i + 1}</td>
-                      <td style={styleTable.td}>{u.name}</td>
-                      <td style={styleTable.td}>{u.dob || "—"}</td>
-                      <td style={styleTable.td}>{u.email || "—"}</td>
-                      <td style={styleTable.td}>{u.phone || "—"}</td>
-                      <td style={styleTable.td}> {u.role === "admin" ? "Quản trị viên" : "Nhân viên"} </td>
-                      <td style={styleTable.td}>{u.shift_name || "—"}</td>
-                      <td style={{ ...styleTable.td, fontSize: 18, fontWeight: 700, color: u.face_image ? "#22c55e" : "#ef4444" }}>
-                        {u.face_image ? <ScanFace size={18} color="#22c55e" /> : <CameraOff size={18} color="#ef4444" />}
-                      </td>
-                      <td style={styleTable.td}>
-                        <div style={stylesButton.actionIcons}>
-                          {/* EDIT */}
-                          <div style={tooltipStyle.wrapper}>
-                            <div
-                              style={{
-                                ...stylesButton.iconBoxEdit,
-                                ...stylesButton.iconBoxBase,
-                                ...(hoverIcon.id === u.id &&
-                                  hoverIcon.type === "edit" && stylesButton.iconBoxEditHover),
-                              }}
-                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "edit" })}
-                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditModal(u);
-                              }}
-                            >
-                              <Pencil size={15} />
-                            </div>
-                            {hoverIcon.id === u.id && hoverIcon.type === "edit" && (
-                              <div style={tooltipStyle.tooltip}>
-                                Chỉnh sửa
-                                <div style={tooltipStyle.arrow} />
-                              </div>
-                            )}
-                          </div>
-
-
-                          <div style={tooltipStyle.wrapper}>
-                            <div
-                              style={{
-                                ...stylesButton.iconBoxRegisterFace,
-                                ...stylesButton.iconBoxBase,
-                                ...(hoverIcon.id === u.id &&
-                                  hoverIcon.type === "faceRegister" && stylesButton.iconBoxRegisterFaceHover),
-                              }}
-                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "faceRegister" })}
-                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openCameraModal(u);
-                              }}
-                            >
-                              <Camera size={15} />
-                            </div>
-                            {hoverIcon.id === u.id && hoverIcon.type === "faceRegister" && (
-                              <div style={tooltipStyle.tooltip}>
-                                Đăng ký khuôn mặt
-                                <div style={tooltipStyle.arrow} />
-                              </div>
-                            )}
-                          </div>
-
-
-                          <div style={tooltipStyle.wrapper}>
-                            {/* DELETE */}
-                            <div
-                              style={{
-                                ...stylesButton.iconBoxDelete,
-                                ...stylesButton.iconBoxBase,
-                                ...(hoverIcon.id === u.id &&
-                                  hoverIcon.type === "delete" && stylesButton.iconBoxDeleteHover),
-                              }}
-                              onMouseEnter={() => setHoverIcon({ id: u.id, type: "delete" })}
-                              onMouseLeave={() => setHoverIcon({ id: null, type: null })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setUsers(prev => prev.filter(item => item?.id !== u.id));
-                              }}
-                            >
-                              <Trash2 size={15} />
-                            </div>
-                            {hoverIcon.id === u.id && hoverIcon.type === "delete" && (
-                              <div style={tooltipStyle.tooltip}>
-                                Xóa
-                                <div style={tooltipStyle.arrow} />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <EmployeeTable
+        users={filteredUsers}
+        loading={loading}
+        selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        hoverIcon={hoverIcon}
+        setHoverIcon={setHoverIcon}
+        openEditModal={openEditModal}
+        openCameraModal={openCameraModal}
+        setUsers={setUsers}
+      />
       <EmployeeModal
         show={showModal}
         onClose={() => setShowModal(false)}

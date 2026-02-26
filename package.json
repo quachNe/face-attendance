@@ -25,6 +25,7 @@
     "react-router-dom": "^7.12.0",
     "react-toastify": "^11.0.5",
     "react-webcam": "^7.2.0",
+    "recharts": "^3.7.0",
     "xlsx": "^0.18.5",
     "xlsx-style": "^0.8.13"
   },

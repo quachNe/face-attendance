@@ -105,7 +105,7 @@ export const exportEmployeePDF = async (users) => {
         u.name || "-",
         u.email || "-",
         u.phone || "-",
-        u.role === "ADMIN" ? "Quản trị viên" : "Nhân viên",
+        u.role === "admin" ? "Quản trị viên" : "Nhân viên",
         u.shift_name || "—",
         hasFace ? "Đã có" : "Chưa có",
       ];

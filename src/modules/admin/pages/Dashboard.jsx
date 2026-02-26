@@ -5,7 +5,7 @@ import backgroundImg from "/background.jpg";
 
 const Dashboard = () => {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh" }}>
       {/* Sibar */}
       <SideBar />
 
@@ -18,6 +18,7 @@ const Dashboard = () => {
           backgroundImage: `url(${backgroundImg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
+          minHeight: 0,
         }}
       >
         <NavBar />
@@ -26,6 +27,7 @@ const Dashboard = () => {
             flex: 1,
             height: "calc(100vh - 60px)",
             overflow: "hidden",
+            minHeight: 0,  
           }}
         >
           <div
@@ -34,7 +36,7 @@ const Dashboard = () => {
               padding: 32,
               background: "rgba(1,1,5,0.85)",
               color: "#e5e7eb",
-              overflowY: "auto",
+              // overflowY: "auto",
             }}
           >
             <Outlet />
