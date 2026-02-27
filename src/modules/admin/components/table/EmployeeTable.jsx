@@ -6,7 +6,7 @@ import {
   Trash2,
   Camera,
 } from "lucide-react";
-import { stylesButton, styleTable, tooltipStyle } from "../../style/Styles";
+import { stylesButton, styleTable} from "../../style/Styles";
 import Tooltip from "./Tooltip";
 
 const EmployeeTable = ({
@@ -108,11 +108,20 @@ const EmployeeTable = ({
                               style={{
                                 ...stylesButton.iconBoxEdit,
                                 ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "edit" &&
+                                  stylesButton.iconBoxEditHover),
                               }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openEditModal(u);
                               }}
+                              onMouseEnter={() =>
+                                setHoverIcon({ id: u.id, type: "edit" })
+                              }
+                              onMouseLeave={() =>
+                                setHoverIcon({ id: null, type: null })
+                              }
                             >
                               <Pencil size={15} />
                             </div>
@@ -124,7 +133,17 @@ const EmployeeTable = ({
                               style={{
                                 ...stylesButton.iconBoxRegisterFace,
                                 ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "registerface" &&
+                                  stylesButton.iconBoxRegisterFaceHover),
                               }}
+
+                              onMouseEnter={() =>
+                                setHoverIcon({ id: u.id, type: "registerface" })
+                              }
+                              onMouseLeave={() =>
+                                setHoverIcon({ id: null, type: null })
+                              }
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openCameraModal(u);
@@ -140,7 +159,16 @@ const EmployeeTable = ({
                               style={{
                                 ...stylesButton.iconBoxDelete,
                                 ...stylesButton.iconBoxBase,
+                                ...(hoverIcon.id === u.id &&
+                                  hoverIcon.type === "delete" &&
+                                  stylesButton.iconBoxDeleteHover),
                               }}
+                              onMouseEnter={() =>
+                                setHoverIcon({ id: u.id, type: "delete" })
+                              }
+                              onMouseLeave={() =>
+                                setHoverIcon({ id: null, type: null })
+                              }
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setUsers((prev) =>

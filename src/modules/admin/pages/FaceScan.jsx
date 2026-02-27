@@ -72,7 +72,7 @@ const styles = {
 
   title: {
     position: "absolute",
-    top: 90,
+    top: 50,
     left: "50%",
     transform: "translateX(-50%)",
     color: "#00ffff",

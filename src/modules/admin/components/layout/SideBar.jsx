@@ -52,7 +52,7 @@ const SideBar = () => {
 
           <div>
             <div style={stylesSidebar.logo}>NANO TECH</div>
-            <div style={stylesSidebar.logoSub}>Attendance System</div>
+            {/* <div style={stylesSidebar.logoSub}>Attendance System</div> */}
           </div>
         </div>
       </div>
