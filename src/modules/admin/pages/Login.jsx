@@ -25,12 +25,12 @@ const Login = () => {
     }
 
     const result = await login(userName, password);
-    toast.success("Đăng nhập thành công")
+    
     if (!result.success) {
       setError(result.message || "Đăng nhập thất bại");
       return;
     }
-
+    
     const loggedUser = JSON.parse(localStorage.getItem("user"));
 
     if (loggedUser.role !== "admin") {
@@ -39,7 +39,7 @@ const Login = () => {
       setError("Bạn không có quyền truy cập vào trang dành cho quản trị viên");
       return;
     }
-
+    toast.success("Đăng nhập thành công");
     navigate("/admin/dashboard");
   };
 

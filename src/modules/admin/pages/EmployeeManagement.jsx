@@ -32,7 +32,9 @@ const EmployeeManagement = () => {
     id: null,
     type: null,
   });
+
   const [initialForm, setInitialForm] = useState(null);
+
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -244,7 +246,7 @@ const EmployeeManagement = () => {
         shift_name: u.shift_name || "",
         face_image: u.face_image || null,
       }));
-      console.log(mappedUsers)
+      
       const userNotRootAdmin = mappedUsers.filter(
         u => u.username !== "admin"
       );

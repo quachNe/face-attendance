@@ -73,7 +73,11 @@ const EmployeeTable = ({
                       <td style={styleTable.td}>{u.email || "—"}</td>
                       <td style={styleTable.td}>{u.phone || "—"}</td>
 
-                      <td style={styleTable.td}>
+                      <td style={{
+                        ...styleTable.td,
+                        fontWeight: 600,
+                        color: u.role === "admin" ? "#dc2626" : "#16a34a" ,
+                      }} >
                         {u.role === "admin"
                           ? "Quản trị viên"
                           : "Nhân viên"}
