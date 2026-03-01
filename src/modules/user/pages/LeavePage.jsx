@@ -9,14 +9,14 @@ import LeaveRequest from "./LeaveRequest";
 import LeaveStatus from "./LeaveStatus";
 import ProfileModal from "../components/modal/ProfileModal";
 import ChangePasswordModal from "../components/modal/ChangePasswordModal";
-
+import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 const LeavePage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [active, setActive] = useState(null);
   const { user } = useAuth();
-
+  const [showForgot, setShowForgot] = useState(false);
   useEffect(() => {
     if (!user) {
       setActive(null);
@@ -94,7 +94,20 @@ const LeavePage = () => {
 
       <LeaveFooter />
 
-      {showLogin && <LeaveLoginModal onClose={() => setShowLogin(false)} />}
+      {showLogin && (
+        <LeaveLoginModal
+          onClose={() => setShowLogin(false)}
+          onForgot={() => {
+            setShowLogin(false);
+            setShowForgot(true);
+          }}
+        />
+      )}
+      {showForgot && (
+        <ForgotPasswordModal
+          onClose={() => setShowForgot(false)}
+        />
+      )}
       {showProfile && (
         <ProfileModal onClose={() => setShowProfile(false)} />
       )}

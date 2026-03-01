@@ -1,5 +1,5 @@
 import React from "react";
-import { Lock, Unlock } from "lucide-react";
+import { Lock, Unlock, RefreshCw} from "lucide-react";
 import { styleTable, stylesButton } from "../../style/Styles";
 import Tooltip from "./Tooltip";
 
@@ -11,6 +11,7 @@ const AccountTable = ({
     hoverIcon,
     setHoverIcon,
     onToggleLock,
+    onResetPassword
 }) => {
     return (
         <div style={{ position: "relative" }}>
@@ -103,6 +104,34 @@ const AccountTable = ({
                                                     )}
                                                 </div>
                                             </Tooltip>
+                                        
+                                        {acc.change_password_request && (
+                                            <Tooltip
+                                                text="Yêu cầu đổi mật khẩu"
+                                            >
+                                                <div
+                                                    style={{
+                                                        ...stylesButton.iconBase,
+                                                        ...stylesButton.iconBoxEdit,
+                                                        border: `1px solid #fef3c7`,
+                                                        ...(hoverIcon.id === acc.id &&
+                                                            hoverIcon.type === "refresh" && {
+                                                                backgroundColor: "#fef3c7",
+                                                                border: `1px solid #fef3c7 `
+                                                            }
+                                                        ),
+                                                    }}
+                                                    onMouseEnter={() =>setHoverIcon({id: acc.id,type: "refresh",})}
+                                                    onMouseLeave={() =>setHoverIcon({id: null,type: null,})}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onResetPassword(acc);
+                                                    }}
+                                                >
+                                                        <RefreshCw size={15} color="#f59e0b" />
+                                                </div>
+                                            </Tooltip>
+                                        )}
                                         </div>
                                     </td>
                                 </tr>

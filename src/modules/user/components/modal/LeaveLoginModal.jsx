@@ -2,13 +2,23 @@ import React, { useState } from "react";
 import { useAuth } from "../../../../context/AuthContext.jsx";
 import { stylesError } from "../../../admin/style/Styles.js";
 import { User, Lock, X, Eye, EyeOff } from "lucide-react";
-
-export default function LeaveLoginModal({ onClose }) {
+import { changePassword } from "../../../../services/EmployeeService.js";
+import { toast } from "react-toastify";
+export default function LeaveLoginModal({ onClose, onForgot }) {
   const { login } = useAuth();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const [forceChangePassword, setForceChangePassword] = useState(false);
+
+  // ================= LOGIN =================
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -20,12 +30,73 @@ export default function LeaveLoginModal({ onClose }) {
 
     try {
       const result = await login(username, password);
-      if (result.success) {
-        onClose();
-      } else {
+      console.log("LOGIN RESULT:", result);
+
+      if (!result.success) {
         setError(result.message || "Tên đăng nhập hoặc mật khẩu không đúng");
+        return;
       }
+
+      // 🔥 ÉP ĐỔI MẬT KHẨU
+      if (result.user.must_change_password) {
+        setForceChangePassword(true);
+        return;
+      }
+
+      // Login bình thường
+      onClose();
+
     } catch (err) {
+      setError("Lỗi kết nối server");
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!newPassword || !confirmPassword) {
+      setError("Vui lòng nhập đầy đủ mật khẩu mới!");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Mật khẩu phải có ít nhất 6 ký tự!");
+      return;
+    }
+
+    try {
+      // const response = await fetch("http://localhost:5000/api/change-password", {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      //   body: JSON.stringify({ new_password: newPassword }),
+      // });
+
+      // 🔥 Đọc text trước
+      // const text = await response.text();
+
+      // Nếu rỗng → tránh crash
+      // const data = text ? JSON.parse(text) : {};
+      const {data} = await changePassword({ new_password: newPassword });
+      if (!data.success) {
+        setError(data.message || "Có lỗi xảy ra");
+        return;
+      }
+
+      toast.success("Đổi mật khẩu thành công!");
+
+      setForceChangePassword(false);
+
+    } catch (err) {
+      console.error(err);
       setError("Lỗi kết nối server");
     }
   };
@@ -33,47 +104,93 @@ export default function LeaveLoginModal({ onClose }) {
   return (
     <div style={styles.overlay}>
       <div style={styles.modal}>
-        
-        {/* Close button */}
         <button style={styles.closeBtn} onClick={onClose}>
           <X size={18} />
         </button>
 
-        <h2 style={styles.title}>ĐĂNG NHẬP HỆ THỐNG</h2>
+        <h2 style={styles.title}>
+          {forceChangePassword ? "ĐỔI MẬT KHẨU MỚI" : "ĐĂNG NHẬP HỆ THỐNG"}
+        </h2>
 
-        <form onSubmit={handleLogin} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <User size={18} />
-            <input
-              type="text"
-              placeholder="Tên đăng nhập"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-            />
-          </div>
+        {!forceChangePassword ? (
+          <form onSubmit={handleLogin} style={styles.form}>
+            <div style={styles.inputGroup}>
+              <User size={18} />
+              <input
+                type="text"
+                placeholder="Tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={styles.input}
+              />
+            </div>
 
-          <div style={styles.inputGroup}>
-            <Lock size={18} />
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-            />
-            <span 
-              onClick={() => setShowPassword(!showPassword)}
-              style={styles.eyeIcon}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
-          {error && <p style={{...stylesError.message, marginBottom:"-5px", marginTop:"-5px"}}>{error}</p>}
-          <button type="submit" style={styles.button}>
-            Đăng nhập
-          </button>
-        </form>
+            <div style={styles.inputGroup}>
+              <Lock size={18} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Mật khẩu"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={styles.input}
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            </div>
+
+            {error && (
+              <p style={{ ...stylesError.message, marginBottom: "-5px", marginTop: "-5px" }}>
+                {error}
+              </p>
+            )}
+
+            <p style={styles.forgot} onClick={onForgot}>
+              Quên mật khẩu?
+            </p>
+
+            <button type="submit" style={styles.button}>
+              Đăng nhập
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleChangePassword} style={styles.form}>
+            <div style={styles.inputGroup}>
+              <Lock size={18} />
+              <input
+                type="password"
+                placeholder="Mật khẩu mới"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.inputGroup}>
+              <Lock size={18} />
+              <input
+                type="password"
+                placeholder="Xác nhận mật khẩu"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+
+            {error && (
+              <p style={{ ...stylesError.message }}>
+                {error}
+              </p>
+            )}
+
+            <button type="submit" style={styles.button}>
+              Đổi mật khẩu
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -152,5 +269,11 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
-
+  forgot: {
+    textAlign: "right",
+    fontSize: "14px",
+    color: "#2563eb",
+    cursor: "pointer",
+    marginBottom: "-10px",
+  },
 };

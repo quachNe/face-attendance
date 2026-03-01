@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Styles, stylesForm } from "../style/Styles";
 import { UserCog } from "lucide-react";
-import { getEmployees, updateEmployee } from "../../../services/EmployeeService";
+import { getEmployees, updateEmployee, resetPasswordByAdmin} from "../../../services/EmployeeService";
 import { toast } from "react-toastify";
 import AccountTable from "../components/table/AccountTable";
 
@@ -53,6 +53,18 @@ const AccountsManagement = () => {
         }
     };
 
+    const handleResetPassword = async (account) => {
+        try {
+            await resetPasswordByAdmin(account.id);
+
+            toast.success("Đã reset mật khẩu và hủy yêu cầu");
+
+            fetchAccounts();
+        } catch (error) {
+            toast.error("Reset mật khẩu thất bại");
+            console.error(error);
+        }
+    };
     // ================= FILTER =================
     const filteredAccounts = accounts.filter((a) => {
         const keyword = search.toLowerCase().trim();
@@ -110,6 +122,7 @@ const AccountsManagement = () => {
                 hoverIcon={hoverIcon}
                 setHoverIcon={setHoverIcon}
                 onToggleLock={handleToggleLock}
+                onResetPassword={handleResetPassword}
             />
         </>
     );
