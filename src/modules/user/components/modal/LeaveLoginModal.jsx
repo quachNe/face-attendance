@@ -30,14 +30,13 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
 
     try {
       const result = await login(username, password);
-      console.log("LOGIN RESULT:", result);
 
       if (!result.success) {
         setError(result.message || "Tên đăng nhập hoặc mật khẩu không đúng");
         return;
       }
 
-      // 🔥 ÉP ĐỔI MẬT KHẨU
+      // ÉP ĐỔI MẬT KHẨU
       if (result.user.must_change_password) {
         setForceChangePassword(true);
         return;
@@ -93,7 +92,7 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
 
       toast.success("Đổi mật khẩu thành công!");
 
-      setForceChangePassword(false);
+      onClose();
 
     } catch (err) {
       console.error(err);
@@ -104,9 +103,11 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
   return (
     <div style={styles.overlay}>
       <div style={styles.modal}>
-        <button style={styles.closeBtn} onClick={onClose}>
-          <X size={18} />
-        </button>
+        {!forceChangePassword && (
+          <button style={styles.closeBtn} onClick={onClose}>
+            <X size={18} />
+          </button>
+        )}
 
         <h2 style={styles.title}>
           {forceChangePassword ? "ĐỔI MẬT KHẨU MỚI" : "ĐĂNG NHẬP HỆ THỐNG"}

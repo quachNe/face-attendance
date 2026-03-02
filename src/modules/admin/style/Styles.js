@@ -72,16 +72,23 @@ export const styleModel = {
     padding: 20,
     borderRadius: 20,
     border: "1px solid #1e293b",
+    padding: "30px 32px 36px",
   },
 
   btnClose : {
     position: "absolute",
-    top: 12,
-    right: 12,
+    top: 14,
+    right: 14,
+    background: "rgba(255,255,255,.08)",
     border: "none",
-    background: "transparent",
-    cursor: "pointer",
     color: "#fff",
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   modalTitle: {
@@ -214,15 +221,6 @@ export const stylesButton = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    boxShadow: "0 12px 30px rgba(34,211,238,0.5)",
-  },
-
-  btnCancelHover: {
-    transform: "translateY(-1px)",
-  },
-
-  btnSaveHover: {
-    transform: "translateY(-1px)",
   },
 
   btnExcel: {
@@ -238,7 +236,6 @@ export const stylesButton = {
     gap: 4,
     fontSize: 15,
     fontWeight: 700,
-    boxShadow: "0 6px 18px rgba(34,197,94,0.45)",
   },
   
   btnPdf: {
@@ -254,7 +251,6 @@ export const stylesButton = {
     gap: 4,
     fontSize: 15,
     fontWeight: 700,
-    boxShadow: "0 6px 18px rgba(239,68,68,0.45)",
   },
 
   btnAdd: {
@@ -270,7 +266,6 @@ export const stylesButton = {
     gap: 4,
     fontSize: 15,
     fontWeight: 700,
-    boxShadow: "0 6px 18px rgba(34,211,238,0.45)",
     transition: "all 0.2s ease",
   },
 
@@ -349,7 +344,6 @@ export const stylesButton = {
     fontWeight: 600,
     fontSize: 15,
     cursor: "pointer",
-    boxShadow: "0 14px 30px rgba(12,161,161,0.45)",
     transition: "all 0.25s ease",
   },
 
@@ -363,17 +357,14 @@ export const stylesButton = {
     transition: "color 0.2s ease",
   },
 
-  uploadBtn: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: "10px 16px",
-    fontSize: 14,
-    fontWeight: 500,
+  btnReset: {
+    padding: "8px 14px",
+    backgroundColor: "#9D4EDD",
+    color: "#fff",
+    border: "none",
+    borderRadius: 6,
     cursor: "pointer",
-    background: "none",
-  }
+  },
 };
 
 // USING IN ERROR MESSAGES

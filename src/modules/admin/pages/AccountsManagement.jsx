@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Styles, stylesForm } from "../style/Styles";
-import { UserCog } from "lucide-react";
+import { Styles, stylesForm, stylesButton} from "../style/Styles";
+import { UserCog, RotateCcw} from "lucide-react";
 import { getEmployees, updateEmployee, resetPasswordByAdmin} from "../../../services/EmployeeService";
 import { toast } from "react-toastify";
 import AccountTable from "../components/table/AccountTable";
@@ -8,12 +8,18 @@ import AccountTable from "../components/table/AccountTable";
 const AccountsManagement = () => {
     const [accounts, setAccounts] = useState([]);
     const [search, setSearch] = useState("");
+    const [filterRole, setFilterRole] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
     const [loading, setLoading] = useState(true);
     const [hoverIcon, setHoverIcon] = useState({ id: null, type: null });
     const [selectedId, setSelectedId] = useState(null);
     const currentUser = JSON.parse(localStorage.getItem("user"));
 
+    const handleResetFilter = () => {
+        setSearch("");
+        setFilterRole("all");
+        setFilterStatus("all");
+    };
     // ================= FETCH =================
     const fetchAccounts = async () => {
         try {
@@ -46,7 +52,7 @@ const AccountsManagement = () => {
 
             toast.success(account.is_active ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
 
-            fetchAccounts();
+            await  fetchAccounts();
         } catch (error) {
             toast.error("Cập nhật trạng thái thất bại");
             console.error(error);
@@ -56,10 +62,14 @@ const AccountsManagement = () => {
     const handleResetPassword = async (account) => {
         try {
             await resetPasswordByAdmin(account.id);
-
-            toast.success("Đã reset mật khẩu và hủy yêu cầu");
-
-            fetchAccounts();
+            setAccounts(prev =>
+                prev.map(a =>
+                    a.id === account.id
+                        ? { ...a, change_password_request: false }
+                        : a
+                )
+            );
+            toast.success("Đã reset mật khẩu cho nhân viên");
         } catch (error) {
             toast.error("Reset mật khẩu thất bại");
             console.error(error);
@@ -72,8 +82,8 @@ const AccountsManagement = () => {
         const matchSearch = keyword || a.name?.toLowerCase().includes(keyword) || a.username?.toLowerCase().includes(keyword);
 
         const matchStatus = filterStatus === "all" || (filterStatus === "active" && a.is_active) || (filterStatus === "locked" && !a.is_active);
-
-        return matchSearch && matchStatus;
+        const matchRole = filterRole === "all" || a.role === filterRole;
+        return matchSearch && matchStatus && matchRole;
     });
 
     return (
@@ -88,13 +98,13 @@ const AccountsManagement = () => {
                         gap: 10,
                     }}
                 >
-                    <UserCog /> QUẢN LÝ TÀI KHOẢN NHÂN VIÊN
+                    <UserCog /> QUẢN LÝ TÀI KHOẢN
                 </h1>
 
                 <form autoComplete="off">
                     <div style={Styles.actions}>
                         <input
-                            placeholder="Tìm theo tên hoặc username"
+                            placeholder="Tìm theo tên, tên đăng nhập..."
                             style={stylesForm.searchInput}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -105,10 +115,27 @@ const AccountsManagement = () => {
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
                         >
-                            <option value="all">Tất cả</option>
-                            <option value="active">Đang hoạt động</option>
-                            <option value="locked">Đã khóa</option>
+                            <option value="all">Tất cả trạng thái</option>
+                            <option value="active">Còn hoạt động</option>
+                            <option value="locked">Ngưng hoạt động</option>
                         </select>
+
+                        <select
+                            style={stylesForm.filterSelect}
+                            value={filterRole}
+                            onChange={(e) => setFilterRole(e.target.value)}
+                        >
+                            <option value="all">Tất cả chức vụ</option>
+                            <option value="ADMIN">Quản trị viên</option>
+                            <option value="EMPLOYEE">Nhân viên</option>
+                        </select>
+                        <button
+                            type="button"
+                            style={stylesButton.btnReset}
+                            onClick={handleResetFilter}
+                            >
+                            <RotateCcw size={16} />
+                        </button>
                     </div>
                 </form>
             </div>

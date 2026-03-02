@@ -3,14 +3,11 @@ import {
   Styles,
   stylesButton,
   stylesForm,
-  styleTable,
-  tooltipStyle
 } from "../style/Styles";
 
 import {
   Plus,
-  Pencil,
-  Trash2,
+  RotateCcw,
   Clock,
 } from "lucide-react";
 
@@ -141,7 +138,10 @@ const ShiftManagement = () => {
       toast.error("Lưu ca làm việc thất bại");
     }
   };
-
+  
+  const handleResetFilter = () => {
+    setSearch("");
+  };
   /* ================= FILTER ================= */
 
   const filteredShifts = shifts.filter((u) =>
@@ -170,6 +170,13 @@ const ShiftManagement = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <button
+              type="button"
+              style={stylesButton.btnReset}
+              onClick={handleResetFilter}
+            >
+              <RotateCcw size={16} />
+            </button>
 
             <div style={Styles.rightActions}>
               <button

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Styles, stylesForm} from "../style/Styles";
-import { CalendarCheck  } from "lucide-react";
+import { Styles, stylesForm, stylesButton} from "../style/Styles";
+import { CalendarCheck, RotateCcw} from "lucide-react";
 import { getLeave, updateLeave } from "../../../services/LeaveService";
 import { toast } from "react-toastify";
 import LeaveModal from "../components/modal/LeaveModal";
@@ -31,6 +31,7 @@ const LeaveManagement = () => {
     const [leaves, setLeaves] = useState([]);
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
+    const [filterLeaveType, setFilterLeaveType] = useState("all");
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [selectedLeave, setSelectedLeave] = useState(null);
@@ -81,14 +82,20 @@ const LeaveManagement = () => {
         }
     };
 
+    const handleResetFilter = () => {
+        setSearch("");
+        setFilterStatus("all");
+        setFilterLeaveType("all");
+    };
     const filteredLeaves = leaves.filter((l) => {
         const keyword = search.toLowerCase().trim();
 
         const matchSearch = !keyword || l.user_name?.toLowerCase().includes(keyword);
 
         const matchStatus = filterStatus === "all" || l.status === filterStatus;
+        const matchLeaveType = filterLeaveType === "all" || l.leave_type === filterLeaveType;
 
-        return matchSearch && matchStatus;
+        return matchSearch && matchStatus && matchLeaveType ;
     });
 
     return (
@@ -119,11 +126,30 @@ const LeaveManagement = () => {
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
                         >
-                            <option value="all">Tất cả</option>
+                            <option value="all">Tất cả trạng thái</option>
                             <option value="pending">Chờ duyệt</option>
                             <option value="approved">Đã duyệt</option>
                             <option value="rejected">Từ chối</option>
                         </select>
+
+                        <select
+                            style={stylesForm.filterSelect}
+                            value={filterLeaveType}
+                            onChange={(e) => setFilterLeaveType(e.target.value)}
+                        >
+                            <option value="all">Tất cả loại nghỉ</option>
+                            <option value="annual_leave">Nghỉ phép hàng năm</option>
+                            <option value="sick_leave">Nghỉ phép bệnh</option>
+                            <option value="personal_leave">Nghỉ phép cá nhân</option>
+                        </select>
+
+                        <button
+                            type="button"
+                            style={stylesButton.btnReset}
+                            onClick={handleResetFilter}
+                        >
+                            <RotateCcw size={16} />
+                        </button>
                     </div>
                 </form>
             </div>

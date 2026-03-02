@@ -110,11 +110,11 @@ const Login = () => {
             <button
               type="submit"
               style={{
-                ...stylesButton.loginBtn,
+                // ...stylesButton.loginBtn,
                 ...stylesLogin.loginBtn,
               }}
             >
-              <LogIn size={18} />
+              <LogIn size={20} />
               Đăng nhập
             </button>
 
@@ -127,7 +127,7 @@ const Login = () => {
                 ...stylesLogin.backBtn,
               }}
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft size={20} />
               Quay lại trang điểm danh
             </button>
           </form>
@@ -255,7 +255,7 @@ const stylesLogin = {
     color: "#fff",
     background: "linear-gradient(135deg, #22d3ee, #38bdf8)",
     cursor: "pointer",
-    boxShadow: "0 12px 30px rgba(34,211,238,0.4)",
+    // boxShadow: "0 12px 30px rgba(34,211,238,0.4)",
 
     display: "flex",
     alignItems: "center",

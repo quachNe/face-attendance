@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Styles, stylesButton, stylesForm, styleTable, tooltipStyle} from "../style/Styles";
+import { Styles, stylesButton, stylesForm} from "../style/Styles";
 import {
   Plus,
   FileText,
   Users2,
   FileSpreadsheet,
+  RotateCcw 
 } from "lucide-react";
 import { getEmployees, updateEmployee, createEmployee } from "../../../services/EmployeeService";
 import { getShifts } from "../../../services/ShiftService";
@@ -20,6 +21,7 @@ const EmployeeManagement = () => {
   const [shifts, setShifts] = useState([]);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
+  const [filterShift, setFilterShift] = useState("all");
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -218,6 +220,11 @@ const EmployeeManagement = () => {
     }
   };
 
+  const handleResetFilter = () => {
+    setSearch("");
+    setFilterRole("all");
+    setFilterShift("all");
+  };
   // LỌC NHÂN VIÊN THEO TỪ KHÓA VÀ VAI TRÒ
   const filteredUsers = users.filter((u) => {
     const keyword = search.toLowerCase().trim();
@@ -227,7 +234,8 @@ const EmployeeManagement = () => {
       u.email?.toLowerCase().includes(keyword) ||
       u.phone?.toLowerCase().includes(keyword);
     const matchRole = filterRole === "all" || u.role === filterRole;
-    return matchSearch && matchRole;
+    const matchShift = filterShift === "all" || String(u.shift_id) === filterShift;
+    return matchSearch && matchRole && matchShift;
   });
 
   // LẤY DANH SÁCH NHÂN VIÊN TỪ API
@@ -268,7 +276,7 @@ const EmployeeManagement = () => {
     }
   };
 
-  // GỌI APU KHI MOUNT
+  // GỌI API KHI MOUNT
   useEffect(() => {
     fetchEmployee();
     fetchShifts();
@@ -293,34 +301,50 @@ const EmployeeManagement = () => {
 
           <div style={Styles.actions}>
             {/*------------------------ SEARCH ------------------------*/}
-            <input
-              placeholder="Tìm theo tên, ngày sinh, email, SĐT"
-              style={stylesForm.searchInput}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <form autoComplete="off">
+              <input
+                placeholder="Tìm theo tên, ngày sinh, email, SĐT"
+                style={stylesForm.searchInput}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </form>
             {/*------------------------ FILLTER ------------------------*/}
             <select
               style={stylesForm.filterSelect}
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
             >
-              <option value="all">Tất Cả</option>
+              <option value="all">Tất cả các chức vụ</option>
               <option value="admin">Quản Trị Viên</option>
               <option value="employee">Nhân Viên</option>
             </select>
+
+            <select
+              style={stylesForm.filterSelect}
+              value={filterShift}
+              onChange={(e) => setFilterShift(e.target.value)}
+            >
+              <option value="all">Tất cả ca làm việc</option>
+              {shifts.map((shift) => (
+                <option key={shift.id} value={shift.id}>
+                  {shift.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              style={stylesButton.btnReset}
+              onClick={handleResetFilter}
+            >
+              <RotateCcw size={16} />
+            </button>
             <div style={Styles.rightActions}>
               {/*------------------------ ADD ------------------------*/}
               <button style={stylesButton.btnAdd} onClick={openAddModal}>
                 <Plus size={18} /> Thêm
               </button>
-              {/*------------------------ EXPORT EXCEL ------------------------*/}
-              <button 
-                style={stylesButton.btnExcel} 
-                onClick={() => exportEmployeeExcel(filteredUsers)}
-              >
-                <FileSpreadsheet size={18} /> Xuất Excel
-              </button>
+
               {/*------------------------ EXPORT PDF ------------------------*/}
               <button
                 style={stylesButton.btnPdf}
@@ -328,6 +352,15 @@ const EmployeeManagement = () => {
               >
                 <FileText size={18} /> Xuất PDF
               </button>
+
+              {/*------------------------ EXPORT EXCEL ------------------------*/}
+              <button 
+                style={stylesButton.btnExcel} 
+                onClick={() => exportEmployeeExcel(filteredUsers)}
+              >
+                <FileSpreadsheet size={18} /> Xuất Excel
+              </button>
+              
             </div>
           </div>
       </div>
@@ -360,6 +393,14 @@ const EmployeeManagement = () => {
         show={showCameraModal}
         onClose={() => setShowCameraModal(false)}
         userId={cameraUser?.id}
+        onSuccess={() => {
+        setUsers(prev =>
+          prev.map(u =>
+            u.id === cameraUser?.id
+              ? { ...u, face_image: true }
+              : u
+          )
+        )}}
       />
     </>
   );

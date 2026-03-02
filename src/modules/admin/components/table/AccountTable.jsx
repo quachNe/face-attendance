@@ -60,11 +60,12 @@ const AccountTable = ({
                                         <td style={styleTable.td}>{i + 1}</td>
                                         <td style={styleTable.td}>{acc.name}</td>
                                         <td style={styleTable.td}>{acc.username}</td>
-                                        <td style={styleTable.td}>{acc.role}</td>
-
+                                        <td style={{...styleTable.td, color: acc.role === "admin" ? "#dc2626" : "#16a34a", fontWeight: 600}}>
+                                            {acc.role === "admin" ? "Quản trị viên" : "Nhân viên"}
+                                        </td>
                                     <td
                                         style={{
-                                            ...styleTable.td,
+                                            ...styleTable.td, 
                                             fontWeight: 600,
                                             color: acc.is_active ? "#16a34a" : "#dc2626",
                                         }}

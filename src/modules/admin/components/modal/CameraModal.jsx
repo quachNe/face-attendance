@@ -4,10 +4,12 @@ import {
   analyzeFaceSetup,
   finishFaceSetup,
 } from "../../../../services/EmployeeService";
+import { toast } from "react-toastify";
+import { styleModel } from "../../style/Styles";
 
 const OUTPUT_SIZE = 512;
 
-const CameraModal = ({ show, onClose, userId }) => {
+const CameraModal = ({ show, onClose, userId, onSuccess  }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -15,14 +17,31 @@ const CameraModal = ({ show, onClose, userId }) => {
 
   const [step, setStep] = useState("center");
   const [loading, setLoading] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
   const guides = {
-    center: "Nhìn thẳng",
+    center: "Nhìn thẳng vào camera",
     left: "Quay sang TRÁI",
     right: "Quay sang PHẢI",
   };
 
   const stepIndex = { center: 1, left: 2, right: 3 };
+
+  /* ================= ESC CLOSE ================= */
+
+  useEffect(() => {
+    const esc = (e) => e.key === "Escape" && show && handleClose();
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [show]);
+
+  /* ================= ANIMATE ================= */
+
+  useEffect(() => {
+    if (show) {
+      setTimeout(() => setAnimate(true), 10);
+    }
+  }, [show]);
 
   /* ================= RESET ================= */
 
@@ -78,7 +97,7 @@ const CameraModal = ({ show, onClose, userId }) => {
         await videoRef.current.play();
       } catch {
         alert("Không truy cập được camera");
-        onClose();
+        handleClose();
       }
     };
 
@@ -91,9 +110,10 @@ const CameraModal = ({ show, onClose, userId }) => {
   }, [show]);
 
   const handleClose = () => {
+    setAnimate(false);
     stopCamera();
     resetAll();
-    onClose();
+    setTimeout(onClose, 250);
   };
 
   /* ================= CAPTURE ================= */
@@ -113,9 +133,7 @@ const CameraModal = ({ show, onClose, userId }) => {
     const vw = video.videoWidth;
     const vh = video.videoHeight;
 
-    // ⭐ CROP CHÍNH GIỮA VIDEO THẬT (QUAN TRỌNG NHẤT)
     const size = Math.min(vw, vh) * 0.8;
-
     const sx = (vw - size) / 2;
     const sy = (vh - size) / 2;
 
@@ -133,28 +151,21 @@ const CameraModal = ({ show, onClose, userId }) => {
           image: img,
           current_step: step,
         });
-
         data = res.data;
       } catch (err) {
         if (err.response?.data) data = err.response.data;
         else throw err;
       }
 
-      /* ===== FAIL ===== */
-
       if (!data.success) {
         alert(data.message || "Hãy quay đúng hướng theo hướng dẫn");
         return;
       }
 
-      /* ===== OK ===== */
-
       embeddingsRef.current.push(data.embedding);
 
       if (step === "center") return setStep("left");
       if (step === "left") return setStep("right");
-
-      /* ===== FINISH ===== */
 
       stopCamera();
 
@@ -163,17 +174,18 @@ const CameraModal = ({ show, onClose, userId }) => {
         embeddings: embeddingsRef.current,
       });
 
-      alert(
+      toast.success(
         finishRes.data.success
-          ? "Đăng ký khuôn mặt thành công ✔"
+          ? "Đăng ký khuôn mặt thành công"
           : finishRes.data.message || "Đăng ký thất bại"
       );
-
-      onClose();
-
+      if (finishRes.data.success) {
+        onSuccess && onSuccess();
+      }
+      handleClose();
     } catch (err) {
       console.error(err);
-      alert("Lỗi hệ thống hoặc mất kết nối ❌");
+      alert("Lỗi hệ thống hoặc mất kết nối");
     } finally {
       setLoading(false);
     }
@@ -182,21 +194,38 @@ const CameraModal = ({ show, onClose, userId }) => {
   if (!show) return null;
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
-        <button style={styles.close} onClick={handleClose}>
-          <X size={22} />
+    <div style={styleModel.modalOverlay}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...styleModel.modal,
+          ...styles.modal,
+          transform: animate ? "translateY(0)" : "translateY(-40px)",
+          opacity: animate ? 1 : 0,
+          transition: "all .25s",
+        }}
+      >
+        <button style={styleModel.btnClose} onClick={handleClose}>
+          <X size={18} />
         </button>
 
-        <h2>
-          Bước {stepIndex[step]}/3 — {guides[step]}
-        </h2>
+        <h2 style={styleModel.modalTitle}>Đăng Ký Khuôn Mặt</h2>
 
-        <div style={styles.videoWrap}>
-          {/* Mirror chỉ để người dùng nhìn */}
-          <video ref={videoRef} autoPlay playsInline style={styles.video} />
-          <div style={styles.mask} />
-          <div style={styles.frame} />
+        <div style={styles.stepText}>
+          Bước {stepIndex[step]}/3
+        </div>
+
+        <div style={styles.guide}>
+          {guides[step]}
+        </div>
+
+        <div style={styles.circleWrapper}>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={styles.circleVideo}
+          />
         </div>
 
         <button
@@ -204,7 +233,7 @@ const CameraModal = ({ show, onClose, userId }) => {
           onClick={captureImage}
           disabled={loading}
         >
-          <Camera size={20} />
+          <Camera size={18} />
           {loading ? " Đang xử lý..." : " Chụp"}
         </button>
 
@@ -219,77 +248,59 @@ export default CameraModal;
 /* ================= STYLES ================= */
 
 const styles = {
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,.85)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 9999,
-  },
-
   modal: {
-    width: 520,
-    background: "#0f172a",
-    borderRadius: 20,
-    padding: 24,
-    color: "#fff",
+    width: 420,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    position: "relative",
     textAlign: "center",
-    position: "relative",
   },
 
-  close: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    background: "transparent",
-    border: "none",
-    color: "#fff",
-    cursor: "pointer",
+  stepText: {
+    fontSize: 16,
+    color: "#22c55e",
+    fontWeight: 600,
+    marginBottom: 6,
   },
 
-  videoWrap: {
-    position: "relative",
-    aspectRatio: "4/3",
-    borderRadius: 16,
+  guide: {
+    fontSize: 16,
+    color: "#ccc",
+    marginBottom: 22,
+  },
+
+  circleWrapper: {
+    width: 280,
+    height: 280,
+    borderRadius: "50%",
     overflow: "hidden",
-    marginBottom: 16,
+    background: "#000",
+    border: "3px solid #22c55e",
+    boxShadow: "0 0 25px rgba(34,197,94,.35)",
+    marginBottom: 26,
   },
 
-  video: {
+  circleVideo: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    transform: "scaleX(-1)", // mirror UI ONLY
-  },
-
-  mask: {
-    position: "absolute",
-    inset: 0,
-    background:
-      "radial-gradient(circle at center, transparent 150px, rgba(0,0,0,.75) 170px)",
-  },
-
-  frame: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    width: 300,
-    height: 300,
-    borderRadius: "50%",
-    border: "3px solid #22c55e",
-    transform: "translate(-50%, -50%)",
+    transform: "scaleX(-1)",
   },
 
   captureBtn: {
-    marginTop: 12,
-    padding: "12px 24px",
-    borderRadius: 12,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: "12px 30px",
+    borderRadius: 30,
     border: "none",
     background: "#22c55e",
-    color: "#000",
+    color: "#fff",
     fontWeight: 700,
+    fontSize: 15,
     cursor: "pointer",
+    minWidth: 170,
   },
 };
