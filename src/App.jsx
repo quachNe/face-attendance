@@ -17,50 +17,67 @@ import LeaveManagement from "./modules/admin/pages/LeaveManagement";
 import AccountsManagement from "./modules/admin/pages/AccountsManagement";
 import SalaryManagement from "./modules/admin/pages/SalaryManagement";
 
+
+function AppRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      {/*URL trang gửi đơn xin nghỉ phép*/}
+      <Route path="/leaves" element={<LeavePage />} />
+
+      {/*URL trang điểm danh*/}
+      <Route path="/" element={<Navigate to="/scan" replace />} />
+      <Route path="/scan" element={<Scan />} />
+
+      {/*URL trang đăng nhập*/}
+      <Route
+        path="/admin/login"
+        element={
+          <PublicOnlyRoute>
+            <Login />
+          </PublicOnlyRoute>
+        }
+      />
+
+      {/*URL trang dashboard*/}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <Protected allowedRoles={["admin"]}>
+            <Dashboard />
+          </Protected>
+        }
+      >
+        {/* mặc định */}
+        <Route index element={<Navigate to="stats" replace />} />
+
+        {/* CHỈ admin thật */}
+        {user?.username === "admin" && (
+          <>
+            <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="account" element={<AccountsManagement />} />
+          </>
+        )}
+
+        <Route path="history" element={<AttendanceHistory />} />
+        <Route path="shift" element={<ShiftManagement />} />
+        <Route path="leave" element={<LeaveManagement />} />
+        <Route path="salary" element={<SalaryManagement />} />
+        <Route path="stats" element={<SystemStatistics />} />
+      </Route>
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        {/*URL trang gửi đơn xin nghỉ phép*/}
-        <Route path="/leaves" element={<LeavePage />}/>
+      <AppRoutes />
 
-        {/*URL trang điểm danh*/}
-        <Route path="/" element={<Navigate to="/scan" replace/>} />
-        <Route path="/scan" element={<Scan />} />
-
-        {/*URL trang đăng nhập*/}
-        <Route
-          path="/admin/login"
-          element={
-            <PublicOnlyRoute>
-              <Login />
-            </PublicOnlyRoute>
-          }
-        />
-
-        {/*URL trang dashboard*/}
-        <Route path="/admin/dashboard" 
-          element={
-            <Protected allowedRoles={["admin"]}>
-              <Dashboard />
-            </Protected>
-          }
-               
-        >
-          <Route index element={<Navigate to="employees" replace />} />
-          <Route path="employees" element={<EmployeeManagement />} />
-          <Route path="account" element={<AccountsManagement />} />
-          <Route path="history" element={<AttendanceHistory />} />
-          <Route path="shift" element={<ShiftManagement />} />
-          <Route path="leave" element={<LeaveManagement />} />
-          <Route path="salary" element={<SalaryManagement />} />
-          <Route path="stats" element={<SystemStatistics />} />
-          </Route>
-      </Routes>
-
-      {/*Toast thông báo thao tác*/}
       <ToastContainer position="top-right" autoClose={3000} />
     </AuthProvider>
   );
 }
+
 export default App;

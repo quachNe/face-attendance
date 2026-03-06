@@ -23,6 +23,7 @@ const StatisticalCard = () => {
   const fetchStats = async () => {
     try {
       const { data } = await getStats();
+      console.log(data); 
       setTotalEmployees(data.total_employees);
       setPresentToday(data.present_today);
       setLateToday(data.late_today);
