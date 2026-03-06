@@ -14,6 +14,13 @@ export const AuthProvider = ({ children }) => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
+    const updateUser = (newUserData) => {
+        setUser((prev) => ({
+        ...prev,
+        ...newUserData,
+        }));
+    };
+
     // XỬ LÝ LOGIN
     const login = async (username, password) => {
         try {
@@ -54,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user,setUser, login, logout }}>
+        <AuthContext.Provider value={{ user,setUser, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

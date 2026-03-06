@@ -10,6 +10,7 @@ import {
   User,
   UserCheck,
   ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { checkInFace } from "../../../services/AttendanceService";
 
@@ -23,7 +24,7 @@ const styles = {
   },
 
   header: {
-    height: 64,
+    height: 60,
     background: "rgba(2,6,23,0.75)",
     borderBottom: "1px solid rgba(0,255,255,0.25)",
     backdropFilter: "blur(18px)",
@@ -31,28 +32,38 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 36px",
+    padding: "0 15px",
     fontSize: 15,
     letterSpacing: 0.5,
   },
-
-  adminBtn: {
-    position: "fixed",
-    top: 12,
-    right: 12,
+  
+  loginSwitch: {
     display: "flex",
     alignItems: "center",
-    gap: 8,
-    padding: "10px 18px",
-    fontWeight: 600,
-    color: "#00ffe1",
-    background: "rgba(0,255,225,0.1)",
-    border: "1px solid rgba(0,255,225,0.5)",
+    gap: 10,
+    padding: "8px 18px",
     borderRadius: 999,
-    cursor: "pointer",
+    border: "1px solid rgba(0,255,225,0.5)",
+    background: "rgba(0,255,225,0.08)",
     backdropFilter: "blur(12px)",
-    boxShadow: "0 0 16px rgba(0,255,225,0.45)",
-    transition: "0.25s",
+    boxShadow: "0 0 16px rgba(0,255,225,0.35)",
+  },
+
+  loginBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    background: "transparent",
+    border: "none",
+    color: "#00ffe1",
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: 14,
+  },
+
+  divider: {
+    color: "#00ffe1",
+    opacity: 0.7,
   },
 
   body: {
@@ -63,34 +74,33 @@ const styles = {
     position: "relative",
   },
 
-  overlay: {
+  overlayBg: {
     position: "absolute",
     inset: 0,
-    background:
-      "radial-gradient(circle at center, rgba(0,0,0,0.4), rgba(0,0,0,0.9))",
+    background: "radial-gradient(circle at center, rgba(0,0,0,0.5), rgba(0,0,0,0.9))",
   },
 
   title: {
     position: "absolute",
-    top: 50,
+    top: 40,
     left: "50%",
     transform: "translateX(-50%)",
-    color: "#00ffff",
-    fontSize: 34,
-    fontWeight: 700,
-    textShadow: "0 0 18px rgba(0,255,255,0.8)",
+    color: "#a5f3fc",
+    fontSize: 38,
+    fontWeight: 800,
+    textShadow: "0 0 24px rgba(0,255,255,0.75)",
     zIndex: 2,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
 
-  main: {
+  cameraContainer: {
     height: "100%",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    gap: 80,
     position: "relative",
-    zIndex: 1,
+    gap: 40,
   },
 
   cameraWrap: {
@@ -100,15 +110,12 @@ const styles = {
   },
 
   cameraBorder: {
-    width: 460,
-    height: 460,
+    width: 400,
+    height: 400,
     borderRadius: "50%",
-    padding: 10,
-    background:
-      "conic-gradient(#00ffff, #00ff99, #00bfff, #00ffff)",
-    boxShadow:
-      "0 0 60px rgba(0,255,255,0.7), inset 0 0 40px rgba(0,255,255,0.25)",
-    position: "relative",
+    padding: 5,
+    background: "#22c55e",
+    boxShadow: "0 0 0px rgba(0,255,255,0.65), inset 0 0 50px rgba(0,255,255,0.3)",
   },
 
   cameraInner: {
@@ -120,328 +127,366 @@ const styles = {
   },
 
   scanBtn: (disabled) => ({
-    marginTop: 28,
-    padding: "16px 54px",
-    fontSize: 17,
+    padding: "16px 72px",
+    marginTop: 32,
+    fontSize: 18,
     fontWeight: 700,
     borderRadius: 999,
     border: "none",
     cursor: disabled ? "not-allowed" : "pointer",
     background: disabled
-      ? "#444"
-      : "linear-gradient(135deg,#00c6ff,#0072ff)",
+      ? "rgba(100,100,100,0.6)"
+      : "linear-gradient(135deg, #00d4ff, #0077ff)",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     gap: 12,
-    boxShadow: disabled
-      ? "none"
-      : "0 0 25px rgba(0,150,255,0.8)",
-    transition: "0.25s",
+    boxShadow: disabled ? "none" : "0 0 30px rgba(0,180,255,0.7)",
+    transition: "all 0.3s",
   }),
 
-  /* ===== RESULT CARD ===== */
-
-  resultBox: {
-    width: 360,
-    padding: 26,
-    borderRadius: 22,
-    backdropFilter: "blur(18px)",
-    background: "rgba(15,23,42,0.75)",
-    boxShadow: "0 0 40px rgba(0,0,0,0.6)",
-    color: "#fff",
-  },
-
-  successBox: {
-    border: "1px solid rgba(0,255,200,0.6)",
-    boxShadow: "0 0 35px rgba(0,255,200,0.45)",
-  },
-
-  failedBox: {
-    border: "1px solid rgba(255,70,70,0.6)",
-    boxShadow: "0 0 35px rgba(255,70,70,0.45)",
-    textAlign: "center",
-  },
-
-  titleSuccess: {
-    color: "#00ffd0",
+  resultOverlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(0,0,0,0.7)",
+    backdropFilter: "blur(16px)",
     display: "flex",
     alignItems: "center",
-    gap: 12,
-    fontSize: 22,
-    fontWeight: 700,
-  },
-
-  titleFail: {
-    color: "#ff6b6b",
-    display: "flex",
     justifyContent: "center",
-    gap: 12,
-    fontSize: 22,
-    fontWeight: 700,
+    zIndex: 10,
+    animation: "fadeIn 0.4s ease-out",
   },
 
-  row: {
+  resultCard: {
+    width: 400,
+    padding: 32,
+    borderRadius: 24,
+    background: "rgba(15, 23, 42, 0.9)",
+    border: "1px solid rgba(0,255,220,0.4)",
+    boxShadow: "0 0 60px rgba(0,0,0,0.7)",
+    color: "#f0f9ff",
+    textAlign: "center",
+    animation: "popIn 0.5s ease-out",
+  },
+
+  successCard: {
+    borderColor: "rgba(0,255,200,0.7)",
+    boxShadow: "0 0 50px rgba(0,255,200,0.5)",
+  },
+
+  alreadyCard: {
+    borderColor: "rgba(251,191,36,0.7)",
+    boxShadow: "0 0 50px rgba(251,191,36,0.4)",
+  },
+
+  failCard: {
+    borderColor: "rgba(255,90,90,0.7)",
+    boxShadow: "0 0 50px rgba(255,90,90,0.45)",
+  },
+
+  resultIcon: {
+    marginBottom: 13,
+  },
+
+  resultTitle: {
+    fontSize: 28,
+    fontWeight: 700,
+    marginBottom: 13,
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: 10,
-    marginTop: 10,
-    fontSize: 16,
-    opacity: 0.95,
+    whiteSpace: "nowrap",
+  },
+
+  successTitle: { color: "#00ffc8" },
+  alreadyTitle: { color: "#fbbf24" },
+  failTitle: { color: "#ff6b6b" },
+
+  resultInfo: {
+    fontSize: 17,
+    lineHeight: 1.6,
+    margin: "5px 0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
 
   capturedImg: {
-    width: 120,
-    height: 120,
+    width: 140,
+    height: 140,
     borderRadius: "50%",
     objectFit: "cover",
-    margin: "16px auto",
-    display: "block",
-    border: "3px solid #00ffcc",
-    boxShadow: "0 0 25px rgba(0,255,200,0.8)",
+    margin: "20px auto",
+    border: "4px solid #00ffcc",
+    boxShadow: "0 0 30px rgba(0,255,200,0.6)",
+  },
+
+  countdown: {
+    marginTop: 24,
+    fontSize: 16,
+    color: "#a5f3fc",
+    opacity: 0.8,
   },
 };
-/* ========================================= */
 
-const Scan = () => {
+/* Global animations */
+const globalStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.85); opacity: 0; }
+    60%  { transform: scale(1.04); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+`;
+
+const FaceScan = () => {
   const webcamRef = useRef(null);
   const navigate = useNavigate();
 
   const [time, setTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [checkinTime, setCheckinTime] = useState(null);
-
-  const [userInfo, setUserInfo] = useState({
-    name: "",
-    status: "",
-    message: "",
-  });
-
+  const [result, setResult] = useState(null);
+  const [scanTime, setScanTime] = useState(null);
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  /* =========== GIỌNG ĐỌC ============== */
+  const [countdown, setCountdown] = useState(5);
+  useEffect(() => {
+    if (!result) return;
+
+    setCountdown(5);
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setResult(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [result]);
+
   const speakSuccess = (name, type) => {
     window.speechSynthesis.cancel();
-
-    let text = "Điểm danh thành công.";
-
-    if (type === "CHECK_IN") {
-      text = `Xin chào ${name}. Bạn đã chấm công vào thành công. Chúc bạn một ngày làm việc hiệu quả.`;
-    }
-
-    if (type === "CHECK_OUT") {
-      text = `Tạm biệt ${name}. Bạn đã chấm công ra về thành công. Hẹn gặp lại bạn.`;
-    }
-
+    let text =
+      type === "CHECK_IN"
+        ? `Xin chào ${name}. Chấm công vào làm thành công.`
+        : `Tạm biệt ${name}. Chấm công ra về thành công.`;
     const utter = new SpeechSynthesisUtterance(text);
-
-    // TỐI ƯU GIỌNG
     utter.lang = "vi-VN";
-    utter.rate = 0.85;
-    utter.pitch = 1;
-    utter.volume = 1;
-
-    // CHỌN GIỌNG VIỆT TỐT NHẤT
+    utter.rate = 0.9;
+    utter.pitch = 1.0;
     const voices = speechSynthesis.getVoices();
-
-    const vietnameseVoice =
-      voices.find(v => v.lang === "vi-VN") ||
-      voices.find(v => v.lang.includes("vi")) ||
-      voices[0];
-
-    if (vietnameseVoice) utter.voice = vietnameseVoice;
-
+    const vnVoice = voices.find((v) => v.lang === "vi-VN") || voices[0];
+    if (vnVoice) utter.voice = vnVoice;
     speechSynthesis.speak(utter);
   };
 
-  /* =========================== XỬ LÝ ĐIỂM DANH ============================== */
   const handleScan = async () => {
     if (loading) return;
     setLoading(true);
-    setFailed(false);
+    setResult(null);
 
     try {
-      const imageSrc = webcamRef.current.getScreenshot();
+      const imageSrc = webcamRef.current?.getScreenshot();
+      if (!imageSrc) throw new Error("Không lấy được ảnh");
 
       const { data } = await checkInFace(imageSrc);
 
-      setLoading(false);
-
       if (data.success) {
-        setCheckinTime(new Date());
-        setUserInfo(data);
-        setCapturedImage(imageSrc);
-        setSuccess(true);
-
-        speakSuccess(data.name, data.type);
-
-        setTimeout(() => {
-          setSuccess(false);
-          setCapturedImage(null);
-        }, 4500);
-
-      } else {
-        let msg =
-          data.message ||
-          "Không nhận diện được khuôn mặt\n\nVui lòng nhìn thẳng camera.";
-
-        if (msg.toLowerCase().includes("spoof")) {
-          msg =
-            "Không thể xác thực khuôn mặt\n\nHệ thống phát hiện dấu hiệu giả mạo.\n\nVui lòng đứng trực tiếp trước camera.";
+        setScanTime(new Date());
+        if (data.message?.includes("đã chấm công đủ") || data.message?.includes("đã chấm công đủ rồi")) {
+          setResult({ type: "already", message: data.message || "Hôm nay bạn đã điểm danh rồi!" });
+        } else {
+          setResult({ type: "success", data });
+          speakSuccess(data.name, data.type);
         }
-
-        setErrorMsg(msg);
-        setFailed(true);
-        setTimeout(() => setFailed(false), 4000);
+      } else {
+        let msg = data.message || "Không nhận diện được khuôn mặt";
+        if (msg.toLowerCase().includes("spoof")) {
+          msg = "Phát hiện dấu hiệu giả mạo.\nVui lòng đứng trực tiếp trước camera.";
+        }
+        setResult({ type: "error", message: msg });
       }
-
     } catch (err) {
-      setLoading(false);
-
-      // ⭐️ ĐỌC LỖI TỪ SERVER (QUAN TRỌNG)
-      if (err.response?.data) {
-        let msg =
-          err.response.data.message ||
-          "Không nhận diện được khuôn mặt";
-
+      let msg = "Lỗi kết nối máy chủ";
+      if (err.response?.data?.message) {
+        msg = err.response.data.message;
         if (msg.toLowerCase().includes("spoof")) {
-          msg =
-            "Không thể xác thực khuôn mặt\n\nHệ thống phát hiện dấu hiệu giả mạo.\n\nVui lòng đứng trực tiếp trước camera.";
+          msg = "Phát hiện dấu hiệu giả mạo.\nVui lòng đứng trực tiếp trước camera.";
         }
-
-        setErrorMsg(msg);
-      } else {
-        setErrorMsg("Lỗi kết nối máy chủ!");
       }
-
-      setFailed(true);
-      setTimeout(() => setFailed(false), 4000);
+      setResult({ type: "error", message: msg });
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   return (
-    <div style={styles.page}>
-      {/* HEADER */}
-      <div style={styles.header}>
-        <div>
-          {time.toLocaleDateString("vi-VN")} |{" "}
-          {time.toLocaleTimeString()}
-        </div>
-
-        <button
-          style={styles.adminBtn}
-          onClick={() => navigate("/admin/login")}
-        >
-          <ShieldCheck size={18} />
-          Admin Login
-        </button>
-      </div>
-
-      {/* BODY */}
-      <div style={styles.body}>
-        <div style={styles.overlay} />
-        <div style={styles.title}>
-          HỆ THỐNG ĐIỂM DANH KHUÔN MẶT
-        </div>
-
-        <div style={styles.main}>
-          {/* CAMERA */}
-          <div style={styles.cameraWrap}>
-            <div style={styles.cameraBorder}>
-              <div style={styles.cameraInner}>
-                <Webcam
-                  ref={webcamRef}
-                  audio={false}
-                  screenshotFormat="image/jpeg"
-                  videoConstraints={{
-                    width: 420,
-                    height: 420,
-                    facingMode: "user",
-                  }}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              </div>
+    <>
+      <style>{globalStyles}</style>
+      <div style={styles.page}>
+        <div style={styles.header}>
+          <div>
+            <div>
+              {time.toLocaleDateString("vi-VN", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}{" "}
+              | {time.toLocaleTimeString("vi-VN")}
             </div>
+          </div>
+          <div style={styles.loginSwitch}>
+            <button
+              style={styles.loginBtn}
+              onClick={() => navigate("/admin/login")}
+            >
+              <ShieldCheck size={16} /> Admin
+            </button>
+
+            <span style={styles.divider}>|</span>
 
             <button
-              onClick={handleScan}
-              disabled={loading}
-              style={styles.scanBtn(loading)}
+              style={styles.loginBtn}
+              onClick={() => navigate("/leaves")}
             >
-              <ScanFace size={20} />
-              {loading
-                ? "Đang nhận diện..."
-                : "Quét Khuôn Mặt"}
+              <User size={16} /> User
             </button>
           </div>
+        </div>
 
-          {/* SUCCESS */}
-          {success && (
-            <div
-              style={{
-                ...styles.resultBox,
-                ...styles.successBox,
-              }}
-            >
-              <h3 style={styles.titleSuccess}>
-                <CheckCircle2 /> {userInfo.message}
-              </h3>
+        <div style={styles.body}>
+          <div style={styles.overlayBg} />
+          <div style={styles.title}>HỆ THỐNG ĐIỂM DANH KHUÔN MẶT</div>
 
-              {capturedImage && (
-                <img
-                  src={capturedImage}
-                  style={styles.capturedImg}
-                />
-              )}
+          <div style={styles.cameraContainer}>
+            <div style={styles.cameraWrap}>
+              <div style={styles.cameraBorder}>
+                <div style={styles.cameraInner}>
+                  <Webcam
+                    ref={webcamRef}
+                    audio={false}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={{
+                      width: 440,
+                      height: 440,
+                      facingMode: "user",
+                    }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+              </div>
 
-              <p style={styles.row}>
-                <User /> <b>{userInfo.name}</b>
-              </p>
-              <p style={styles.row}>
-                <UserCheck /> {userInfo.status}
-              </p>
-              <p style={styles.row}>
-                <Clock />{" "}
-                {checkinTime?.toLocaleTimeString("vi-VN")}
-              </p>
+              <button
+                onClick={handleScan}
+                disabled={loading || !!result}
+                style={styles.scanBtn(loading || !!result)}
+              >
+                <ScanFace size={22} />
+                {loading ? "Đang nhận diện..." : result ? "Hoàn tất" : "Quét Khuôn Mặt"}
+              </button>
             </div>
-          )}
 
-          {/* FAILED */}
-          {failed && (
-            <div
-              style={{
-                ...styles.resultBox,
-                ...styles.failedBox,
-              }}
-            >
-              <h3 style={styles.titleFail}>
-                <XCircle />
-                {errorMsg.includes("giả mạo")
-                  ? " Phát hiện giả mạo"
-                  : " Không nhận diện được"}
-              </h3>
+            {/* RESULT OVERLAY */}
+            {result && (
+              <div style={styles.resultOverlay}>
+                <div
+                  style={{
+                    ...styles.resultCard,
+                    ...(result.type === "success"
+                      ? styles.successCard
+                      : result.type === "already"
+                      ? styles.alreadyCard
+                      : styles.failCard),
+                  }}
+                >
+                  {result.type === "success" ? (
+                    <>
+                      <div style={{ ...styles.resultTitle, ...styles.successTitle }}>
+                        <CheckCircle2 size={44} style={styles.resultIcon} />
+                        {result.data.message || "Thành công"}
+                      </div>
 
-              <p style={{ whiteSpace: "pre-line" }}>
-                {errorMsg}
-              </p>
-            </div>
-          )}
+                      <p style={{ fontSize: 20, color: "#99f6e4", margin: "12px 0 24px" }}>
+                        {result.data.type === "CHECK_IN" ? "Check-in" : "Check-out"} lúc{" "}
+                        {scanTime?.toLocaleTimeString("vi-VN")}
+                      </p>
+
+                      <img
+                        src={webcamRef.current?.getScreenshot()}
+                        alt="Captured face"
+                        style={styles.capturedImg}
+                      />
+
+                      <div style={styles.resultInfo}>
+                        <User size={20} /> <b>{result.data.name}</b>
+                      </div>
+
+                      {result.data.late_minutes > 0 && (
+                        <div style={{ ...styles.resultInfo, color: "#fcd34d" }}>
+                          <Clock size={20} /> Đi muộn: {result.data.late_minutes} phút
+                        </div>
+                      )}
+                      {result.data.early_leave_minutes > 0 && (
+                        <div style={{ ...styles.resultInfo, color: "#fb7185" }}>
+                          <Clock size={20} /> Về sớm: {result.data.early_leave_minutes} phút
+                        </div>
+                      )}
+                      {result.data.overtime_minutes > 0 && (
+                        <div style={{ ...styles.resultInfo, color: "#6ee7b7" }}>
+                          <Clock size={20} /> Tăng ca: {result.data.overtime_minutes} phút
+                        </div>
+                      )}
+                    </>
+                  ) : result.type === "already" ? (
+                    <>
+                      <div style={{ ...styles.resultTitle, ...styles.alreadyTitle }}>
+                        <CheckCircle2 size={44} style={styles.resultIcon} />
+                        Đã điểm danh
+                      </div>
+                      <p style={{ fontSize: 18, margin: "16px 0 8px", color: "#fde68a" }}>
+                        {result.message || "Hôm nay bạn đã điểm danh rồi!"}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ ...styles.resultTitle, ...styles.failTitle }}>
+                        <XCircle size={44} style={styles.resultIcon} />
+                        {result.message?.includes("giả mạo") ? "Phát hiện giả mạo" : "Thất bại"}
+                      </div>
+                      <p style={{ whiteSpace: "pre-line", fontSize: 17, lineHeight: 1.5, marginTop: 12 }}>
+                        {result.message}
+                      </p>
+                      {result.message?.includes("giả mạo") && (
+                        <AlertTriangle size={48} color="#ff6b6b" style={{ margin: "24px 0" }} />
+                      )}
+                    </>
+                  )}
+
+                  <div style={styles.countdown}>
+                    Tự động đóng sau {countdown} giây
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default Scan;
+export default FaceScan;

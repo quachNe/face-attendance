@@ -17,7 +17,7 @@ import { useAuth } from "../../../../context/AuthContext";
 import { toast } from "react-toastify";
 
 const UserProfile = ({ onClose }) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [initialForm, setInitialForm] = useState(null);
   const [animate, setAnimate] = useState(false);
   const [shake, setShake] = useState(false);
@@ -116,7 +116,7 @@ const UserProfile = ({ onClose }) => {
         phone: form.phone,
         dob: form.dob,
       };
-
+      updateUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
       toast.success("Đổi thông tin thành công!!")
       handleClose();

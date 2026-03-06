@@ -22,13 +22,18 @@ const AttendanceHistory = () => {
   // Từ khóa tìm kiếm theo tên nhân viên
   const [search, setSearch] = useState("");
 
+  const [monthYear, setMonthYear] = useState(
+  new Date().toISOString().slice(0, 7)
+);
   /* ================= API CALL ================= */
   // Hàm gọi API lấy danh sách điểm danh theo ngày
   const fetchAttendanceRecords = async () => {
     try {
       setLoading(true);
       const { data } = await getLogs({ date });
-      setRecords(data);
+      console.log("DATE:", date);
+      console.log("DATA:", data);
+      setRecords(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -47,7 +52,7 @@ const AttendanceHistory = () => {
 
     return (
       !keyword ||
-      r.user_name?.toLowerCase().includes(keyword)
+      r.name?.toLowerCase().includes(keyword)
     );
   });
 
@@ -103,13 +108,15 @@ const AttendanceHistory = () => {
           {/* Nút xuất file */}
           <div style={Styles.rightActions}>
             {/* Xuất PDF */}
-            <button 
-              style={stylesButton.btnPdf}
-            >
-              <FileText size={18}/> Xuất PDF
-            </button>
+            <input
+              type="month"
+              style={{ ...stylesForm.filterSelect, width: "50%" }}
+              value={monthYear}
+              onChange={(e) => setMonthYear(e.target.value)}
+              className={"custom-date-input"} 
+            />
             {/* Xuất Excel */}
-            <button 
+            <button
               style={stylesButton.btnExcel}
             >
               <FileSpreadsheet  size={18}/> Xuất Excel

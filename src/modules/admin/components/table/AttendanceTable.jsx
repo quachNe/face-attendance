@@ -15,7 +15,8 @@ const AttendanceTable = ({ loading, records, selectedId, setSelectedId}) => {
                     <table style={styleTable.table}>
                         <thead>
                             <tr>
-                                {["#", "Họ Và Tên", "Giờ Vào", "Giờ Ra", "Ghi Chú"].map( (c) => (<th key={c} style={styleTable.th}> {c} </th>))}
+                                {["#", "Họ Và Tên", "Giờ Vào", "Giờ Ra", "Số Phút Trễ","Số Phút Về Sớm", "Số Phút Tăng Ca", "Ghi Chú"]
+                                .map( (c) => (<th key={c} style={styleTable.th}> {c} </th>))}
                             </tr>
                         </thead>
 
@@ -23,7 +24,7 @@ const AttendanceTable = ({ loading, records, selectedId, setSelectedId}) => {
                             {records.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={5}
+                                        colSpan={8}
                                         style={{
                                             ...styleTable.td,
                                             ...styleTable.notData,
@@ -48,15 +49,20 @@ const AttendanceTable = ({ loading, records, selectedId, setSelectedId}) => {
                                             <td style={styleTable.td}>{r.name}</td>
                                             <td style={styleTable.td}>{r.time}</td>
                                             <td style={styleTable.td}>{r.checkout}</td>
+                                            <td style={styleTable.td}>{r.late_minutes}</td>
+                                            <td style={styleTable.td}>{r.early_leave_minutes}</td>
+                                            <td style={styleTable.td}>{r.overtime_minutes}</td>
                                             <td
                                                 style={{
                                                     ...styleTable.td,
                                                     fontWeight: 600,
-                                                    color: r.status === "overtime" ? "#ef4444" : "#22c55e",
+                                                    color: r.status === "PRESENT" ? "#22c55e" : 
+                                                        r.status === "ABSENT" ? "#ef4444" : "#f59e0b",
                                                 }}
-                                            >
-                                                {r.status === "overtime" ? "Trễ Giờ" : "Đúng Giờ"}
-                                            </td>
+                                                >
+                                                {r.status === "PRESENT" ? "Có mặt" : r.status === "ABSENT"
+                                                    ? "Vắng" : "Nghỉ phép"}
+                                                </td>
                                         </tr>
                                     )
                                 })

@@ -65,22 +65,31 @@ const LeaveManagement = () => {
     }, []);
 
     const handleUpdateStatus = async (leaveId, newStatus, response = "") => {
-        try {
-            const payload = {
-                status: newStatus,
-                response: response,
-            };
+    try {
+        const payload = {
+            status: newStatus,
+            comment: response,
+        };
 
-            await updateLeave(leaveId, payload);
-            toast.success(newStatus === "APPROVED" ? "Đã duyệt đơn nghỉ" : "Đã từ chối đơn nghỉ");
+        const res = await updateLeave(leaveId, payload);
 
+        if (res.data.success) {
+            toast.success(
+                newStatus === "APPROVED"
+                    ? "Đã duyệt đơn nghỉ"
+                    : "Đã từ chối đơn nghỉ"
+            );
             setShowModal(false);
-            fetchLeaves(); // reload bảng
-        } catch (error) {
-            toast.error("Cập nhật trạng thái thất bại");
-            console.error(error);
+            fetchLeaves();
+        } else {
+            toast.error(res.data.message || "Cập nhật thất bại");
         }
-    };
+
+    } catch (error) {
+        toast.error("Cập nhật trạng thái thất bại");
+        console.error(error);
+    }
+};
 
     const handleResetFilter = () => {
         setSearch("");

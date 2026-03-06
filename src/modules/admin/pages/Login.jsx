@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "/background.jpg";
 import { useAuth } from "../../../context/AuthContext";
-import { stylesButton } from "../style/Styles";
 import { Eye, EyeOff, User, Lock, LogIn, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -15,7 +14,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // HANDLE LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -25,111 +23,106 @@ const Login = () => {
     }
 
     const result = await login(userName, password);
-    
+
     if (!result.success) {
       setError(result.message || "Đăng nhập thất bại");
       return;
     }
-    
+
     const loggedUser = JSON.parse(localStorage.getItem("user"));
 
     if (loggedUser.role !== "admin") {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      setError("Bạn không có quyền truy cập vào trang dành cho quản trị viên");
+      setError("Bạn không có quyền truy cập vào trang quản trị");
       return;
     }
+
     toast.success("Đăng nhập thành công");
     navigate("/admin/dashboard");
   };
 
   return (
-    <div style={stylesLogin.wrapper}>
-      {/* BACKGROUND */}
+    <div style={styles.wrapper}>
       <div
         style={{
-          ...stylesLogin.background,
+          ...styles.background,
           backgroundImage: `url(${backgroundImg})`,
         }}
       />
 
-      {/* DARK OVERLAY */}
-      <div style={stylesLogin.overlay} />
+      <div style={styles.overlay} />
 
-      {/* CENTER CONTAINER */}
-      <div style={stylesLogin.modalContainer}>
-        <div style={stylesLogin.modal}>
-          {/* TITLE */}
-          <div style={stylesLogin.logoBox}>
-            <h2 style={stylesLogin.title}>ĐĂNG NHẬP</h2>
-          </div>
+      <div style={styles.center}>
+        <div style={styles.modal}>
+          <h2 style={styles.title}>ĐĂNG NHẬP HỆ THỐNG</h2>
 
-          {/* FORM */}
-          <form onSubmit={handleLogin} style={stylesLogin.form}>
+          <form onSubmit={handleLogin} style={styles.form}>
+            
             {/* USERNAME */}
-            <div style={stylesLogin.inputBox}>
-              <span style={stylesLogin.icon}>
-                <User size={18} />
-              </span>
+            <div style={styles.inputBox}>
+              <User size={18} style={styles.icon} />
 
               <input
                 type="text"
                 placeholder="Tên đăng nhập"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                style={stylesLogin.input}
+                style={styles.input}
               />
             </div>
 
             {/* PASSWORD */}
-            <div style={stylesLogin.inputBox}>
-              <span style={stylesLogin.icon}>
-                <Lock size={18} />
-              </span>
+            <div>
+              <div style={styles.inputBox}>
+                <Lock size={18} style={styles.icon} />
 
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={stylesLogin.input}
-              />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mật khẩu"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={styles.input}
+                />
 
-              <span
-                style={stylesLogin.eye}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
+                <span
+                  style={styles.eye}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </span>
+              </div>
+
+              {/* FORGOT PASSWORD */}
+              <div style={styles.forgotBox}>
+                <span
+                  style={styles.forgot}
+                  onClick={() => toast.info("Chức năng đang phát triển")}
+                >
+                  Quên mật khẩu?
+                </span>
+              </div>
             </div>
 
             {/* ERROR */}
-            {error && <p style={stylesLogin.error}>{error}</p>}
+            {error && <p style={styles.error}>{error}</p>}
 
-            {/* LOGIN BUTTON */}
-            <button
-              type="submit"
-              style={{
-                // ...stylesButton.loginBtn,
-                ...stylesLogin.loginBtn,
-              }}
-            >
-              <LogIn size={20} />
-              Đăng nhập
-            </button>
+            {/* BUTTONS */}
+            <div style={styles.buttonGroup}>
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                style={styles.backBtn}
+              >
+                <ArrowLeft size={18} />
+                Quay lại
+              </button>
 
-            {/* BACK BUTTON */}
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              style={{
-                ...stylesButton.backBtn,
-                ...stylesLogin.backBtn,
-              }}
-            >
-              <ArrowLeft size={20} />
-              Quay lại trang điểm danh
-            </button>
+              <button type="submit" style={styles.loginBtn}>
+                <LogIn size={18} />
+                Đăng nhập
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -139,12 +132,11 @@ const Login = () => {
 
 export default Login;
 
-const stylesLogin = {
+const styles = {
   wrapper: {
     height: "100vh",
     width: "100%",
     position: "relative",
-    overflow: "hidden",
     fontFamily: "Segoe UI, sans-serif",
   },
 
@@ -153,17 +145,17 @@ const stylesLogin = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(6px) brightness(0.5) scale(1.1)",
+    filter: "blur(10px) brightness(0.45) scale(1.1)",
   },
 
   overlay: {
     position: "absolute",
     inset: 0,
     background:
-      "radial-gradient(circle at center, rgba(0,0,0,0.25), rgba(0,0,0,0.8))",
+      "radial-gradient(circle at center, rgba(0,0,0,0.35), rgba(0,0,0,0.85))",
   },
 
-  modalContainer: {
+  center: {
     height: "100%",
     display: "flex",
     alignItems: "center",
@@ -171,107 +163,115 @@ const stylesLogin = {
   },
 
   modal: {
-    width: 450,
-    padding: "42px 38px",
-    borderRadius: 26,
-    background: "rgba(15, 23, 42, 0.9)",
-    backdropFilter: "blur(24px)",
+    width: 380,
+    padding: "38px 34px",
+    borderRadius: 20,
+    background: "rgba(15, 23, 42, 0.95)",
+    backdropFilter: "blur(30px)",
     border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 60px 140px rgba(0,0,0,0.85)",
-  },
-
-  logoBox: {
-    marginBottom: 30,
-    textAlign: "center",
+    boxShadow: "0 40px 120px rgba(0,0,0,0.9)",
   },
 
   title: {
-    fontSize: 36,
-    fontWeight: 900,
-    letterSpacing: 6,
-    background: "linear-gradient(135deg, #ffffff, #cbd5f5)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 8px 25px rgba(0,0,0,0.6)",
+    fontSize: 24,
+    fontWeight: 700,
+    letterSpacing: 1,
+    color: "#f1f5f9",
+    textAlign: "center",
+    marginBottom: 28,
   },
 
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: 22,
+    gap: 18,
   },
 
   inputBox: {
     display: "flex",
     alignItems: "center",
-    background: "rgba(255,255,255,0.96)",
-    borderRadius: 18,
-    padding: "15px 18px",
-    border: "1px solid rgba(255,255,255,0.4)",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
+    background: "#ffffff",
+    borderRadius: 12,
+    padding: "12px 14px",
+    border: "1px solid #e2e8f0",
   },
 
   icon: {
-    marginRight: 12,
-    opacity: 0.7,
-    color: "#475569",
-    display: "flex",
-    alignItems: "center",
+    color: "#64748b",
+    marginRight: 8,
   },
 
   input: {
     border: "none",
     outline: "none",
-    fontSize: 15,
+    fontSize: 14,
     width: "100%",
-    color: "#020617",
+    color: "#0f172a",
     background: "transparent",
-    fontWeight: 500,
   },
 
   eye: {
-    marginLeft: 10,
     cursor: "pointer",
-    opacity: 0.7,
-    color: "#475569",
+    color: "#64748b",
     display: "flex",
     alignItems: "center",
+  },
+
+  forgotBox: {
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: 6,
+  },
+
+  forgot: {
+    fontSize: 12.5,
+    color: "#38bdf8",
+    cursor: "pointer",
+    fontWeight: 500,
   },
 
   error: {
-    color: "#f87171",
-    fontSize: 14,
-    fontWeight: "bold",
+    color: "#ef4444",
+    fontSize: 13,
     textAlign: "center",
+    fontWeight: 600,
+  },
+
+  buttonGroup: {
+    display: "flex",
+    gap: 10,
+    marginTop: 4,
   },
 
   loginBtn: {
-    padding: "15px 0",
-    borderRadius: 16,
+    flex: 1,
+    padding: "13px 0",
+    borderRadius: 12,
     border: "none",
-    fontWeight: 700,
-    fontSize: 16,
-    letterSpacing: 1,
+    fontWeight: 600,
+    fontSize: 14,
     color: "#fff",
-    background: "linear-gradient(135deg, #22d3ee, #38bdf8)",
+    background: "linear-gradient(135deg,#06b6d4,#3b82f6)",
     cursor: "pointer",
-    // boxShadow: "0 12px 30px rgba(34,211,238,0.4)",
-
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 6,
   },
 
   backBtn: {
+    flex: 1,
     padding: "13px 0",
-    borderRadius: 14,
+    borderRadius: 12,
+    border: "1px solid rgba(255,255,255,0.2)",
+    color: "#e2e8f0",
+    background: "transparent",
     fontWeight: 600,
     fontSize: 14,
-
+    cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 6,
   },
 };

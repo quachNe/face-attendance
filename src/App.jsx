@@ -15,6 +15,7 @@ import AttendanceHistory from "./modules/admin/pages/AttendanceHistory";
 import ShiftManagement from "./modules/admin/pages/ShiftManagement";
 import LeaveManagement from "./modules/admin/pages/LeaveManagement";
 import AccountsManagement from "./modules/admin/pages/AccountsManagement";
+import SalaryManagement from "./modules/admin/pages/SalaryManagement";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="history" element={<AttendanceHistory />} />
           <Route path="shift" element={<ShiftManagement />} />
           <Route path="leave" element={<LeaveManagement />} />
+          <Route path="salary" element={<SalaryManagement />} />
           <Route path="stats" element={<SystemStatistics />} />
           </Route>
       </Routes>
