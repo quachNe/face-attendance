@@ -24,7 +24,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/*URL trang gửi đơn xin nghỉ phép*/}
-      <Route path="/leaves" element={<LeavePage />} />
+      <Route path="/employee/*" element={<LeavePage />} />
 
       {/*URL trang điểm danh*/}
       <Route path="/" element={<Navigate to="/scan" replace />} />

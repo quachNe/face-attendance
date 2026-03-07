@@ -33,21 +33,16 @@ const EmployeeTable = ({
           <table style={styleTable.table}>
             <thead>
               <tr>
-                {[
-                  "#",
-                  "Họ Và Tên",
-                  "Ngày Sinh",
-                  "Email",
-                  "SĐT",
-                  "Chức Vụ",
-                  "Ca",
-                  "Khuôn Mặt",
-                  "Thao Tác",
-                ].map((h) => (
-                  <th key={h} style={styleTable.th}>
-                    {h}
-                  </th>
-                ))}
+                <th style={{...styleTable.th, width: "40px"}}>#</th>
+                <th style={{...styleTable.th, width: "180px"}}>Họ và tên</th>
+                <th style={{...styleTable.th, width: "110px"}}>Ngày sinh</th>
+                <th style={{...styleTable.th, width: "200px"}}>Email</th>
+                <th style={{...styleTable.th, width: "120px"}}>SĐT</th>
+                <th style={{...styleTable.th, width: "120px"}}>Chức vụ</th>
+                <th style={{...styleTable.th, width: "120px"}}>Ca</th>
+                <th style={{...styleTable.th, width: "170px"}}>Lương cơ bản</th>
+                <th style={{...styleTable.th, width: "100px"}}>Khuôn mặt</th>
+                <th style={{...styleTable.th, width: "140px"}}>Thao tác</th>
               </tr>
             </thead>
 
@@ -86,7 +81,11 @@ const EmployeeTable = ({
                       <td style={styleTable.td}>
                         {u.shift_name || "—"}
                       </td>
-
+                      <td style={styleTable.td}>
+                        {u.base_salary
+                          ? Number(u.base_salary).toLocaleString("vi-VN") + " đ"
+                          : "—"}
+                      </td>
                       {/* FACE STATUS */}
                       <td
                         style={{

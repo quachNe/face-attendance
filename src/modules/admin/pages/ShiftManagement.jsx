@@ -135,7 +135,12 @@ const ShiftManagement = () => {
       handleCloseModal();
     } catch (err) {
       console.error(err);
-      toast.error("Lưu ca làm việc thất bại");
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Lưu ca làm việc thất bại";
+      setError(message);
+      // toast.error(message);
     }
   };
   

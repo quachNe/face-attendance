@@ -140,6 +140,22 @@ const EmployeeModal = ({
                 ))}
               </select>
             </div>
+
+            <div style={styleModel.formGroup}>
+              <label style={styleModel.label}>
+                Lương cơ bản <span style={{ color: "red" }}>*</span>
+              </label>
+
+              <input
+                type="number"
+                style={styleModel.formInput}
+                value={form.base_salary || ""}
+                placeholder="Ví dụ: 8000000"
+                onChange={(e) =>
+                  setForm({ ...form, base_salary: Number(e.target.value) })
+                }
+              />
+            </div>
           </div>
 
           {error && <p style={stylesError.message}>{error}</p>}

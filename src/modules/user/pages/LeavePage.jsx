@@ -10,6 +10,7 @@ import LeaveStatus from "./LeaveStatus";
 import ProfileModal from "../components/modal/ProfileModal";
 import ChangePasswordModal from "../components/modal/ChangePasswordModal";
 import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
+import Salary from "./Salary";
 const LeavePage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -65,6 +66,17 @@ const LeavePage = () => {
               <span>Trạng thái đơn nghỉ phép</span>
             </h2>
             <LeaveStatus />
+          </>
+        );
+
+      case "salary":
+        return (
+          <>
+            <h2 style={styles.contentTitle}>
+              <FileText size={22} />
+              <span>Lương tháng</span>
+            </h2>
+            <Salary />
           </>
         );
       default:

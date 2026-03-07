@@ -42,7 +42,7 @@ function LeaveHeader({
 
       {/* TITLE */}
       <h2 style={styles.pageTitle}>
-        QUẢN LÝ ĐƠN XIN NGHỈ PHÉP
+        CỔNG THÔNG TIN NHÂN VIÊN
       </h2>
 
       {/* USER */}

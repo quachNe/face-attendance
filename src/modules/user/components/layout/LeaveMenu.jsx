@@ -35,7 +35,18 @@ export default function LeaveMenu({ active, setActive, onLoginClick }) {
             >
                 <FileText size={20} />
                 <span>Xem trạng thái xét duyệt</span>
-            </div>  
+            </div>
+
+            <div
+                style={{
+                ...styles.menuItem,
+                background: active === "salary" ? "#e7f0ff" : "transparent",
+                }}
+                onClick={() => handleOnclick("salary")} 
+            >
+                <FileText size={20} />
+                <span>Lương tháng</span>
+            </div>
         </div>
     );
 }

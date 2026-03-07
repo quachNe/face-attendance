@@ -361,7 +361,7 @@ const FaceScan = () => {
 
             <button
               style={styles.loginBtn}
-              onClick={() => navigate("/leaves")}
+              onClick={() => navigate("/employee")}
             >
               <User size={16} /> User
             </button>

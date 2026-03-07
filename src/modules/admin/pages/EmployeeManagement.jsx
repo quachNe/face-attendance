@@ -48,6 +48,7 @@ const EmployeeManagement = () => {
     shift_id: "",
     face_preview: null,
     face_file: null,
+    base_salary: "",
   });
 
   //  MỞ MODEL THÊM NHÂN VIÊN
@@ -65,6 +66,7 @@ const EmployeeManagement = () => {
       shift_id: "",
       face_preview: null,
       face_file: null,
+      base_salary: "",
     };
 
     setForm(emptyForm);
@@ -90,6 +92,7 @@ const EmployeeManagement = () => {
       face_preview: null,
       face_file: null,
       face_image: !!u.face_image,
+      base_salary: u.base_salary || "",
     };
 
     setEditId(u.id);
@@ -164,7 +167,7 @@ const EmployeeManagement = () => {
         phone: form.phone,
         role: form.role,
         shift_id: form.shift_id,
-        image: imageBase64,
+        base_salary: form.base_salary,
       };
 
       try {
@@ -201,7 +204,7 @@ const EmployeeManagement = () => {
       phone: form.phone,
       role: form.role || "EMPLOYEE",
       shift_id: form.shift_id,
-      image: imageBase64,
+      base_salary: form.base_salary || "",
     };
 
     try {
@@ -252,12 +255,13 @@ const EmployeeManagement = () => {
         role: u.role,
         shift_id: u.shift_id || null,
         shift_name: u.shift_name || "",
-        face_image: u.face_image || null,
+        base_salary: u.base_salary || "",
       }));
       
       const userNotRootAdmin = mappedUsers.filter(
         u => u.username !== "admin"
       );
+      console.log("Fetched users:", userNotRootAdmin);
       setUsers(userNotRootAdmin);
     } catch (error) {
       console.error(error);
