@@ -8,7 +8,7 @@ import {
   XCircle,
   Clock,
   User,
-  UserCheck,
+  CalendarClock,
   ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
@@ -252,16 +252,17 @@ const FaceScan = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [scanTime, setScanTime] = useState(null);
+  const [capturedImage, setCapturedImage] = useState(null);
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(30);
   useEffect(() => {
     if (!result) return;
 
-    setCountdown(5);
+    setCountdown(30);
 
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -301,7 +302,7 @@ const FaceScan = () => {
     try {
       const imageSrc = webcamRef.current?.getScreenshot();
       if (!imageSrc) throw new Error("Không lấy được ảnh");
-
+      setCapturedImage(imageSrc); 
       const { data } = await checkInFace(imageSrc);
 
       if (data.success) {
@@ -417,22 +418,28 @@ const FaceScan = () => {
                     <>
                       <div style={{ ...styles.resultTitle, ...styles.successTitle }}>
                         <CheckCircle2 size={44} style={styles.resultIcon} />
-                        {result.data.message || "Thành công"}
+                        {result.data.type === "CHECK_IN"
+                          ? "Check in thành công"
+                          : "Check out thành công"}
                       </div>
-
-                      <p style={{ fontSize: 20, color: "#99f6e4", margin: "12px 0 24px" }}>
-                        {result.data.type === "CHECK_IN" ? "Check-in" : "Check-out"} lúc{" "}
-                        {scanTime?.toLocaleTimeString("vi-VN")}
-                      </p>
-
+                    
                       <img
                         src={webcamRef.current?.getScreenshot()}
                         alt="Captured face"
                         style={styles.capturedImg}
                       />
 
+                      <p style={{ fontSize: 20, color: "#99f6e4", margin: "12px 0 24px" }}>
+                        {result.data.type === "CHECK_IN" ? "Check in" : "Check out"} lúc{" "}
+                        {scanTime?.toLocaleTimeString("vi-VN")}
+                      </p>
+
                       <div style={styles.resultInfo}>
                         <User size={20} /> <b>{result.data.name}</b>
+                      </div>
+
+                      <div style={styles.resultInfo}>
+                        <CalendarClock size={20} /> <b>{result.data.shift_name}</b>
                       </div>
 
                       {result.data.late_minutes > 0 && (

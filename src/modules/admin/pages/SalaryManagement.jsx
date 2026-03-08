@@ -1,89 +1,99 @@
 import React, { useEffect, useState } from "react";
-import { Styles, stylesForm, stylesButton} from "../style/Styles";
-import { DollarSign, RotateCcw} from "lucide-react";
-import { getEmployees, updateEmployee, resetPasswordByAdmin} from "../../../services/EmployeeService";
+import { Styles, stylesForm, stylesButton } from "../style/Styles";
+import { DollarSign, RotateCcw, FileSpreadsheet, Calculator, FileText} from "lucide-react";
+import { getEmployeePayroll } from "../../../services/SalaryService";
 import { toast } from "react-toastify";
 import SalaryTable from "../components/table/SalaryTable";
+import SalaryModal from "../components/modal/SalaryModal";
 
 const SalaryManagement = () => {
-    const [accounts, setAccounts] = useState([]);
+    const [salaries, setSalaries] = useState([]);
     const [search, setSearch] = useState("");
     const [filterRole, setFilterRole] = useState("all");
-    const [filterStatus, setFilterStatus] = useState("all");
     const [loading, setLoading] = useState(true);
-    const [hoverIcon, setHoverIcon] = useState({ id: null, type: null });
     const [selectedId, setSelectedId] = useState(null);
-    const currentUser = JSON.parse(localStorage.getItem("user"));
 
+    const [month, setMonth] = useState(null);
+    const [year, setYear] = useState(null);
+    const [selectedSalary, setSelectedSalary] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [monthYear, setMonthYear] = useState(
+        new Date().toISOString().slice(0, 7)
+    );
+
+    const [hoverIcon, setHoverIcon] = useState({
+        id: null,
+        type: null,
+    });
+
+    const openSalaryDetail = (salary) => {
+        setSelectedSalary(salary);
+        setShowModal(true);
+    };
+    // ================= LẤY THÁNG TRƯỚC =================
+    const getPreviousMonthYear = () => {
+        const now = new Date();
+
+        let m = now.getMonth(); // 0-11
+        let y = now.getFullYear();
+
+        if (m === 0) {
+            m = 12;
+            y -= 1;
+        }
+
+        return { month: m, year: y };
+    };
+
+    // ================= RESET FILTER =================
     const handleResetFilter = () => {
         setSearch("");
         setFilterRole("all");
-        setFilterStatus("all");
     };
-    // ================= FETCH =================
-    const fetchAccounts = async () => {
+
+    // ================= FETCH SALARY =================
+    const fetchSalary = async (m, y) => {
         try {
             setLoading(true);
-            const { data } = await getEmployees();
-            const userNotRootAdmin = data.filter(
-                u => u.username !== "admin"
+
+            const { data } = await getEmployeePayroll(m, y);
+
+            console.log("API:", data);
+
+            const payrolls = data || [];
+
+            const filtered = payrolls.filter(
+                (u) => u.employee_code !== "admin"
             );
-            setAccounts(userNotRootAdmin);
+
+            setSalaries(filtered);
+
         } catch (err) {
-            toast.error("Lỗi tải danh sách tài khoản");
             console.error(err);
+            toast.error("Không tải được dữ liệu lương");
         } finally {
             setLoading(false);
         }
     };
 
+    // ================= INIT =================
     useEffect(() => {
-        fetchAccounts();
+        fetchSalary(3, 2026);
     }, []);
 
-    // ================= TOGGLE LOCK =================
-    const handleToggleLock = async (account) => {
-        if (account.id === currentUser?.id) {
-            toast.warning("Bạn không thể tự khóa tài khoản của mình");
-            return;
-        }
-        try {
-            await updateEmployee(account.id, {is_active: !account.is_active,});
-
-            toast.success(account.is_active ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
-
-            await  fetchAccounts();
-        } catch (error) {
-            toast.error("Cập nhật trạng thái thất bại");
-            console.error(error);
-        }
-    };
-
-    const handleResetPassword = async (account) => {
-        try {
-            await resetPasswordByAdmin(account.id);
-            setAccounts(prev =>
-                prev.map(a =>
-                    a.id === account.id
-                        ? { ...a, change_password_request: false }
-                        : a
-                )
-            );
-            toast.success("Đã reset mật khẩu cho nhân viên");
-        } catch (error) {
-            toast.error("Reset mật khẩu thất bại");
-            console.error(error);
-        }
-    };
     // ================= FILTER =================
-    const filteredAccounts = accounts.filter((a) => {
+    const filteredSalaries = salaries.filter((s) => {
         const keyword = search.toLowerCase().trim();
 
-        const matchSearch = keyword || a.name?.toLowerCase().includes(keyword) || a.username?.toLowerCase().includes(keyword);
+        const matchSearch =
+            !keyword ||
+            s.name?.toLowerCase().includes(keyword) ||
+            s.employee_code?.toLowerCase().includes(keyword);
 
-        const matchStatus = filterStatus === "all" || (filterStatus === "active" && a.is_active) || (filterStatus === "locked" && !a.is_active);
-        const matchRole = filterRole === "all" || a.role === filterRole;
-        return matchSearch && matchStatus && matchRole;
+        const matchRole =
+            filterRole === "all" || s.role === filterRole;
+
+        return matchSearch && matchRole;
     });
 
     return (
@@ -100,56 +110,72 @@ const SalaryManagement = () => {
                 >
                     <DollarSign /> QUẢN LÝ LƯƠNG NHÂN VIÊN
                 </h1>
-
-                <form autoComplete="off">
-                    <div style={Styles.actions}>
+                <div style={Styles.actions}>
+                    <form autoComplete="off">
                         <input
-                            placeholder="Tìm theo tên, tên đăng nhập..."
+                            placeholder="Tìm theo tên hoặc mã nhân viên..."
                             style={stylesForm.searchInput}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
+                    </form>
+                    <input
+                        type="month"
+                        style={{ ...stylesForm.filterSelect}}
+                        value={monthYear}
+                        onChange={(e) => setMonthYear(e.target.value)}
+                        className={"custom-date-input"} 
+                    />
 
-                        <select
-                            style={stylesForm.filterSelect}
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                        >
-                            <option value="all">Tất cả trạng thái</option>
-                            <option value="active">Còn hoạt động</option>
-                            <option value="locked">Ngưng hoạt động</option>
-                        </select>
-
-                        <select
-                            style={stylesForm.filterSelect}
-                            value={filterRole}
-                            onChange={(e) => setFilterRole(e.target.value)}
-                        >
-                            <option value="all">Tất cả chức vụ</option>
-                            <option value="ADMIN">Quản trị viên</option>
-                            <option value="EMPLOYEE">Nhân viên</option>
-                        </select>
+                    <button
+                        type="button"
+                        style={stylesButton.btnReset}
+                        onClick={handleResetFilter}
+                    >
+                        <RotateCcw size={16} />
+                    </button>
+                    
+                    <div style={Styles.rightActions}>
+                        {/* Tính lương */}
                         <button
                             type="button"
-                            style={stylesButton.btnReset}
-                            onClick={handleResetFilter}
-                            >
-                            <RotateCcw size={16} />
+                            style={stylesButton.btnAdd}
+                        >
+                            <Calculator size={18} /> Tính lương
+                        </button>
+
+                        <button
+                            style={stylesButton.btnPdf}
+                            // onClick={exportPDF}
+                        >
+                            <FileText size={18}/> Xuất PDF
+                        </button>
+
+                        {/* Xuất Excel */}
+                        <button
+                            style={stylesButton.btnExcel}
+                        >
+                            <FileSpreadsheet  size={18}/> Xuất Excel
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
 
             {/* TABLE */}
             <SalaryTable
                 loading={loading}
-                accounts={filteredAccounts}
+                salaries={filteredSalaries}
                 selectedId={selectedId}
                 setSelectedId={setSelectedId}
                 hoverIcon={hoverIcon}
                 setHoverIcon={setHoverIcon}
-                onToggleLock={handleToggleLock}
-                onResetPassword={handleResetPassword}
+                onViewSalary={openSalaryDetail}
+            />
+
+            <SalaryModal
+                show={showModal}
+                salary={selectedSalary}
+                onClose={() => setShowModal(false)}
             />
         </>
     );

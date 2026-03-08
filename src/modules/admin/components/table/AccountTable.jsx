@@ -78,30 +78,42 @@ const AccountTable = ({
                                             <Tooltip
                                                 text={acc.is_active ? "Khóa tài khoản" : "Mở khóa tài khoản"}
                                             >
-                                            <div
-                                                style={{
-                                                    ...stylesButton.iconBase,
-                                                    ...stylesButton.iconBoxEdit,
-                                                    border: `1px solid ${acc.is_active ? "#dc2626" : "#16a34a"}`,
-                                                    ...(hoverIcon.id === acc.id &&
-                                                        hoverIcon.type === "lock" && {
-                                                            backgroundColor: acc.is_active
-                                                            ? "#fee2e2"
-                                                            : "#dcfce7",
-                                                            border: `1px solid ${
-                                                            acc.is_active ? "#dc2626" : "#16a34a"
-                                                            }`,
-                                                        }
-                                                    ),
-                                                }}
-                                                onMouseEnter={() =>setHoverIcon({id: acc.id,type: "lock",})}
-                                                onMouseLeave={() =>setHoverIcon({id: null,type: null,})}
-                                                onClick={(e) => {e.stopPropagation();onToggleLock(acc);}}
+                                                <div
+                                                    style={{
+                                                        ...stylesButton.iconBase,
+                                                        ...stylesButton.iconBoxEdit,
+                                                        border: `1px solid ${acc.is_active ? "#ef4444" : "#16a34a"}`,
+                                                        ...(hoverIcon.id === acc.id &&
+                                                            hoverIcon.type === "lock" && {
+                                                                backgroundColor: acc.is_active
+                                                                ? "#ef4444"
+                                                                : "#16a34a",
+                                                                border: `1px solid ${
+                                                                acc.is_active ? "#dc2626" : "#16a34a"
+                                                                }`,
+                                                            }
+                                                        ),
+                                                    }}
+                                                    onMouseEnter={() =>setHoverIcon({id: acc.id,type: "lock",})}
+                                                    onMouseLeave={() =>setHoverIcon({id: null,type: null,})}
+                                                    onClick={(e) => {e.stopPropagation();onToggleLock(acc);}}
                                                 >
                                                     {acc.is_active ? (
-                                                        <Lock size={15} color="#dc2626" />
+                                                        <Lock size={15} 
+                                                            color={
+                                                                hoverIcon.id === acc.id && hoverIcon.type === "lock"
+                                                                ? "#ffffff"
+                                                                : "#dc2626"
+                                                            } 
+                                                        />
                                                     ) : (
-                                                        <Unlock size={15} color="#16a34a" />
+                                                        <Unlock size={15} 
+                                                            color={
+                                                                hoverIcon.id === acc.id && hoverIcon.type === "lock"
+                                                                ? "#ffffff"
+                                                                : "#16a34a"
+                                                            }  
+                                                        />
                                                     )}
                                                 </div>
                                             </Tooltip>

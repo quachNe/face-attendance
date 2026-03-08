@@ -1,22 +1,23 @@
-import React, { useState, useEffect, useRef, use } from "react";
-import { User, Settings, Lock, LogOut, Bold } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { User, Settings, Lock, LogOut, Menu } from "lucide-react";
 import ChangePassword from "../modal/ChangePassword";
 import UserProfile from "../modal/UserProfile";
 import { useAuth } from "../../../../context/AuthContext";
-const Navbar = () => {
+import logoImg from "/Logo1.png";
+
+const Navbar = ({ collapsed, setCollapsed }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const {user} = useAuth();
+  const { user } = useAuth();
+
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
 
-  // XỬ LÝ ĐĂNG XUẤT
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/admin/login";
   };
-
-  // click ngoài thì đóng dropdown
+  const [menuHover, setMenuHover] = useState(false);
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -30,6 +31,38 @@ const Navbar = () => {
   return (
     <>
       <div style={styles.container}>
+        
+        {/* LEFT */}
+        <div style={styles.left}>
+          {/* LOGO */}
+          <div style={styles.logoBox}>
+            <img src={logoImg} style={styles.logoIcon} />
+            <span style={styles.logoText}>NANO TECH</span>
+          </div>
+
+          {/* BUTTON COLLAPSE SIDEBAR */}
+          <div
+            style={{
+              ...styles.menuBtn,
+              background: menuHover
+                ? "rgba(12,161,161,0.25)"
+                : "transparent",
+              transform: menuHover ? "scale(1.08)" : "scale(1)",
+              boxShadow: menuHover
+                ? "0 0 14px rgba(34,211,238,0.5)"
+                : "none",
+            }}
+            onMouseEnter={() => setMenuHover(true)}
+            onMouseLeave={() => setMenuHover(false)}
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? "Mở thanh bên" : "Đóng thanh bên"}
+          >
+            <Menu size={22} />
+          </div>
+
+        </div>
+
+        {/* RIGHT */}
         <div style={styles.right} ref={dropdownRef}>
           <span style={styles.greeting}>
             Xin chào,{" "}
@@ -61,9 +94,20 @@ const Navbar = () => {
           {/* Dropdown */}
           {open && (
             <div style={styles.dropdown}>
-              <DropdownItem icon={<Settings size={16} />} text="Đổi thông tin" onClick={() => setShowUserProfile(true)} />
-              <DropdownItem onClick={() => setShowChangePassword(true)} icon={<Lock size={16} />} text="Đổi mật khẩu" />
+              <DropdownItem
+                icon={<Settings size={16} />}
+                text="Đổi thông tin"
+                onClick={() => setShowUserProfile(true)}
+              />
+
+              <DropdownItem
+                icon={<Lock size={16} />}
+                text="Đổi mật khẩu"
+                onClick={() => setShowChangePassword(true)}
+              />
+
               <div style={styles.divider} />
+
               <DropdownItem
                 icon={<LogOut size={16} />}
                 text="Đăng xuất"
@@ -74,17 +118,20 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
       {showChangePassword && (
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
+
       {showUserProfile && (
         <UserProfile onClose={() => setShowUserProfile(false)} />
-      )}  
+      )}
     </>
   );
 };
 
-/* ===================== ITEM ===================== */
+/* ================= ITEM ================= */
+
 const DropdownItem = ({ icon, text, danger, onClick }) => {
   const [hover, setHover] = useState(false);
 
@@ -109,7 +156,8 @@ const DropdownItem = ({ icon, text, danger, onClick }) => {
   );
 };
 
-/* ===================== STYLES ===================== */
+/* ================= STYLES ================= */
+
 const styles = {
   container: {
     height: 60,
@@ -118,9 +166,47 @@ const styles = {
     backdropFilter: "blur(12px)",
     borderBottom: "1px solid rgba(12,161,161,0.35)",
     display: "flex",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
     zIndex: 20,
+  },
+
+  left: {
+    display: "flex",
+    alignItems: "center",
+    gap: 35,
+  },
+
+  menuBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    border: "1px solid rgba(12,161,161,0.35)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#22d3ee",
+    cursor: "pointer",
+    transition: "all 0.25s ease", 
+  },
+
+  logoBox: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  logoIcon: {
+    width: 36,
+    height: 36,
+    objectFit: "contain",
+  },
+
+  logoText: {
+    color: "#ffffff",
+    fontWeight: 700,
+    fontSize: 18,
+    letterSpacing: 1,
   },
 
   right: {
@@ -158,7 +244,6 @@ const styles = {
     borderRadius: 12,
     boxShadow: "0 20px 40px rgba(0,0,0,0.55)",
     overflow: "hidden",
-    animation: "fadeScale 0.18s ease",
   },
 
   item: {

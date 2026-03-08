@@ -7,4 +7,4 @@ export const getLogs = (params) =>
 
 // CHECK IN CHECK OUT
 export const checkInFace = (image) =>
-  API.post("/attendance/mark", { image });
+  API.post("/checkin", { image });

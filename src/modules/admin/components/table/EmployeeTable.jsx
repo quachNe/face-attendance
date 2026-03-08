@@ -8,6 +8,10 @@ import {
 } from "lucide-react";
 import { stylesButton, styleTable} from "../../style/Styles";
 import Tooltip from "./Tooltip";
+const formatCurrency = (value) => {
+  if (!value) return "0 ₫";
+  return value.toLocaleString("vi-VN") + " ₫";
+};
 
 const EmployeeTable = ({
   users,
@@ -73,19 +77,11 @@ const EmployeeTable = ({
                         fontWeight: 600,
                         color: u.role === "admin" ? "#dc2626" : "#16a34a" ,
                       }} >
-                        {u.role === "admin"
-                          ? "Quản trị viên"
-                          : "Nhân viên"}
+                        {u.role === "admin" ? "Quản trị viên" : "Nhân viên"}
                       </td>
 
-                      <td style={styleTable.td}>
-                        {u.shift_name || "—"}
-                      </td>
-                      <td style={styleTable.td}>
-                        {u.base_salary
-                          ? Number(u.base_salary).toLocaleString("vi-VN") + " đ"
-                          : "—"}
-                      </td>
+                      <td style={styleTable.td}>{u.shift_name || "—"}</td>
+                      <td style={styleTable.td}>{formatCurrency(u.base_salary)}</td>
                       {/* FACE STATUS */}
                       <td
                         style={{
@@ -95,11 +91,7 @@ const EmployeeTable = ({
                             : "#ef4444",
                         }}
                       >
-                        {u.face_image ? (
-                          <ScanFace size={18} />
-                        ) : (
-                          <CameraOff size={18} />
-                        )}
+                        {u.face_image ? (<ScanFace size={18} />) : (<CameraOff size={18} />)}
                       </td>
 
                       {/* ACTIONS */}

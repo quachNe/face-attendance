@@ -1,34 +1,53 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Users , CalendarCheck, BarChart3, Clock, ClipboardCheck, UserCog, DollarSign, User} from "lucide-react";
-import logoImg from "/Logo1.png";
+import {
+  Users,
+  CalendarCheck,
+  BarChart3,
+  Clock,
+  ClipboardCheck,
+  UserCog,
+  DollarSign,
+} from "lucide-react";
+
 import { useAuth } from "../../../../context/AuthContext";
 
-const SideBar = () => {
-  const {user} = useAuth();
+const SideBar = ({ collapsed }) => {
+  const { user } = useAuth();
+
   const renderMenu = (to, label, Icon) => {
     return (
       <NavLink
         to={to}
+        title={collapsed ? label : ""}
         style={({ isActive }) => ({
           ...stylesSidebar.menuItem,
           ...(isActive && stylesSidebar.menuItemActive),
           textDecoration: "none",
           color: "inherit",
+          justifyContent: collapsed ? "center" : "flex-start",
+          padding: collapsed ? "14px" : "14px 18px",
+          gap: collapsed ? 0 : 15,
         })}
       >
         {({ isActive }) => (
           <>
-            {isActive && <div style={stylesSidebar.activeBar} />}
+            {isActive && !collapsed && (
+              <div style={stylesSidebar.activeBar} />
+            )}
+
             <Icon size={20} color={isActive ? "#fff" : "#94a3b8"} />
-            <span
-              style={{
-                ...stylesSidebar.menuText,
-                ...(isActive && stylesSidebar.activeText),
-              }}
-            >
-              {label}
-            </span>
+
+            {!collapsed && (
+              <span
+                style={{
+                  ...stylesSidebar.menuText,
+                  ...(isActive && stylesSidebar.activeText),
+                }}
+              >
+                {label}
+              </span>
+            )}
           </>
         )}
       </NavLink>
@@ -36,39 +55,24 @@ const SideBar = () => {
   };
 
   return (
-    <aside style={stylesSidebar.sidebar}>
-      <div style={stylesSidebar.header}>
-        <div style={stylesSidebar.logoBox}>
-          <div style={stylesSidebar.logoIcon}>
-            <img
-              src={logoImg}
-              alt="Nano Tech"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
-          </div>
-
-          <div>
-            <div style={stylesSidebar.logo}>NANO TECH</div>
-            {/* <div style={stylesSidebar.logoSub}>Attendance System</div> */}
-          </div>
-        </div>
-      </div>
-
+    <aside
+      style={{
+        ...stylesSidebar.sidebar,
+        width: collapsed ? 80 : 260,
+      }}
+    >
+      {/* MENU */}
       <div style={stylesSidebar.menuList}>
-        {user.username === "admin" && (
+        {user?.username === "admin" && (
           <>
-          {renderMenu("/admin/dashboard/employees", "Nhân viên", Users )}
-          {renderMenu("/admin/dashboard/account", "Tài khoản", UserCog)}
+            {renderMenu("/admin/dashboard/employees", "Nhân viên", Users)}
+            {renderMenu("/admin/dashboard/account", "Tài khoản", UserCog)}
           </>
         )}
-        
+
         {renderMenu("/admin/dashboard/shift", "Ca làm việc", Clock)}
         {renderMenu("/admin/dashboard/leave", "Nghỉ phép", CalendarCheck)}
-        {renderMenu("/admin/dashboard/history", "Điểm danh", ClipboardCheck )}
+        {renderMenu("/admin/dashboard/history", "Điểm danh", ClipboardCheck)}
         {renderMenu("/admin/dashboard/salary", "Lương nhân viên", DollarSign)}
         {renderMenu("/admin/dashboard/stats", "Thống kê", BarChart3)}
       </div>
@@ -80,58 +84,19 @@ const SideBar = () => {
 
 export default SideBar;
 
+/* ================= STYLES ================= */
+
 export const stylesSidebar = {
   sidebar: {
-    width: 280,
-    height: "100vh",
+    height: "calc(100vh - 60px)",
     background: "linear-gradient(180deg, #020617 0%, #020617 100%)",
     backdropFilter: "blur(14px)",
     borderRight: "1px solid rgba(12,161,161,0.25)",
     display: "flex",
     flexDirection: "column",
+    transition: "width 0.3s ease",
   },
 
-  /* HEADER */
-  header: {
-    height: 60,
-    display: "flex",
-    alignItems: "center",
-    padding: "0 20px",
-    borderBottom: "1px solid rgba(12,161,161,0.25)",
-  },
-
-  logoBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-  },
-
-  logoIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 18,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 0 22px rgba(34,211,238,0.55)",
-    overflow: "hidden",
-  },
-  
-  logo: {
-    fontSize: 22,
-    fontWeight: 800,
-    letterSpacing: 2,
-    color: "#ffffff",
-    lineHeight: 1.5,
-  },
-
-  logoSub: {
-    fontSize: 14,
-    color: "#67e8f9",
-    letterSpacing: 1.1,
-  },
-
-  /* MENU */
   menuList: {
     padding: "20px 12px",
     display: "flex",
@@ -141,22 +106,17 @@ export const stylesSidebar = {
 
   menuItem: {
     position: "relative",
-    padding: "14px 18px",
-    borderRadius: 15,
+    borderRadius: 14,
     display: "flex",
     alignItems: "center",
-    gap: 15,
     cursor: "pointer",
     transition: "all 0.25s ease",
+    color: "#94a3b8",
   },
 
   menuItemActive: {
     background: "linear-gradient(90deg, #0ca1a1, #089191)",
     boxShadow: "0 10px 26px rgba(12,161,161,0.4)",
-  },
-
-  menuItemHover: {
-    background: "rgba(30,41,59,0.65)",
   },
 
   menuText: {
@@ -167,7 +127,6 @@ export const stylesSidebar = {
 
   activeText: {
     color: "#ffffff",
-    fontWeight: 600,
   },
 
   activeBar: {
