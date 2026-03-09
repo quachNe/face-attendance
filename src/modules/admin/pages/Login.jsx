@@ -2,17 +2,21 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImg from "/background.jpg";
 import { useAuth } from "../../../context/AuthContext";
-import { Eye, EyeOff, User, Lock, LogIn, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, User, Lock, LogIn, ArrowLeft, Mail, Send, X} from "lucide-react";
 import { toast } from "react-toastify";
+import { requestPasswordReset } from "../../../services/EmployeeService";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-
+  const [ isForgotPassword, setIsForgotPassword ] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorForgot, setErrorForgot] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [emailUser, SetEmailUser] = useState("");
+  const [userForgot, setUserForgot] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -42,91 +46,187 @@ const Login = () => {
     navigate("/admin/dashboard");
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorForgot("");
+    if (!emailUser.trim() || !userForgot.trim()) {
+      setErrorForgot("Vui lòng nhập đầy đủ tên đăng nhập và email!");
+      return;
+    }
+    const paload = {
+      username : userForgot,
+      email: emailUser,
+    }
+    try {
+      const {data} = await requestPasswordReset(paload);
+        if (data.success) {
+          toast.success("Yêu cầu cấp lại mật khẩu đã được gửi!");
+          setIsForgotPassword(false);
+        } else {
+          toast.error(data.message || "Thông tin không chính xác");
+      }
+    } catch (err) {
+      toast.error("Lỗi kết nối server");
+    }
+  };
+
   return (
-    <div style={styles.wrapper}>
-      <div
-        style={{
-          ...styles.background,
-          backgroundImage: `url(${backgroundImg})`,
-        }}
-      />
+    <>
+    {isForgotPassword ? (
+      <div style={styles.wrapper}>
+        <div
+          style={{
+            ...styles.background,
+            backgroundImage: `url(${backgroundImg})`,
+          }}
+        />
 
-      <div style={styles.overlay} />
+        <div style={styles.overlay} />
 
-      <div style={styles.center}>
-        <div style={styles.modal}>
-          <h2 style={styles.title}>ĐĂNG NHẬP HỆ THỐNG</h2>
+        <div style={styles.center}>
+          <div style={styles.modal}>
+            <h2 style={styles.title}>QUÊN MẬT KHẨU</h2>
 
-          <form onSubmit={handleLogin} style={styles.form}>
-            
-            {/* USERNAME */}
-            <div style={styles.inputBox}>
-              <User size={18} style={styles.icon} />
-
-              <input
-                type="text"
-                placeholder="Tên đăng nhập"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                style={styles.input}
-              />
-            </div>
-
-            {/* PASSWORD */}
-            <div>
+            <form onSubmit={(e) => handleSubmit(e)} style={styles.form}>
+              
+              {/* USERNAME */}
               <div style={styles.inputBox}>
-                <Lock size={18} style={styles.icon} />
+                <User size={18} style={styles.icon} />
 
                 <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mật khẩu"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  type="text"
+                  placeholder="Tên đăng nhập"
+                  value={userForgot}
+                  onChange={(e) => setUserForgot(e.target.value)}
                   style={styles.input}
                 />
-
-                <span
-                  style={styles.eye}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </span>
               </div>
 
-              {/* FORGOT PASSWORD */}
-              <div style={styles.forgotBox}>
-                <span
-                  style={styles.forgot}
-                  onClick={() => toast.info("Chức năng đang phát triển")}
-                >
-                  Quên mật khẩu?
-                </span>
+              {/* Email */}
+              <div>
+                <div style={styles.inputBox}>
+                  <Mail size={18} style={styles.icon} />
+
+                  <input
+                    type="text"
+                    placeholder="Email khôi phục"
+                    value={emailUser}
+                    onChange={(e) => SetEmailUser(e.target.value)}
+                    style={styles.input}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* ERROR */}
-            {error && <p style={styles.error}>{error}</p>}
+              {/* ERROR */}
+              {errorForgot && <p style={styles.error}>{errorForgot}</p>}
 
-            {/* BUTTONS */}
-            <div style={styles.buttonGroup}>
-              <button
-                type="button"
-                onClick={() => navigate("/")}
-                style={styles.backBtn}
-              >
-                <ArrowLeft size={18} />
-                Quay lại
-              </button>
+              {/* BUTTONS */}
+              <div style={styles.buttonGroup}>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPassword(false)}
+                  style={styles.backBtn}
+                >
+                  <X size={18} />
+                  Hủy
+                </button>
 
-              <button type="submit" style={styles.loginBtn}>
-                <LogIn size={18} />
-                Đăng nhập
-              </button>
-            </div>
-          </form>
+                <button type="submit" style={styles.loginBtn}>
+                  <Send size={18} />
+                  Gửi yêu cầu
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    ) : (
+      <div style={styles.wrapper}>
+        <div
+          style={{
+            ...styles.background,
+            backgroundImage: `url(${backgroundImg})`,
+          }}
+        />
+
+        <div style={styles.overlay} />
+
+        <div style={styles.center}>
+          <div style={styles.modal}>
+            <h2 style={styles.title}>ĐĂNG NHẬP HỆ THỐNG</h2>
+
+            <form onSubmit={handleLogin} style={styles.form}>
+              
+              {/* USERNAME */}
+              <div style={styles.inputBox}>
+                <User size={18} style={styles.icon} />
+
+                <input
+                  type="text"
+                  placeholder="Tên đăng nhập"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  style={styles.input}
+                />
+              </div>
+
+              {/* PASSWORD */}
+              <div>
+                <div style={styles.inputBox}>
+                  <Lock size={18} style={styles.icon} />
+
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mật khẩu"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={styles.input}
+                  />
+
+                  <span
+                    style={styles.eye}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </span>
+                </div>
+
+                {/* FORGOT PASSWORD */}
+                <div style={styles.forgotBox}>
+                  <span
+                    style={styles.forgot}
+                    onClick={() => setIsForgotPassword(true)}
+                  >
+                    Quên mật khẩu?
+                  </span>
+                </div>
+              </div>
+
+              {/* ERROR */}
+              {error && <p style={styles.error}>{error}</p>}
+
+              {/* BUTTONS */}
+              <div style={styles.buttonGroup}>
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  style={styles.backBtn}
+                >
+                  <ArrowLeft size={18} />
+                  Quay lại
+                </button>
+
+                <button type="submit" style={styles.loginBtn}>
+                  <LogIn size={18} />
+                  Đăng nhập
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

@@ -5,7 +5,7 @@ import { User, Lock, X, Eye, EyeOff } from "lucide-react";
 import { changePassword } from "../../../../services/EmployeeService.js";
 import { toast } from "react-toastify";
 export default function LeaveLoginModal({ onClose, onForgot }) {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -35,16 +35,15 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
         setError(result.message || "Tên đăng nhập hoặc mật khẩu không đúng");
         return;
       }
-
+      toast.success("Đăng nhập thành công!")
       // ÉP ĐỔI MẬT KHẨU
       if (result.user.must_change_password) {
         setForceChangePassword(true);
+        toast.success("Vui lòng thay đổi mật khẩu!")
         return;
       }
 
-      // Login bình thường
       onClose();
-
     } catch (err) {
       setError("Lỗi kết nối server");
     }
@@ -70,20 +69,6 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
     }
 
     try {
-      // const response = await fetch("http://localhost:5000/api/change-password", {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      //   body: JSON.stringify({ new_password: newPassword }),
-      // });
-
-      // 🔥 Đọc text trước
-      // const text = await response.text();
-
-      // Nếu rỗng → tránh crash
-      // const data = text ? JSON.parse(text) : {};
       const {data} = await changePassword({ new_password: newPassword });
       if (!data.success) {
         setError(data.message || "Có lỗi xảy ra");
@@ -92,7 +77,14 @@ export default function LeaveLoginModal({ onClose, onForgot }) {
 
       toast.success("Đổi mật khẩu thành công!");
 
-      onClose();
+      // logout để login lại
+      logout();
+
+      // reset form
+      setForceChangePassword(false);
+      setPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
 
     } catch (err) {
       console.error(err);

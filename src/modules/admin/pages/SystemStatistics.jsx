@@ -4,13 +4,12 @@ import { BarChart3 } from "lucide-react";
 import StatisticalChart from "../components/layout/StatisticalChart";
 import StatisticalFeaturedEmployee from "../components/layout/StatisticalFeaturedEmployee";
 import StatisticalCard from "../components/layout/StatisticalCard";
+import MonthlySalaryChart from "../components/layout/SalaryStatistics";
 
 /* ================= MAIN COMPONENT ================= */
 const SystemStatistics = () => {
   return (
-    <>
-      {/* ================= HEADER ================= */}
-
+<>
       <div style={Styles.header}>
         <h1
           style={{
@@ -28,15 +27,16 @@ const SystemStatistics = () => {
         <StatisticalCard />
         <StatisticalFeaturedEmployee />
         <StatisticalChart />
+        <MonthlySalaryChart />
       </div>
-    </>
+</>
   );
 };
 
 export default SystemStatistics;
 const systemStyle = {
   scrollContainer: {
-    maxHeight: "calc(100vh - 140px)", // trừ header + padding
+    maxHeight: "calc(100vh - 120px)", // trừ header + padding
     overflow: "auto",
 
     /* Firefox */

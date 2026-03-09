@@ -87,10 +87,12 @@ const styles = {
     transform: "translateX(-50%)",
     color: "#a5f3fc",
     fontSize: 38,
-    fontWeight: 800,
-    textShadow: "0 0 24px rgba(0,255,255,0.75)",
+    fontWeight: 700,
     zIndex: 2,
     letterSpacing: 1.2,
+    whiteSpace: "nowrap",
+    textAlign: "center",
+    width: "100%",
   },
 
   cameraContainer: {
@@ -258,11 +260,11 @@ const FaceScan = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(5);
   useEffect(() => {
     if (!result) return;
 
-    setCountdown(30);
+    setCountdown(5);
 
     const interval = setInterval(() => {
       setCountdown((prev) => {
@@ -307,8 +309,16 @@ const FaceScan = () => {
 
       if (data.success) {
         setScanTime(new Date());
-        if (data.message?.includes("đã chấm công đủ") || data.message?.includes("đã chấm công đủ rồi")) {
-          setResult({ type: "already", message: data.message || "Hôm nay bạn đã điểm danh rồi!" });
+
+        if (
+          data.message?.includes("đã chấm công đủ") ||
+          data.message?.includes("đã chấm công đủ rồi") ||
+          data.message?.includes("đã check-out")
+        ) {
+          setResult({
+            type: "already",
+            message: data.message || "Bạn đã check-out rồi!",
+          });
         } else {
           setResult({ type: "success", data });
           speakSuccess(data.name, data.type);
@@ -424,7 +434,7 @@ const FaceScan = () => {
                       </div>
                     
                       <img
-                        src={webcamRef.current?.getScreenshot()}
+                        src={capturedImage}
                         alt="Captured face"
                         style={styles.capturedImg}
                       />

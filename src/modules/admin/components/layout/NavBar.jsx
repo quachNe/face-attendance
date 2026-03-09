@@ -8,30 +8,49 @@ import logoImg from "/Logo1.png";
 const Navbar = ({ collapsed, setCollapsed }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+
   const { user } = useAuth();
 
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [disableIsClose, setDisableIsClose] = useState(false);
+
+  const [menuHover, setMenuHover] = useState(false);
+
+  /* ================= LOGOUT ================= */
 
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/admin/login";
   };
-  const [menuHover, setMenuHover] = useState(false);
+
+  /* ================= CLOSE DROPDOWN OUTSIDE ================= */
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  /* ================= FORCE CHANGE PASSWORD ================= */
+
+  useEffect(() => {
+    if (user?.must_change_password) {
+      setShowChangePassword(true);
+      setDisableIsClose(true);
+    }
+  }, [user]);
 
   return (
     <>
       <div style={styles.container}>
-        
         {/* LEFT */}
         <div style={styles.left}>
           {/* LOGO */}
@@ -59,7 +78,6 @@ const Navbar = ({ collapsed, setCollapsed }) => {
           >
             <Menu size={22} />
           </div>
-
         </div>
 
         {/* RIGHT */}
@@ -97,13 +115,19 @@ const Navbar = ({ collapsed, setCollapsed }) => {
               <DropdownItem
                 icon={<Settings size={16} />}
                 text="Đổi thông tin"
-                onClick={() => setShowUserProfile(true)}
+                onClick={() => {
+                  setShowUserProfile(true);
+                  setOpen(false);
+                }}
               />
 
               <DropdownItem
                 icon={<Lock size={16} />}
                 text="Đổi mật khẩu"
-                onClick={() => setShowChangePassword(true)}
+                onClick={() => {
+                  setShowChangePassword(true);
+                  setOpen(false);
+                }}
               />
 
               <div style={styles.divider} />
@@ -119,10 +143,15 @@ const Navbar = ({ collapsed, setCollapsed }) => {
         </div>
       </div>
 
+      {/* CHANGE PASSWORD */}
       {showChangePassword && (
-        <ChangePassword onClose={() => setShowChangePassword(false)} />
+        <ChangePassword
+          onClose={() => setShowChangePassword(false)}
+          disableIsclose={disableIsClose}
+        />
       )}
 
+      {/* USER PROFILE */}
       {showUserProfile && (
         <UserProfile onClose={() => setShowUserProfile(false)} />
       )}
@@ -187,7 +216,7 @@ const styles = {
     justifyContent: "center",
     color: "#22d3ee",
     cursor: "pointer",
-    transition: "all 0.25s ease", 
+    transition: "all 0.25s ease",
   },
 
   logoBox: {

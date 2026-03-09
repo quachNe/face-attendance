@@ -4,31 +4,39 @@ import { stylesError } from "../../../admin/style/Styles.js";
 import { toast } from "react-toastify";
 import { requestPasswordReset } from "../../../../services/EmployeeService.js";
 export default function ForgotPasswordModal({ onClose }) {
-    const [username, setUsername] = useState("");
-    const [message, setMessage] = useState("");
-    const [email, setEmail] = useState("");
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage("");
+  const [username, setUsername] = useState("");
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
-        if (!username.trim() || !email.trim()) {
-            setMessage("Vui lòng nhập đầy đủ tên đăng nhập và email!");
-            return;
-        }
+    if (!username.trim() || !email.trim()) {
+      setMessage("Vui lòng nhập đầy đủ tên đăng nhập và email!");
+      return;
+    }
 
-        try {
-            const {data} = await requestPasswordReset({ username, email });
-            if (data.success) {
-                toast.success("Yêu cầu cấp lại mật khẩu đã được gửi!");
-                onClose();
-            } else {
-                toast.error(data.message || "Thông tin không chính xác");
-            }
-        } catch (err) {
-            toast.error("Lỗi kết nối server");
-        }
-    };
+    try {
+      const {data} = await requestPasswordReset({ username, email });
+      if (data.success) {
+        toast.success("Yêu cầu cấp lại mật khẩu đã được gửi!");
+        onClose();
+      }
+    }catch (err) {
+      if (err.response?.status === 404) {
+        toast.error("Tên đăng nhập hoặc email không đúng");
+      }
 
+      else if (err.response?.status === 400) {
+        toast.error(err.response.data.message);
+      }
+
+      else {
+        toast.error("Lỗi kết nối server");
+      }
+
+    }
+  };
   return (
     <div style={styles.overlay}>
         <div style={styles.modal}>

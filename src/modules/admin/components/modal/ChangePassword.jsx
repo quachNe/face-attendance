@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Eye, EyeOff, Save, X } from "lucide-react";
 import { useAuth } from "../../../../context/AuthContext.jsx";
-import { updateEmployee } from "../../../../services/EmployeeService.js";
+import { updateEmployee, changePassword } from "../../../../services/EmployeeService.js";
 import {
   stylesButton,
   stylesError,
@@ -11,10 +11,13 @@ import {
 const ChangePassword = ({ onClose }) => {
   const { user } = useAuth();
 
+  // kiểm tra có bắt buộc đổi password không
+  const forceChange = user?.must_change_password === true;
+
   const [animate, setAnimate] = useState(false);
   const [shake, setShake] = useState(false);
-
   const [error, setError] = useState("");
+
   const [form, setForm] = useState({
     oldPassword: "",
     newPassword: "",
@@ -57,7 +60,7 @@ const ChangePassword = ({ onClose }) => {
     setTimeout(() => setAnimate(true), 10);
 
     const handleEsc = (e) => {
-      if (e.key === "Escape") handleClose();
+      if (e.key === "Escape" && !forceChange) handleClose();
     };
 
     document.addEventListener("keydown", handleEsc);
@@ -65,6 +68,8 @@ const ChangePassword = ({ onClose }) => {
   }, []);
 
   const handleClose = () => {
+    if (forceChange) return;
+
     setAnimate(false);
     setTimeout(() => onClose(), 250);
   };
@@ -74,11 +79,12 @@ const ChangePassword = ({ onClose }) => {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    window.location.href = "/admin/login";
   };
 
-  /* ================= SUBMIT ================= */
   const resetForm = () => {
+    if (forceChange) return;
+
     setForm({
       oldPassword: "",
       newPassword: "",
@@ -92,12 +98,17 @@ const ChangePassword = ({ onClose }) => {
     });
 
     setError("");
-    setShake(false);
   };
 
+  /* ================= SUBMIT ================= */
 
   const handleSubmit = async () => {
-    if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
+
+    if (
+      (!forceChange && !form.oldPassword) ||
+      !form.newPassword ||
+      !form.confirmPassword
+    ) {
       setError("Vui lòng nhập đầy đủ thông tin");
       triggerShake();
       return;
@@ -109,7 +120,7 @@ const ChangePassword = ({ onClose }) => {
       return;
     }
 
-    if (form.oldPassword === form.newPassword) {
+    if (!forceChange && form.oldPassword === form.newPassword) {
       setError("Mật khẩu mới phải khác mật khẩu cũ");
       triggerShake();
       return;
@@ -122,12 +133,26 @@ const ChangePassword = ({ onClose }) => {
     }
 
     try {
-      const payload = {
-        oldPassword: form.oldPassword,
-        password: form.newPassword,
-      };
 
-      const res = await updateEmployee(user.id, payload);
+      let res;
+
+      // CASE 1: force change password
+      if (forceChange) {
+        const payload = {
+          new_password : form.newPassword
+        }
+        res = await changePassword(payload);
+      }
+
+      // CASE 2: normal change password
+      else {
+        const payload = {
+          oldPassword: form.oldPassword,
+          password: form.newPassword,
+        };
+
+        res = await updateEmployee(user.id, payload);
+      }
 
       if (res.status === 200 || res.status === 204) {
         alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
@@ -137,7 +162,9 @@ const ChangePassword = ({ onClose }) => {
 
       setError(res.data?.message || "Đổi mật khẩu thất bại");
       triggerShake();
+
     } catch (err) {
+
       if (err.response?.status === 400) {
         setError(err.response.data?.message || "Mật khẩu cũ không đúng");
         triggerShake();
@@ -162,17 +189,17 @@ const ChangePassword = ({ onClose }) => {
           ...styleModel.modal,
           width: 400,
           padding: "30px 24px",
-          transform: animate
-            ? "translateY(0)"
-            : "translateY(-40px)",
+          transform: animate ? "translateY(0)" : "translateY(-40px)",
           opacity: animate ? 1 : 0,
           transition: "all 0.25s ease",
           animation: shake ? "shake 0.35s" : "none",
         }}
       >
-        {/* NÚT X */}
-        <button
-          onClick={handleClose}
+
+        {/* CLOSE BUTTON */}
+        {!forceChange && (
+          <button
+            onClick={handleClose}
             style={{
               position: "absolute",
               top: 12,
@@ -182,13 +209,18 @@ const ChangePassword = ({ onClose }) => {
               cursor: "pointer",
               color: "#fff",
             }}
-        >
-          <X size={20}/>
-        </button>
+          >
+            <X size={20} />
+          </button>
+        )}
+
         <h2 style={styleModel.modalTitle}>ĐỔI MẬT KHẨU</h2>
 
         <div style={styleModel.formGridShift}>
-          {["old", "new", "confirm"].map((type, index) => {
+
+          {(forceChange ? ["new", "confirm"] : ["old", "new", "confirm"])
+          .map((type) => {
+
             const key =
               type === "old"
                 ? "oldPassword"
@@ -205,6 +237,7 @@ const ChangePassword = ({ onClose }) => {
 
             return (
               <div key={type} style={styleModel.formGroupShift}>
+
                 <label style={styleModel.label}>
                   {label} <span style={{ color: "red" }}>*</span>
                 </label>
@@ -218,17 +251,14 @@ const ChangePassword = ({ onClose }) => {
                       handleChange(key, e.target.value)
                     }
                   />
+
                   <span
                     style={styleModel.eyeIcon}
                     onClick={() =>
                       setShow({ ...show, [type]: !show[type] })
                     }
                   >
-                    {show[type] ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
+                    {show[type] ? <EyeOff size={18} /> : <Eye size={18} />}
                   </span>
                 </div>
 
@@ -247,8 +277,7 @@ const ChangePassword = ({ onClose }) => {
                         style={{
                           width: `${(strength / 4) * 100}%`,
                           height: "100%",
-                          background:
-                            strengthColor[strength],
+                          background: strengthColor[strength],
                           transition: "0.3s",
                         }}
                       />
@@ -264,6 +293,7 @@ const ChangePassword = ({ onClose }) => {
                     </small>
                   </div>
                 )}
+
               </div>
             );
           })}
@@ -272,12 +302,15 @@ const ChangePassword = ({ onClose }) => {
         {error && <p style={stylesError.message}>{error}</p>}
 
         <div style={stylesButton.actions}>
-          <button
-            style={stylesButton.btnCancel}
-            onClick={resetForm}
-          >
-            <X size={18} /> Hủy
-          </button>
+
+          {!forceChange && (
+            <button
+              style={stylesButton.btnCancel}
+              onClick={resetForm}
+            >
+              <X size={18} /> Hủy
+            </button>
+          )}
 
           <button
             style={stylesButton.btnSave}
@@ -285,10 +318,11 @@ const ChangePassword = ({ onClose }) => {
           >
             <Save size={18} /> Lưu
           </button>
+
         </div>
+
       </div>
 
-      {/* SHAKE KEYFRAME */}
       <style>
         {`
         @keyframes shake {
@@ -300,6 +334,7 @@ const ChangePassword = ({ onClose }) => {
         }
       `}
       </style>
+
     </div>
   );
 };

@@ -40,7 +40,7 @@ const Dashboard = () => {
               padding: 32,
               background: "rgba(1,1,5,0.85)",
               color: "#e5e7eb",
-              overflowY: "auto",
+              overflowY: "hidden",
             }}
           >
             <Outlet />

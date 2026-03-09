@@ -1,28 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Star, Clock } from "lucide-react";
-import { getTopLate } from "../../../../services/StatisficalService";
-
-/* ================= TOP XUẤT SẮC (DEMO) ================= */
-const topEmployees = [
-  {
-    name: "Nguyễn Văn A",
-    code: "NV20260001",
-    role: "Nhân viên",
-    avatar: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    name: "Trần Thị B",
-    code: "NV20260002",
-    role: "Nhân viên",
-    avatar: "https://i.pravatar.cc/150?img=32",
-  },
-  {
-    name: "Phạm Thị D",
-    code: "NV20260004",
-    role: "Quản trị viên",
-    avatar: "https://i.pravatar.cc/150?img=56",
-  },
-];
+import { getEmployeeRanking } from "../../../../services/StatisficalService";
 
 /* ================= ITEM ================= */
 const EmployeeItem = ({ emp }) => (
@@ -37,7 +15,7 @@ const EmployeeItem = ({ emp }) => (
     }}
   >
     <img
-      src={emp.avatar}
+      src={`/IconUser.png`}
       alt={emp.name}
       style={{
         width: 56,
@@ -63,7 +41,9 @@ const EmployeeItem = ({ emp }) => (
 
     <div style={{ fontSize: 10, color: "#94a3b8" }}>{emp.code}</div>
 
-    <div style={{ fontSize: 10, color: "#94a3b8" }}>{emp.role}</div>
+    <div style={{ fontSize: 10, color: "#f87171", fontWeight: 600 }}>
+      {emp.role}
+    </div>
   </div>
 );
 
@@ -94,7 +74,7 @@ const EmployeeList = ({ list }) => {
       }}
     >
       {list.map((emp) => (
-        <EmployeeItem key={emp.code || emp.name} emp={emp}/>
+        <EmployeeItem key={emp.code || emp.name} emp={emp} />
       ))}
     </div>
   );
@@ -133,29 +113,34 @@ const SmallFrame = ({ icon, title, children }) => (
 
 /* ================= MAIN COMPONENT ================= */
 const StatisticalFeaturedEmployee = () => {
-  const [lateEmployees, setLateEmployees] = useState([]);
+  const [bestEmployees, setBestEmployees] = useState([]);
+  const [worstEmployees, setWorstEmployees] = useState([]);
 
   useEffect(() => {
-    const fetchTopLate = async () => {
+    const fetchRanking = async () => {
       try {
-        const { data } = await getTopLate();
+        const res = await getEmployeeRanking();
 
-        const mapped = data.map((u, i) => ({
+        const best = res.data.best.map((u, i) => ({
           name: u.name,
-          code: `NV${(i + 1).toString().padStart(4, "0")}`,
-          role: "Nhân viên",
-          avatar: u.avatar
-            ? "https://i.pravatar.cc/150?img=12"
-            : "https://i.pravatar.cc/150?img=1",
+          code: `TOP ${i + 1}`,
+          role: `Score ${u.score}`,
         }));
 
-        setLateEmployees(mapped);
-      } catch (e) {
-        console.error("Lỗi top trễ:", e);
+        const worst = res.data.worst.map((u, i) => ({
+          name: u.name,
+          code: `TOP ${i + 1}`,
+          role: `Score ${u.score}`,
+        }));
+
+        setBestEmployees(best);
+        setWorstEmployees(worst);
+      } catch (err) {
+        console.error("Lỗi load ranking:", err);
       }
     };
 
-    fetchTopLate();
+    fetchRanking();
   }, []);
 
   return (
@@ -170,7 +155,6 @@ const StatisticalFeaturedEmployee = () => {
         boxShadow: "0 8px 28px rgba(0,0,0,0.6)",
       }}
     >
-      {/* HEADER */}
       <div
         style={{
           fontSize: 18,
@@ -183,22 +167,21 @@ const StatisticalFeaturedEmployee = () => {
         XẾP HẠNG NHÂN VIÊN
       </div>
 
-      {/* 2 FRAME */}
       <div style={{ display: "flex", gap: 16 }}>
-        {/* ⭐ XUẤT SẮC */}
+        {/* THÀNH TÍCH TỐT */}
         <SmallFrame
           icon={<Star size={16} color="#facc15" fill="#facc15" />}
           title="THÀNH TÍCH TỐT"
         >
-          <EmployeeList list={topEmployees} />
+          <EmployeeList list={bestEmployees} />
         </SmallFrame>
 
-        {/* ⏰ ĐI TRỄ */}
+        {/* THÀNH TÍCH KÉM */}
         <SmallFrame
           icon={<Clock size={16} color="#f87171" />}
           title="THÀNH TÍCH KÉM"
         >
-          <EmployeeList list={lateEmployees} />
+          <EmployeeList list={worstEmployees} />
         </SmallFrame>
       </div>
     </div>

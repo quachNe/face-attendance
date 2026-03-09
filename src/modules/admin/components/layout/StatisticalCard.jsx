@@ -1,76 +1,104 @@
 import React, { useEffect, useState } from "react";
-import { Users, UserCheck, UserX, Clock } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Clock,
+  LogOut,
+  FileText
+} from "lucide-react";
 import { getStats } from "../../../../services/StatisficalService";
-import { toast } from "react-toastify"
+
 /* ================= BASE CARD ================= */
 const cardStyle = {
   background: "linear-gradient(180deg, #020617 0%, #030712 100%)",
-  borderRadius: 16,
+  borderRadius: 14,
   border: "1px solid #1e293b",
-  padding: "18px 18px",
+  padding: "14px 16px", // nhỏ hơn
   position: "relative",
   overflow: "hidden",
   transition: "all .25s ease",
 };
 
 const StatisticalCard = () => {
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  const [presentToday, setPresentToday] = useState(0);
-  const [lateToday, setLateToday] = useState(0);
-  const [absentToday, setAbsentToday] = useState(0);
+  const [stats, setStats] = useState({
+    total: 0,
+    present: 0,
+    late: 0,
+    early: 0,
+    leave: 0,
+    absent: 0
+  });
 
-  // THỐNG KÊ TỔNG QUAN CỦA HỆ THỐNG
   const fetchStats = async () => {
     try {
       const { data } = await getStats();
-      console.log(data); 
-      setTotalEmployees(data.total_employees);
-      setPresentToday(data.present_today);
-      setLateToday(data.late_today);
-      setAbsentToday(data.absent);
+
+      setStats({
+        total: data.total_employees,
+        present: data.present_today,
+        late: data.late_today,
+        early: data.early_leave_today,
+        leave: data.leave_today,
+        absent: data.absent_no_permission
+      });
+
     } catch (err) {
       console.error("Lỗi lấy thống kê:", err);
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     fetchStats();
   }, []);
 
-
   /* ================= KPI DATA ================= */
+
   const Items = [
     {
-      label: "TỔNG SỐ NHÂN VIÊN",
-      value: `${totalEmployees}`,
-      icon: <Users size={22} />,
+      label: "TỔNG NHÂN VIÊN",
+      value: stats.total,
+      icon: <Users size={18} />,
       color: "#67e8f9",
     },
     {
       label: "ĐI LÀM HÔM NAY",
-      value: `${presentToday}`,
-      icon: <UserCheck size={22} />,
+      value: stats.present,
+      icon: <UserCheck size={18} />,
       color: "#4ade80",
     },
     {
-      label: "ĐI TRỄ HÔM NAY",
-      value: `${lateToday}`,
-      icon: <Clock size={22} />,
+      label: "ĐI TRỄ",
+      value: stats.late,
+      icon: <Clock size={18} />,
       color: "#facc15",
     },
     {
-      label: "VẮNG MẶT HÔM NAY",
-      value: `${absentToday}`,
-      icon: <UserX size={22} />,
+      label: "VỀ SỚM",
+      value: stats.early,
+      icon: <LogOut size={18} />,
+      color: "#fb923c",
+    },
+    {
+      label: "NGHỈ PHÉP",
+      value: stats.leave,
+      icon: <FileText size={18} />,
+      color: "#a78bfa",
+    },
+    {
+      label: "VẮNG KHÔNG PHÉP",
+      value: stats.absent,
+      icon: <UserX size={18} />,
       color: "#f87171",
     },
   ];
+
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: 18,
+        gridTemplateColumns: "repeat(6, 1fr)", // 6 card
+        gap: 14,
         marginBottom: 24,
       }}
     >
@@ -80,7 +108,7 @@ const StatisticalCard = () => {
           style={cardStyle}
           onMouseEnter={(e) => {
             e.currentTarget.style.border = `1px solid ${item.color}55`;
-            e.currentTarget.style.boxShadow = `0 12px 30px ${item.color}22`;
+            e.currentTarget.style.boxShadow = `0 10px 22px ${item.color}22`;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.border = "1px solid #1e293b";
@@ -105,15 +133,15 @@ const StatisticalCard = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12,
-              marginBottom: 14,
+              gap: 10,
+              marginBottom: 10,
             }}
           >
             <div
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
+                width: 34,
+                height: 34,
+                borderRadius: 10,
                 background: `${item.color}1f`,
                 display: "flex",
                 alignItems: "center",
@@ -127,11 +155,11 @@ const StatisticalCard = () => {
 
             <div
               style={{
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "#e5e7eb",
-                letterSpacing: 0.7,
-                lineHeight: 1.25,
+                letterSpacing: 0.6,
+                lineHeight: 1.2,
               }}
             >
               {item.label}
@@ -143,12 +171,12 @@ const StatisticalCard = () => {
             style={{
               display: "flex",
               alignItems: "baseline",
-              gap: 8,
+              gap: 6,
             }}
           >
             <span
               style={{
-                fontSize: 30,
+                fontSize: 24, // nhỏ hơn
                 fontWeight: 800,
                 color: item.color,
                 lineHeight: 1,
@@ -159,7 +187,7 @@ const StatisticalCard = () => {
 
             <span
               style={{
-                fontSize: 14,
+                fontSize: 12,
                 color: "#94a3b8",
               }}
             >
@@ -173,8 +201,8 @@ const StatisticalCard = () => {
               position: "absolute",
               right: -36,
               bottom: -36,
-              width: 110,
-              height: 110,
+              width: 90,
+              height: 90,
               background: item.color,
               opacity: 0.05,
               filter: "blur(48px)",

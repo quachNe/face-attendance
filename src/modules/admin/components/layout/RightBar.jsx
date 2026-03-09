@@ -25,7 +25,7 @@ const Rightbar = ({ activePage }) => {
       <style>
         {`
           .custom-scroll {
-            overflow-y: auto;
+            overflow-y: hidden;
           }
           .custom-scroll::-webkit-scrollbar { width: 8px; }
           .custom-scroll::-webkit-scrollbar-track { background: #020617; }
@@ -52,6 +52,7 @@ const styles = {
     padding: 30,
     background: "rgba(1,1,5,0.85)",
     color: "#e5e7eb",
+    overflow: "hidden",
   },
 };
 

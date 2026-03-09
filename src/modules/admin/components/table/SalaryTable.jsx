@@ -54,7 +54,7 @@ const SalaryTable = ({
                             {salaries.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={7}
+                                        colSpan={11}
                                         style={{
                                             ...styleTable.td,
                                             ...styleTable.notData,

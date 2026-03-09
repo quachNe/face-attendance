@@ -1,48 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { Styles, stylesForm, stylesButton } from "../style/Styles";
-import { DollarSign, RotateCcw, FileSpreadsheet, Calculator, FileText} from "lucide-react";
+import { DollarSign, RotateCcw, FileSpreadsheet, Calculator, FileText } from "lucide-react";
 import { getEmployeePayroll } from "../../../services/SalaryService";
 import { toast } from "react-toastify";
+
 import SalaryTable from "../components/table/SalaryTable";
 import SalaryModal from "../components/modal/SalaryModal";
 
 const SalaryManagement = () => {
+
     const [salaries, setSalaries] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const [search, setSearch] = useState("");
     const [filterRole, setFilterRole] = useState("all");
-    const [loading, setLoading] = useState(true);
-    const [selectedId, setSelectedId] = useState(null);
 
-    const [month, setMonth] = useState(null);
-    const [year, setYear] = useState(null);
+    const [selectedId, setSelectedId] = useState(null);
     const [selectedSalary, setSelectedSalary] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const today = new Date();
+    const currentMonth = today.toISOString().slice(0, 7);
+    // mặc định tháng hiện tại
     const [monthYear, setMonthYear] = useState(
         new Date().toISOString().slice(0, 7)
     );
 
     const [hoverIcon, setHoverIcon] = useState({
         id: null,
-        type: null,
+        type: null
     });
 
+    // ================= OPEN MODAL =================
     const openSalaryDetail = (salary) => {
         setSelectedSalary(salary);
         setShowModal(true);
-    };
-    // ================= LẤY THÁNG TRƯỚC =================
-    const getPreviousMonthYear = () => {
-        const now = new Date();
-
-        let m = now.getMonth(); // 0-11
-        let y = now.getFullYear();
-
-        if (m === 0) {
-            m = 12;
-            y -= 1;
-        }
-
-        return { month: m, year: y };
     };
 
     // ================= RESET FILTER =================
@@ -52,16 +43,15 @@ const SalaryManagement = () => {
     };
 
     // ================= FETCH SALARY =================
-    const fetchSalary = async (m, y) => {
+    const fetchSalary = async (month, year) => {
         try {
             setLoading(true);
 
-            const { data } = await getEmployeePayroll(m, y);
-
-            console.log("API:", data);
+            const { data } = await getEmployeePayroll(month, year);
 
             const payrolls = data || [];
 
+            // bỏ admin
             const filtered = payrolls.filter(
                 (u) => u.employee_code !== "admin"
             );
@@ -76,13 +66,20 @@ const SalaryManagement = () => {
         }
     };
 
-    // ================= INIT =================
+    // ================= LOAD DATA =================
     useEffect(() => {
-        fetchSalary(3, 2026);
-    }, []);
+
+        if (!monthYear) return;
+
+        const [year, month] = monthYear.split("-").map(Number);
+
+        fetchSalary(month, year);
+
+    }, [monthYear]);
 
     // ================= FILTER =================
     const filteredSalaries = salaries.filter((s) => {
+
         const keyword = search.toLowerCase().trim();
 
         const matchSearch =
@@ -100,17 +97,21 @@ const SalaryManagement = () => {
         <>
             {/* HEADER */}
             <div style={Styles.header}>
+
                 <h1
                     style={{
                         ...Styles.title,
                         display: "flex",
                         alignItems: "center",
-                        gap: 10,
+                        gap: 10
                     }}
                 >
                     <DollarSign /> QUẢN LÝ LƯƠNG NHÂN VIÊN
                 </h1>
+
                 <div style={Styles.actions}>
+
+                    {/* SEARCH */}
                     <form autoComplete="off">
                         <input
                             placeholder="Tìm theo tên hoặc mã nhân viên..."
@@ -119,14 +120,18 @@ const SalaryManagement = () => {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </form>
+
+                    {/* MONTH FILTER */}
                     <input
                         type="month"
-                        style={{ ...stylesForm.filterSelect}}
+                        style={stylesForm.filterSelect}
                         value={monthYear}
                         onChange={(e) => setMonthYear(e.target.value)}
-                        className={"custom-date-input"} 
+                        className="custom-date-input"
+                        max={currentMonth}
                     />
 
+                    {/* RESET */}
                     <button
                         type="button"
                         style={stylesButton.btnReset}
@@ -134,29 +139,20 @@ const SalaryManagement = () => {
                     >
                         <RotateCcw size={16} />
                     </button>
-                    
+
                     <div style={Styles.rightActions}>
-                        {/* Tính lương */}
-                        <button
-                            type="button"
-                            style={stylesButton.btnAdd}
-                        >
-                            <Calculator size={18} /> Tính lương
+                        {/* EXPORT PDF */}
+                        <button style={stylesButton.btnPdf}>
+                            <FileText size={18} />
+                            Xuất PDF
                         </button>
 
-                        <button
-                            style={stylesButton.btnPdf}
-                            // onClick={exportPDF}
-                        >
-                            <FileText size={18}/> Xuất PDF
+                        {/* EXPORT EXCEL */}
+                        <button style={stylesButton.btnExcel}>
+                            <FileSpreadsheet size={18} />
+                            Xuất Excel
                         </button>
 
-                        {/* Xuất Excel */}
-                        <button
-                            style={stylesButton.btnExcel}
-                        >
-                            <FileSpreadsheet  size={18}/> Xuất Excel
-                        </button>
                     </div>
                 </div>
             </div>
@@ -172,6 +168,7 @@ const SalaryManagement = () => {
                 onViewSalary={openSalaryDetail}
             />
 
+            {/* MODAL */}
             <SalaryModal
                 show={showModal}
                 salary={selectedSalary}
