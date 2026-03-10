@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Styles, stylesForm, stylesButton } from "../style/Styles";
-import { DollarSign, RotateCcw, FileSpreadsheet, Calculator, FileText } from "lucide-react";
+import { DollarSign, RotateCcw, FileSpreadsheet, FileText } from "lucide-react";
 import { getEmployeePayroll } from "../../../services/SalaryService";
 import { toast } from "react-toastify";
 
 import SalaryTable from "../components/table/SalaryTable";
 import SalaryModal from "../components/modal/SalaryModal";
+import { exportSalaryPDF } from "../../../utils/exportSalaryPdf";
 
 const SalaryManagement = () => {
 
@@ -57,7 +58,6 @@ const SalaryManagement = () => {
             );
 
             setSalaries(filtered);
-
         } catch (err) {
             console.error(err);
             toast.error("Không tải được dữ liệu lương");
@@ -92,7 +92,10 @@ const SalaryManagement = () => {
 
         return matchSearch && matchRole;
     });
-
+    const handleExportPDF = () => {
+        const [year, month] = monthYear.split("-").map(Number);
+        exportSalaryPDF(month, year);
+    };
     return (
         <>
             {/* HEADER */}
@@ -142,10 +145,17 @@ const SalaryManagement = () => {
 
                     <div style={Styles.rightActions}>
                         {/* EXPORT PDF */}
-                        <button style={stylesButton.btnPdf}>
-                            <FileText size={18} />
-                            Xuất PDF
+                        <button style={stylesButton.btnAdd}>
+                            <DollarSign size={18} />
+                            Chốt Lương ({monthYear})
                         </button>
+                        {/* EXPORT PDF */}
+                        <button
+    style={stylesButton.btnPdf}
+    onClick={handleExportPDF}
+>
+    💰 Xuất bảng lương PDF
+</button>
 
                         {/* EXPORT EXCEL */}
                         <button style={stylesButton.btnExcel}>

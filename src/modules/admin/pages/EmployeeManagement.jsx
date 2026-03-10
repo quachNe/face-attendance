@@ -46,8 +46,6 @@ const EmployeeManagement = () => {
     phone: "",
     role: "",
     shift_id: "",
-    face_preview: null,
-    face_file: null,
     base_salary: "",
   });
 
@@ -256,6 +254,7 @@ const EmployeeManagement = () => {
         shift_id: u.shift_id || null,
         shift_name: u.shift_name || "",
         base_salary: u.base_salary || "",
+        face_image: u.face_image,
       }));
       
       const userNotRootAdmin = mappedUsers.filter(

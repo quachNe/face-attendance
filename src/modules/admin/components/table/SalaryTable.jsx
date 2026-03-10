@@ -37,7 +37,8 @@ const SalaryTable = ({
                                 "Chức vụ",
                                 "Lương cơ bản",
                                 "Ngày đi làm",
-                                "Ngày nghỉ",
+                                "Vắng phép",
+                                "Vắng không phép",
                                 "Phút trễ",
                                 "Phút về sớm",
                                 "Phút OT",
@@ -88,6 +89,7 @@ const SalaryTable = ({
                                         <td style={styleTable.td}>{formatCurrency(salary.base_salary)}</td>
                                         <td style={styleTable.td}>{salary.total_working_days}</td>
                                         <td style={styleTable.td}>{salary.leave_days}</td>
+                                        <td style={styleTable.td}>{salary.absent_days}</td>
                                         <td style={{ ...styleTable.td, color: "#f59e0b" }}>{salary.total_late_minutes}</td>
                                         <td style={{ ...styleTable.td, color: "#f97316" }}>{salary.total_early_minutes}</td>
                                         <td style={{ ...styleTable.td, color: "#9333ea" }}>{salary.total_overtime_minutes}</td>

@@ -10,6 +10,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
         const handleEsc = (e) => {
             if (e.key === "Escape" && show) handleClose();
         };
+
         document.addEventListener("keydown", handleEsc);
         return () => document.removeEventListener("keydown", handleEsc);
     }, [show]);
@@ -25,22 +26,31 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
     if (!show || !salary) return null;
 
-    const formatMoney = (v) =>
-        new Intl.NumberFormat("vi-VN").format(Math.round(v)) + " ₫";
+    /* ======================
+       FORMAT TIỀN
+    ====================== */
 
+    const formatMoney = (v = 0) =>
+        new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            maximumFractionDigits: 0
+        }).format(v);
 
-    /* ================================
+    /* ======================
        CÔNG THỨC TÍNH LƯƠNG
-    ================================= */
+    ====================== */
 
     const STANDARD_WORKING_DAYS = 26;
     const MINUTES_IN_WORKDAY = 8 * 60;
 
     const baseSalary = salary.base_salary || 0;
 
-    const dailySalary = baseSalary / STANDARD_WORKING_DAYS;
+    const dailySalary =
+        baseSalary / STANDARD_WORKING_DAYS;
 
-    const minutePenalty = dailySalary / MINUTES_IN_WORKDAY;
+    const minutePenalty =
+        dailySalary / MINUTES_IN_WORKDAY;
 
     const totalLateEarly =
         (salary.total_late_minutes || 0) +
@@ -62,11 +72,15 @@ const SalaryModal = ({ show, salary, onClose }) => {
         salaryFromDays + overtimeBonus;
 
     const netSalary =
-        totalSalary - deductions;
-
+        Math.max(0, totalSalary - deductions);
 
     return (
-        <div style={styleModel.modalOverlay}>
+
+        <div
+            style={styleModel.modalOverlay}
+            onClick={handleClose}
+        >
+
             <div
                 onClick={(e) => e.stopPropagation()}
                 style={{
@@ -75,24 +89,38 @@ const SalaryModal = ({ show, salary, onClose }) => {
                     padding: "34px",
                     transform: animate ? "translateY(0)" : "translateY(-40px)",
                     opacity: animate ? 1 : 0,
-                    transition: "all 0.25s ease",
+                    transition: "all 0.25s ease"
                 }}
             >
 
                 {/* CLOSE */}
-                <button onClick={handleClose} style={styleModel.btnClose}>
+                <button
+                    onClick={handleClose}
+                    style={styleModel.btnClose}
+                >
                     <X size={20}/>
                 </button>
 
-                {/* TITLE */}
+
+                {/* HEADER */}
                 <div style={styles.header}>
+
                     <h2 style={styles.title}>
                         BẢNG LƯƠNG THÁNG {salary.month}/{salary.year}
                     </h2>
+
                     <div style={styles.titleLine}/>
+
+                    <div style={{
+                        ...styles.status,
+                        color: salary.is_paid ? "#22c55e" : "#facc15"
+                    }}>
+                        {salary.is_paid ? "Đã chốt" : "Chưa chốt"}
+                    </div>
+
                 </div>
 
-                {/* BODY */}
+
                 <div style={styles.layout}>
 
                     {/* LEFT */}
@@ -104,6 +132,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
                                 <Info label="Mã nhân viên:" value={salary.user_id}/>
                                 <Info label="Họ và tên:" value={salary.name}/>
+
                                 <Info label="Mã tài khoản:" value={salary.employee_code}/>
 
                                 <Info
@@ -128,11 +157,17 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
                             <div style={styles.infoGrid}>
 
-                                <Info label="Số ngày làm việc:" value={salary.total_working_days}/>
+                                <Info
+                                    label="Số ngày làm việc:"
+                                    value={`${salary.total_working_days} / ${STANDARD_WORKING_DAYS}`}
+                                />
+
                                 <Info label="Số ngày nghỉ phép:" value={salary.leave_days}/>
                                 <Info label="Số ngày vắng:" value={salary.absent_days}/>
+
                                 <Info label="Số phút đi trễ:" value={salary.total_late_minutes}/>
                                 <Info label="Số phút về sớm:" value={salary.total_early_minutes}/>
+
                                 <Info label="Số phút tăng ca:" value={salary.total_overtime_minutes}/>
 
                             </div>
@@ -148,20 +183,33 @@ const SalaryModal = ({ show, salary, onClose }) => {
                         <Section title="3. Chi tiết tính lương">
 
                             <SalaryRow
-                                title="Lương theo ngày"
+                                title="Lương cơ bản"
+                                result={formatMoney(baseSalary)}
+                            />
+
+                            <SalaryRow
+                                title="Lương ngày"
                                 formula={`${salary.total_working_days} ngày × ${formatMoney(dailySalary)}`}
                                 result={formatMoney(salaryFromDays)}
                             />
 
                             <SalaryRow
                                 title="Thưởng tăng ca"
-                                formula={`${salary.total_overtime_minutes} phút × ${formatMoney(otBonusPerMinute)}`}
+                                formula={
+                                    salary.total_overtime_minutes > 0
+                                        ? `${salary.total_overtime_minutes} phút × ${formatMoney(otBonusPerMinute)}`
+                                        : "-"
+                                }
                                 result={formatMoney(overtimeBonus)}
                             />
 
                             <SalaryRow
                                 title="Khấu trừ đi trễ / về sớm"
-                                formula={`${totalLateEarly} phút × ${formatMoney(minutePenalty)}`}
+                                formula={
+                                    totalLateEarly > 0
+                                        ? `${totalLateEarly} phút × ${formatMoney(minutePenalty)}`
+                                        : "-"
+                                }
                                 result={`- ${formatMoney(deductions)}`}
                             />
 
@@ -174,13 +222,13 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
                             <div style={styles.totalRow}>
                                 <span>Tổng khấu trừ</span>
-                                <span>- {formatMoney(deductions)}</span>
+                                <span>{formatMoney(deductions)}</span>
                             </div>
 
                         </Section>
 
-                        {/* THỰC LÃNH */}
 
+                        {/* THỰC LÃNH */}
                         <div style={styles.finalBox}>
 
                             <div style={styles.finalLabel}>
@@ -198,6 +246,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
                 </div>
 
             </div>
+
         </div>
     );
 };
@@ -205,9 +254,9 @@ const SalaryModal = ({ show, salary, onClose }) => {
 export default SalaryModal;
 
 
-/* ================================
+/* ======================
    COMPONENT PHỤ
-================================ */
+====================== */
 
 const Info = ({ label, value }) => (
     <div>
@@ -234,9 +283,9 @@ const SalaryRow = ({ title, formula, result }) => (
 const Divider = () => <hr style={styles.divider}/>;
 
 
-/* ================================
+/* ======================
    STYLE
-================================ */
+====================== */
 
 const styles = {
 
@@ -258,6 +307,12 @@ const styles = {
         background: "#3b82f6",
         margin: "10px auto 0",
         borderRadius: 3
+    },
+
+    status: {
+        marginTop: 8,
+        fontSize: 13,
+        fontWeight: 600
     },
 
     layout: {
@@ -294,7 +349,7 @@ const styles = {
     salaryRow: {
         display: "grid",
         gridTemplateColumns: "1.4fr 1fr 0.8fr",
-        padding: "7px 0",
+        padding: "10px 0",
         fontSize: 14,
         alignItems: "center"
     },
