@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,17 +9,10 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-
-/* ================= DATA TĨNH ================= */
-
-const salaryData = [
-  { month: "01", total: 120000000 },
-  { month: "02", total: 135000000 },
-  { month: "03", total: 142000000 },
-  { month: "04", total: 150000000 },
-  { month: "05", total: 148000000 },
-  { month: "06", total: 160000000 },
-];
+import { getSalaryChart } from "../../../../services/StatisficalService";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { DollarSign, Calendar} from "lucide-react";
 
 /* ================= FORMAT TIỀN ================= */
 
@@ -30,33 +23,67 @@ const formatMoney = (value) =>
 
 const MonthlySalaryChart = () => {
 
+  const [salaryData, setSalaryData] = useState([]);
+  const [year, setYear] = useState(new Date());
+
+  useEffect(() => {
+    fetchSalary();
+  }, [year]);
+
+  const fetchSalary = async () => {
+
+    try {
+
+      const selectedYear = year.getFullYear();
+
+      const { data } = await getSalaryChart(selectedYear);
+
+      const monthly = data.monthly_breakdown || [];
+
+      const chartData = monthly.map((v, i) => ({
+        month: String(i + 1).padStart(2, "0"),
+        total: v,
+      }));
+
+      setSalaryData(chartData);
+
+    } catch (err) {
+      console.error("Load salary chart error:", err);
+    }
+  };
+
   return (
-    <div
-      style={{
-        background: "linear-gradient(180deg,#020617,#030712)",
-        borderRadius: 18,
-        border: "1px solid #1e293b",
-        padding: 20,
-        marginBottom: 50,
-      }}
-    >
+    <div style={styles.container}>
 
       {/* HEADER */}
 
-      <div
-        style={{
-          fontSize: 16,
-          fontWeight: 700,
-          color: "#e5e7eb",
-          marginBottom: 16,
-        }}
-      >
-        💰 TỔNG LƯƠNG THEO THÁNG
+      <div style={styles.header}>
+
+        <div style={styles.title}>
+          <DollarSign size={18}/>
+          TỔNG LƯƠNG THEO NĂM {year.getFullYear()}
+        </div>
+
+        {/* YEAR PICKER */}
+
+        <div style={styles.yearContainer}>
+          <DatePicker
+            selected={year}
+            onChange={(date) => setYear(date)}
+            showYearPicker
+            dateFormat="yyyy"
+            showPopperArrow={false}
+            customInput={<input style={styles.yearPicker} />}
+          />
+
+          <Calendar size={18} style={styles.calendarIcon} />
+        </div>
+
       </div>
 
       {/* CHART */}
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={450}>
         <LineChart data={salaryData}>
 
           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -69,16 +96,12 @@ const MonthlySalaryChart = () => {
 
           <YAxis
             stroke="#64748b"
-            tickFormatter={(v) => (v / 1000000) + "M"}
+            tickFormatter={(v) => v / 1000000 + "M"}
           />
 
           <Tooltip
             formatter={(value) => formatMoney(value)}
-            contentStyle={{
-              background: "#020617",
-              border: "1px solid #334155",
-              borderRadius: 10,
-            }}
+            contentStyle={styles.tooltip}
           />
 
           <Legend />
@@ -89,6 +112,7 @@ const MonthlySalaryChart = () => {
             stroke="#22c55e"
             strokeWidth={3}
             dot={{ r: 4 }}
+            activeDot={{ r: 6 }}
             name="Tổng lương"
           />
 
@@ -100,3 +124,66 @@ const MonthlySalaryChart = () => {
 };
 
 export default MonthlySalaryChart;
+
+
+/* ================= STYLES ================= */
+
+const styles = {
+
+  container: {
+    background: "linear-gradient(180deg,#020617,#030712)",
+    borderRadius: 18,
+    border: "1px solid #1e293b",
+    padding: 20,
+    marginBottom: 50,
+    position: "relative",
+  },
+
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+
+  title: {
+    display: "flex",
+    justifyContent: "center",
+    fontSize: 18,
+    fontWeight: 700,
+    color: "#e5e7eb",
+    gap: 6,
+  },
+
+  yearContainer: {
+    width: 160,
+    position: "relative",
+  },
+
+  yearPicker: {
+    width: "100%",
+    padding: "6px 30px 6px 10px",
+    borderRadius: 10,
+    border: "1px solid #3b4a6b",
+    background: "transparent",
+    color: "#fff",
+    textAlign: "center"
+  },
+
+  calendarIcon: {
+    position: "absolute",
+    right: 8,
+    top: "50%",
+    transform: "translateY(-50%)",
+    pointerEvents: "none"
+  },
+
+  tooltip: {
+    marginTop:10,
+    background: "#020617",
+    border: "1px solid #334155",
+    borderRadius: 10,
+    color: "#e5e7eb",
+  },
+
+};

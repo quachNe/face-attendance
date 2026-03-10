@@ -42,37 +42,30 @@ const SalaryModal = ({ show, salary, onClose }) => {
     ====================== */
 
     const STANDARD_WORKING_DAYS = 26;
-    const MINUTES_IN_WORKDAY = 8 * 60;
 
     const baseSalary = salary.base_salary || 0;
 
     const dailySalary =
         baseSalary / STANDARD_WORKING_DAYS;
 
-    const minutePenalty =
-        dailySalary / MINUTES_IN_WORKDAY;
+    const salaryFromDays =
+        dailySalary * (salary.total_working_days || 0);
 
     const totalLateEarly =
         (salary.total_late_minutes || 0) +
         (salary.total_early_minutes || 0);
 
-    const deductions =
-        minutePenalty * totalLateEarly;
+    /* lấy trực tiếp từ backend */
 
-    const otBonusPerMinute =
-        minutePenalty * 1.5;
+    const overtimeBonus = salary.overtime_bonus || 0;
 
-    const overtimeBonus =
-        (salary.total_overtime_minutes || 0) * otBonusPerMinute;
-
-    const salaryFromDays =
-        dailySalary * (salary.total_working_days || 0);
+    const deductions = salary.deductions || 0;
 
     const totalSalary =
         salaryFromDays + overtimeBonus;
 
     const netSalary =
-        Math.max(0, totalSalary - deductions);
+        salary.net_salary || 0;
 
     return (
 
@@ -130,7 +123,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
                             <div style={styles.infoGrid}>
 
-                                <Info label="Mã nhân viên:" value={salary.user_id}/>
+                                <Info label="Mã nhân viên:" value={salary.employee_id}/>
                                 <Info label="Họ và tên:" value={salary.name}/>
 
                                 <Info label="Mã tài khoản:" value={salary.employee_code}/>
@@ -168,7 +161,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
                                 <Info label="Số phút đi trễ:" value={salary.total_late_minutes}/>
                                 <Info label="Số phút về sớm:" value={salary.total_early_minutes}/>
 
-                                <Info label="Số phút tăng ca:" value={salary.total_overtime_minutes}/>
+                                <Info label="Số phút tăng ca:" value={salary.overtime_minutes}/>
 
                             </div>
 
@@ -197,7 +190,7 @@ const SalaryModal = ({ show, salary, onClose }) => {
                                 title="Thưởng tăng ca"
                                 formula={
                                     salary.total_overtime_minutes > 0
-                                        ? `${salary.total_overtime_minutes} phút × ${formatMoney(otBonusPerMinute)}`
+                                        ? `${salary.overtime_bonus} phút × ${formatMoney(otBonusPerMinute)}`
                                         : "-"
                                 }
                                 result={formatMoney(overtimeBonus)}

@@ -25,7 +25,7 @@ const SystemStatistics = () => {
 
       <div style={systemStyle.scrollContainer}>
         <StatisticalCard />
-        <StatisticalFeaturedEmployee />
+        {/* <StatisticalFeaturedEmployee /> */}
         <StatisticalChart />
         <MonthlySalaryChart />
       </div>

@@ -13,7 +13,9 @@ import {
   CartesianGrid,
 } from "recharts";
 import { getAttendanceChart } from "../../../../services/StatisficalService";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { BarChart3 , Calendar} from "lucide-react";
 /* ================= COLORS ================= */
 
 const COLORS = {
@@ -38,9 +40,7 @@ const DEFAULT_PIE = [
 
 const StatisticalChart = () => {
 
-  const [month, setMonth] = useState(
-    new Date().toISOString().slice(0, 7)
-  );
+  const [month, setMonth] = useState(new Date());
 
   const [lineData, setLineData] = useState([]);
   const [pieData, setPieData] = useState(DEFAULT_PIE);
@@ -53,7 +53,9 @@ const StatisticalChart = () => {
 
       try {
 
-        const res = await getAttendanceChart(month);
+        const monthStr = month.toISOString().slice(0,7);
+
+        const res = await getAttendanceChart(monthStr);
 
         /* ========= LINE DATA ========= */
 
@@ -132,51 +134,42 @@ const StatisticalChart = () => {
         }}
       >
 
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: "#e5e7eb",
-          }}
-        >
-          📊 THỐNG KÊ ĐIỂM DANH THEO THÁNG
+        <div style={styles.title}>
+          <BarChart3  size={18}/>
+            THỐNG KÊ ĐIỂM DANH TRONG THÁNG {month.getMonth()+1} NĂM {month.getFullYear()}
         </div>
 
-        <div style={{ position: "relative" }}>
-
-          <input
-            type="month"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            style={{
-              width: 170,
-              height: 38,
-              background: "#020617",
-              border: "1px solid #334155",
-              borderRadius: 10,
-              padding: "6px 12px",
-              cursor: "pointer",
-              colorScheme: "dark",
-              color: "transparent",
-            }}
+        {/* DATE PICKER */}
+        
+        <div style={styles.yearContainer}>
+          <DatePicker
+            selected={month}
+            onChange={(date) => setMonth(date)}
+            showMonthYearPicker
+            dateFormat="MM/yyyy"
+            maxDate={new Date()}
+            popperPlacement="bottom-end"
+            popperStrategy="fixed"
+            showPopperArrow={false}
+            portalId="root"
+            customInput={
+              <input
+                style={{
+                  width: 170,
+                  height: 38,
+                  background: "#020617",
+                  border: "1px solid #334155",
+                  borderRadius: 10,
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  color: "#e5e7eb",
+                  textAlign: "center",
+                }}
+              />
+            }
           />
-
-          <div
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#e5e7eb",
-              pointerEvents: "none",
-              fontSize: 13,
-            }}
-          >
-            {`Tháng ${month.slice(5)} năm ${month.slice(0, 4)}`}
-          </div>
-
+          <Calendar size={18} style={styles.calendarIcon} />
         </div>
-
       </div>
 
       {/* ================= CONTENT ================= */}
@@ -231,49 +224,11 @@ const StatisticalChart = () => {
 
               <Legend />
 
-              <Line
-                type="monotone"
-                dataKey="onTime"
-                stroke={COLORS.onTime}
-                strokeWidth={3}
-                name="Đúng giờ"
-              />
-
-              <Line
-                type="monotone"
-                dataKey="late"
-                stroke={COLORS.late}
-                strokeWidth={3}
-                strokeDasharray="6 4"
-                name="Đi trễ"
-              />
-
-              <Line
-                type="monotone"
-                dataKey="ot"
-                stroke={COLORS.ot}
-                strokeWidth={3}
-                strokeDasharray="2 4"
-                name="Tăng ca"
-              />
-
-              <Line
-                type="monotone"
-                dataKey="leave"
-                stroke={COLORS.leave}
-                strokeWidth={3}
-                strokeDasharray="10 4"
-                name="Nghỉ phép"
-              />
-
-              <Line
-                type="monotone"
-                dataKey="absent"
-                stroke={COLORS.absent}
-                strokeWidth={3}
-                strokeDasharray="4 4"
-                name="Vắng"
-              />
+              <Line type="monotone" dataKey="onTime" stroke={COLORS.onTime} strokeWidth={3} name="Đúng giờ" />
+              <Line type="monotone" dataKey="late" stroke={COLORS.late} strokeWidth={3} strokeDasharray="6 4" name="Đi trễ" />
+              <Line type="monotone" dataKey="ot" stroke={COLORS.ot} strokeWidth={3} strokeDasharray="2 4" name="Tăng ca" />
+              <Line type="monotone" dataKey="leave" stroke={COLORS.leave} strokeWidth={3} strokeDasharray="10 4" name="Nghỉ phép" />
+              <Line type="monotone" dataKey="absent" stroke={COLORS.absent} strokeWidth={3} strokeDasharray="4 4" name="Vắng" />
 
             </LineChart>
 
@@ -359,3 +314,27 @@ const StatisticalChart = () => {
 };
 
 export default StatisticalChart;
+
+const styles = {
+  yearContainer: {
+    width: 160,
+    position: "relative",
+  },
+
+  calendarIcon: {
+    position: "absolute",
+    right: 8,
+    top: "50%",
+    transform: "translateY(-50%)",
+    pointerEvents: "none"
+  },
+
+  title: {
+    display: "flex",
+    justifyContent: "center",
+    fontSize: 18,
+    fontWeight: 700,
+    color: "#e5e7eb",
+    gap: 6,
+  },
+};

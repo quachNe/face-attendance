@@ -151,11 +151,11 @@ const SalaryManagement = () => {
                         </button>
                         {/* EXPORT PDF */}
                         <button
-    style={stylesButton.btnPdf}
-    onClick={handleExportPDF}
->
-    💰 Xuất bảng lương PDF
-</button>
+                            style={stylesButton.btnPdf}
+                            onClick={handleExportPDF}
+                        >
+                            💰 Xuất bảng lương PDF
+                        </button>
 
                         {/* EXPORT EXCEL */}
                         <button style={stylesButton.btnExcel}>

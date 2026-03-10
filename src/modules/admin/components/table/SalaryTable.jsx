@@ -92,7 +92,7 @@ const SalaryTable = ({
                                         <td style={styleTable.td}>{salary.absent_days}</td>
                                         <td style={{ ...styleTable.td, color: "#f59e0b" }}>{salary.total_late_minutes}</td>
                                         <td style={{ ...styleTable.td, color: "#f97316" }}>{salary.total_early_minutes}</td>
-                                        <td style={{ ...styleTable.td, color: "#9333ea" }}>{salary.total_overtime_minutes}</td>
+                                        <td style={{ ...styleTable.td, color: "#9333ea" }}>{salary.overtime_minutes}</td>
                                         {/* NÚT XEM CHI TIẾT */}
                                         <td style={styleTable.td}>
                                             <div style={stylesButton.actionIcons}>
