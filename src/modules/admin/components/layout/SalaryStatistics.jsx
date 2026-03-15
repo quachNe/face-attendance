@@ -13,11 +13,7 @@ import { getSalaryChart } from "../../../../services/StatisficalService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { DollarSign, Calendar} from "lucide-react";
-
-/* ================= FORMAT TIỀN ================= */
-
-const formatMoney = (value) =>
-  value.toLocaleString("vi-VN") + " đ";
+import {formatMoney} from "../../../../utils/formatMoney"
 
 /* ================= COMPONENT ================= */
 

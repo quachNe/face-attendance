@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User, Settings, Lock, LogOut, Menu } from "lucide-react";
+import { User, Settings, Lock, LogOut, Menu, PanelLeft, PanelRight} from "lucide-react";
 import ChangePassword from "../modal/ChangePassword";
 import UserProfile from "../modal/UserProfile";
 import { useAuth } from "../../../../context/AuthContext";
@@ -76,7 +76,7 @@ const Navbar = ({ collapsed, setCollapsed }) => {
             onClick={() => setCollapsed(!collapsed)}
             title={collapsed ? "Mở thanh bên" : "Đóng thanh bên"}
           >
-            <Menu size={22} />
+            {collapsed ? <PanelRight size={22} /> : <PanelLeft size={22} />}
           </div>
         </div>
 

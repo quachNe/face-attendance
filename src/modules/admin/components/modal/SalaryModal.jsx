@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { styleModel } from "../../style/Styles";
+import {formatMoney} from "../../../../utils/formatMoney"
+
 
 const SalaryModal = ({ show, salary, onClose }) => {
 
@@ -27,21 +29,11 @@ const SalaryModal = ({ show, salary, onClose }) => {
     if (!show || !salary) return null;
 
     /* ======================
-       FORMAT TIỀN
-    ====================== */
-
-    const formatMoney = (v = 0) =>
-        new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-            maximumFractionDigits: 0
-        }).format(v);
-
-    /* ======================
        CÔNG THỨC TÍNH LƯƠNG
     ====================== */
 
     const STANDARD_WORKING_DAYS = 26;
+    const MINUTES_IN_WORKDAY = 8 * 60;
 
     const baseSalary = salary.base_salary || 0;
 
@@ -55,10 +47,15 @@ const SalaryModal = ({ show, salary, onClose }) => {
         (salary.total_late_minutes || 0) +
         (salary.total_early_minutes || 0);
 
+    const minutePenalty =
+        dailySalary / MINUTES_IN_WORKDAY;
+
+    const otBonusPerMinute =
+        minutePenalty * 1.5;
+
     /* lấy trực tiếp từ backend */
 
     const overtimeBonus = salary.overtime_bonus || 0;
-
     const deductions = salary.deductions || 0;
 
     const totalSalary =
@@ -71,7 +68,6 @@ const SalaryModal = ({ show, salary, onClose }) => {
 
         <div
             style={styleModel.modalOverlay}
-            onClick={handleClose}
         >
 
             <div
@@ -94,7 +90,6 @@ const SalaryModal = ({ show, salary, onClose }) => {
                     <X size={20}/>
                 </button>
 
-
                 {/* HEADER */}
                 <div style={styles.header}>
 
@@ -108,11 +103,10 @@ const SalaryModal = ({ show, salary, onClose }) => {
                         ...styles.status,
                         color: salary.is_paid ? "#22c55e" : "#facc15"
                     }}>
-                        {salary.is_paid ? "Đã chốt" : "Chưa chốt"}
+                        {salary.is_paid ? "Đã thanh toán" : "Chưa thanh toán"}
                     </div>
 
                 </div>
-
 
                 <div style={styles.layout}>
 
@@ -151,17 +145,18 @@ const SalaryModal = ({ show, salary, onClose }) => {
                             <div style={styles.infoGrid}>
 
                                 <Info
-                                    label="Số ngày làm việc:"
+                                    label="Ngày công tính lương:"
                                     value={`${salary.total_working_days} / ${STANDARD_WORKING_DAYS}`}
                                 />
 
-                                <Info label="Số ngày nghỉ phép:" value={salary.leave_days}/>
-                                <Info label="Số ngày vắng:" value={salary.absent_days}/>
+                                <Info label="Ngày đi làm:" value={salary.actual_work_days}/>
+                                <Info label="Nghỉ phép:" value={salary.leave_days}/>
+                                <Info label="Vắng không phép:" value={salary.absent_days}/>
 
-                                <Info label="Số phút đi trễ:" value={salary.total_late_minutes}/>
-                                <Info label="Số phút về sớm:" value={salary.total_early_minutes}/>
+                                <Info label="Phút đi trễ:" value={salary.total_late_minutes}/>
+                                <Info label="Phút về sớm:" value={salary.total_early_minutes}/>
 
-                                <Info label="Số phút tăng ca:" value={salary.overtime_minutes}/>
+                                <Info label="Phút tăng ca:" value={salary.overtime_minutes}/>
 
                             </div>
 
@@ -181,6 +176,11 @@ const SalaryModal = ({ show, salary, onClose }) => {
                             />
 
                             <SalaryRow
+                                title="Lương 1 ngày"
+                                result={formatMoney(dailySalary)}
+                            />
+
+                            <SalaryRow
                                 title="Lương ngày"
                                 formula={`${salary.total_working_days} ngày × ${formatMoney(dailySalary)}`}
                                 result={formatMoney(salaryFromDays)}
@@ -189,8 +189,8 @@ const SalaryModal = ({ show, salary, onClose }) => {
                             <SalaryRow
                                 title="Thưởng tăng ca"
                                 formula={
-                                    salary.total_overtime_minutes > 0
-                                        ? `${salary.overtime_bonus} phút × ${formatMoney(otBonusPerMinute)}`
+                                    salary.overtime_minutes > 0
+                                        ? `${salary.overtime_minutes} phút × ${formatMoney(otBonusPerMinute)}`
                                         : "-"
                                 }
                                 result={formatMoney(overtimeBonus)}

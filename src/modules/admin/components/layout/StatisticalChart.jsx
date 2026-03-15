@@ -90,8 +90,8 @@ const StatisticalChart = () => {
           { name: "Đúng giờ", value: pieMap["Đúng giờ"] },
           { name: "Đi trễ", value: pieMap["Đi trễ"] },
           { name: "Tăng ca", value: pieMap["Tăng ca"] },
-          { name: "Nghỉ phép", value: pieMap["Nghỉ phép"] },
-          { name: "Vắng", value: pieMap["Vắng"] },
+          { name: "Có phép", value: pieMap["Nghỉ phép"] },
+          { name: "Không phép", value: pieMap["Vắng"] },
         ];
 
         setPieData(normalizedPie);
@@ -227,8 +227,8 @@ const StatisticalChart = () => {
               <Line type="monotone" dataKey="onTime" stroke={COLORS.onTime} strokeWidth={3} name="Đúng giờ" />
               <Line type="monotone" dataKey="late" stroke={COLORS.late} strokeWidth={3} strokeDasharray="6 4" name="Đi trễ" />
               <Line type="monotone" dataKey="ot" stroke={COLORS.ot} strokeWidth={3} strokeDasharray="2 4" name="Tăng ca" />
-              <Line type="monotone" dataKey="leave" stroke={COLORS.leave} strokeWidth={3} strokeDasharray="10 4" name="Nghỉ phép" />
-              <Line type="monotone" dataKey="absent" stroke={COLORS.absent} strokeWidth={3} strokeDasharray="4 4" name="Vắng" />
+              <Line type="monotone" dataKey="leave" stroke={COLORS.leave} strokeWidth={3} strokeDasharray="10 4" name="Có phép" />
+              <Line type="monotone" dataKey="absent" stroke={COLORS.absent} strokeWidth={3} strokeDasharray="4 4" name="Không phép" />
 
             </LineChart>
 

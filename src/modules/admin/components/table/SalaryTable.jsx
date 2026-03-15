@@ -2,6 +2,7 @@ import React from "react";
 import { styleTable, stylesButton } from "../../style/Styles";
 import Tooltip from "./Tooltip";
 import { Eye } from "lucide-react";
+import {formatMoney} from "../../../../utils/formatMoney"
 const SalaryTable = ({
     loading,
     salaries,
@@ -11,11 +12,6 @@ const SalaryTable = ({
     setHoverIcon,
     onViewSalary
 }) => {
-
-    const formatCurrency = (value) => {
-        if (!value) return "0 ₫";
-        return value.toLocaleString("vi-VN") + " ₫";
-    };
 
     return (
         <div style={{ position: "relative" }}>
@@ -36,6 +32,7 @@ const SalaryTable = ({
                                 "Mã nhân viên",
                                 "Chức vụ",
                                 "Lương cơ bản",
+                                "Ngày công",
                                 "Ngày đi làm",
                                 "Vắng phép",
                                 "Vắng không phép",
@@ -81,13 +78,14 @@ const SalaryTable = ({
                                             style={{
                                                 ...styleTable.td,
                                                 fontWeight: 600,
-                                                color:salary.role === "ADMIN" ? "#dc2626" : "#16a34a",
+                                                color:salary.role === "admin" ? "#dc2626" : "#16a34a",
                                             }}
                                         >
-                                            {salary.role === "ADMIN" ? "Quản trị viên" : "Nhân viên"}
+                                            {salary.role === "admin" ? "Quản trị viên" : "Nhân viên"}
                                         </td>
-                                        <td style={styleTable.td}>{formatCurrency(salary.base_salary)}</td>
+                                        <td style={styleTable.td}>{formatMoney(salary.base_salary)}</td>
                                         <td style={styleTable.td}>{salary.total_working_days}</td>
+                                        <td style={styleTable.td}>{salary.actual_work_days}</td>
                                         <td style={styleTable.td}>{salary.leave_days}</td>
                                         <td style={styleTable.td}>{salary.absent_days}</td>
                                         <td style={{ ...styleTable.td, color: "#f59e0b" }}>{salary.total_late_minutes}</td>
