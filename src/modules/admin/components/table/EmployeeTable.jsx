@@ -149,7 +149,7 @@ const EmployeeTable = ({
                           </Tooltip>
 
                           {/* DELETE */}
-                          <Tooltip text="Xóa">
+                          {/* <Tooltip text="Xóa">
                             <div
                               style={{
                                 ...stylesButton.iconBoxDelete,
@@ -175,7 +175,7 @@ const EmployeeTable = ({
                             >
                               <Trash2 size={15} />
                             </div>
-                          </Tooltip>
+                          </Tooltip> */}
                         </div>
                       </td>
                     </tr>

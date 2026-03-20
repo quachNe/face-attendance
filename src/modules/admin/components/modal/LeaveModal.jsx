@@ -15,6 +15,13 @@ const LeaveModal = ({ show, leave, onClose, onUpdateStatus }) => {
         return () => document.removeEventListener("keydown", handleEsc);
     }, [show]);
 
+    /* ========= LOAD COMMENT ========= */
+    useEffect(() => {
+        if (leave) {
+            setResponse(leave.comment || "");
+        }
+    }, [leave]);
+
     /* ========= OPEN ANIMATION ========= */
     useEffect(() => {
         if (show) setTimeout(() => setAnimate(true), 10);
@@ -47,7 +54,7 @@ const LeaveModal = ({ show, leave, onClose, onUpdateStatus }) => {
 
     const days =
         Math.ceil(
-        (new Date(leave.end_date) - new Date(leave.start_date)) /
+            (new Date(leave.end_date) - new Date(leave.start_date)) /
             (1000 * 60 * 60 * 24)
         ) + 1;
 
@@ -79,18 +86,19 @@ const LeaveModal = ({ show, leave, onClose, onUpdateStatus }) => {
                     <Info label="Nhân viên" value={leave.user_name} />
                     <Info label="Loại nghỉ" value={leaveTypeMap[leave.leave_type]} />
 
-                <Info label="Ngày gửi" value={formatDateTime(leave.created_at)} />
-                <div>
-                    <div style={styles.label}>Trạng thái</div>
-                    <div
-                    style={{
-                        ...styles.statusBadge,
-                        background: statusMap[leave.status].color,
-                    }}
-                    >
-                    {statusMap[leave.status].text}
+                    <Info label="Ngày gửi" value={formatDateTime(leave.created_at)} />
+
+                    <div>
+                        <div style={styles.label}>Trạng thái</div>
+                        <div
+                            style={{
+                                ...styles.statusBadge,
+                                background: statusMap[leave.status].color,
+                            }}
+                        >
+                            {statusMap[leave.status].text}
+                        </div>
                     </div>
-                </div>
 
                     <div style={styles.dateRow}>
                         <Info label="Từ ngày" value={formatDate(leave.start_date)} />
@@ -101,17 +109,23 @@ const LeaveModal = ({ show, leave, onClose, onUpdateStatus }) => {
 
                 {/* ================= LÝ DO ================= */}
                 <Section title="Lý do nghỉ">
-                <div style={styles.box}>{leave.reason}</div>
+                    <div style={styles.box}>{leave.reason}</div>
                 </Section>
 
                 {/* ================= PHẢN HỒI ================= */}
                 <Section title="Phản hồi của quản lý">
-                    <textarea
-                        style={styles.textarea}
-                        placeholder="Nhập phản hồi..."
-                        value={response}
-                        onChange={(e) => setResponse(e.target.value)}
-                    />
+                    {leave.status === "pending" ? (
+                        <textarea
+                            style={styles.textarea}
+                            placeholder="Nhập phản hồi..."
+                            value={response}
+                            onChange={(e) => setResponse(e.target.value)}
+                        />
+                    ) : (
+                        <div style={styles.box}>
+                            {leave.admin_comment || "Không có phản hồi"}
+                        </div>
+                    )}
                 </Section>
 
                 {/* ================= ACTION ================= */}
@@ -119,16 +133,22 @@ const LeaveModal = ({ show, leave, onClose, onUpdateStatus }) => {
                     <div style={styles.actions}>
                         <button
                             style={styles.btnReject}
-                            onClick={() => onUpdateStatus(leave.id, "REJECTED", response) }
+                            onClick={() => {
+                                onUpdateStatus(leave.id, "REJECTED", response);
+                                setResponse(""); // reset
+                            }}
                         >
                             <XCircle size={18} /> Từ chối
                         </button>
 
                         <button
                             style={styles.btnApprove}
-                            onClick={() => onUpdateStatus(leave.id, "APPROVED", response) }
+                            onClick={() => {
+                                onUpdateStatus(leave.id, "APPROVED", response);
+                                setResponse(""); // reset
+                            }}
                         >
-                        <CheckCircle size={18} /> Duyệt
+                            <CheckCircle size={18} /> Duyệt
                         </button>
                     </div>
                 )}

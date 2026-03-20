@@ -11,7 +11,10 @@ export const exportSalaryExcel = async (month, year) => {
     const employees = (data || []).filter(
       (u) => u.employee_code !== "admin"
     );
-
+    if (employees.length === 0) {
+      toast.warning("Không có bản ghi bảng lương để xuất");
+      return;
+    }
     const rows = employees.map((e, index) => ({
       STT: index + 1,
       "Mã nhân viên": e.employee_code,

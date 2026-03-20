@@ -203,11 +203,11 @@ const LeaveStatus = () => {
                         style={styles.eye}
                         onClick={() => setSelectedLeave(leave)}
                       />
-                      <Trash2
+                      {/* <Trash2
                         size={18}
                         style={styles.delete}
                         onClick={() => handleDelete(leave.id)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                 ))

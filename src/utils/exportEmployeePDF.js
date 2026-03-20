@@ -2,7 +2,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export const exportEmployeePDF = async (users) => {
-  if (!users || users.length === 0) return;
+  if (!users || users.length === 0) {
+    toast.warning("Không có dữ liệu để xuất PDF");
+    return;
+  }
 
   const doc = new jsPDF("p", "mm", "a4");
 

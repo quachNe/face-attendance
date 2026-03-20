@@ -52,6 +52,7 @@ const LeaveManagement = () => {
             setLoading(true);
             const { data } = await getLeave("all");
             setLeaves(data);
+            console.log(data);
         } catch (err) {
             toast.error("Lỗi tải danh sách nghỉ phép");
             console.error(err);

@@ -36,7 +36,10 @@ export const exportSalaryPDF = async (month, year) => {
   const employees = (data || []).filter(
     (u) => u.employee_code !== "admin"
   );
-
+  if (employees.length === 0) {
+    toast.warning(`Tháng ${month}/${year} chưa có bảng lương`);
+    return;
+  }
   const formatMoney = (v = 0) =>
     new Intl.NumberFormat("vi-VN").format(Math.round(v || 0)) + " ₫";
 

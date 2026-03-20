@@ -29,7 +29,7 @@ const SalaryTable = ({
                                 {[
                                 "#",
                                 "Tên nhân viên",
-                                "Mã nhân viên",
+                                "Mã tài khoản",
                                 "Chức vụ",
                                 "Lương cơ bản",
                                 "Ngày công",

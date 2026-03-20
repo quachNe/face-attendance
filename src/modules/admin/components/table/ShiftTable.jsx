@@ -110,7 +110,7 @@ const ShiftTable = ({
                         </Tooltip>
 
                         {/* DELETE */}
-                        <Tooltip text="Xóa">
+                        {/* <Tooltip text="Xóa">
                           <div
                             style={{
                               ...stylesButton.iconBase,
@@ -138,7 +138,7 @@ const ShiftTable = ({
                           >
                             <Trash2 size={15} />
                           </div>
-                        </Tooltip>
+                        </Tooltip> */}
                       </div>
                     </td>
                   </tr>

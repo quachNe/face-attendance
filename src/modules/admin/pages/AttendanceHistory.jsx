@@ -3,6 +3,7 @@ import { Styles, stylesButton, stylesForm, datePickerStyles} from "../style/Styl
 import { ClipboardCheck, RotateCcw, FileText,FileSpreadsheet} from "lucide-react";
 import { getLogs } from "../../../services/AttendanceService";
 import AttendanceTable from "../components/table/AttendanceTable";
+import { exportAttendanceToExcel } from "../../../utils/exportAttendanceToExcel";
 const AttendanceHistory = () => {
   /* ================= STATE ================= */
   // Danh sách bản ghi điểm danh lấy từ backend
@@ -107,19 +108,12 @@ const AttendanceHistory = () => {
           </button>
           {/* Nút xuất file */}
           <div style={Styles.rightActions}>
-            {/* Xuất PDF */}
-            <input
-              type="month"
-              style={{ ...stylesForm.filterSelect, width: "50%" }}
-              value={monthYear}
-              onChange={(e) => setMonthYear(e.target.value)}
-              className={"custom-date-input"} 
-            />
             {/* Xuất Excel */}
             <button
               style={stylesButton.btnExcel}
+              onClick={() => exportAttendanceToExcel(filteredRecords, date)}
             >
-              <FileSpreadsheet  size={18}/> Xuất Excel
+              <FileSpreadsheet size={18}/> Xuất Excel
             </button>
           </div>
         </div>
